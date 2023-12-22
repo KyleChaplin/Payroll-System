@@ -5,6 +5,6 @@ module org.example.project {
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
 
-    opens org.project.home to javafx.fxml;
-    exports org.project.home;
+    exports application;
+    opens application to javafx.fxml;
 }
