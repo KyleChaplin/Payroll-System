@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -25,17 +26,13 @@ public class SceneController {
     @FXML
     private TextField passwordTextField;
 
-    public void switchToSceneLogin(ActionEvent event) throws IOException {
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("views/login-view.fxml")));
-        stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
-    }
+
 
     public void loginButtonOnAction(ActionEvent event) throws IOException {
 
         int loginCheck = checkLoginDetails();
+
+        loginCheck = 1;
 
         switch (loginCheck) {
             case 0:
@@ -47,6 +44,9 @@ public class SceneController {
                 Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("views/home-view.fxml")));
                 stage = (Stage)((Node)event.getSource()).getScene().getWindow();
                 scene = new Scene(root);
+                stage.setTitle("Payroll - Home");
+                //stage.setFullScreen(true);
+                //stage.initStyle(StageStyle.DECORATED);
                 stage.setScene(scene);
                 stage.show();
                 break;

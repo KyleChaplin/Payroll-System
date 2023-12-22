@@ -7,4 +7,6 @@ module org.example.project {
 
     exports application;
     opens application to javafx.fxml;
+    exports application.home;
+    opens application.home to javafx.fxml;
 }

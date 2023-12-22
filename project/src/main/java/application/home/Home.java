@@ -1,4 +1,4 @@
-package application;
+package application.home;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -10,13 +10,12 @@ import javafx.stage.StageStyle;
 import java.io.IOException;
 import java.util.Objects;
 
-public class Main extends Application {
+public class Home extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("views/login-view.fxml")));
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("views/home-view.fxml")));
         Scene scene = new Scene(root);
-        stage.initStyle(StageStyle.DECORATED);
-        stage.setTitle("Payroll - Login");
+        stage.setTitle("Payroll - Home");
         stage.setScene(scene);
         stage.show();
     }
