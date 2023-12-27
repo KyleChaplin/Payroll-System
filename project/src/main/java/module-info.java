@@ -9,4 +9,6 @@ module org.example.project {
     opens application to javafx.fxml;
     exports application.home;
     opens application.home to javafx.fxml;
+    exports application.timeoff;
+    opens application.timeoff to javafx.fxml;
 }

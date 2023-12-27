@@ -1,5 +1,6 @@
 package application.schedule;
 
+import application.SceneController;
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -17,27 +18,27 @@ public class ScheduleController {
     }
 
     public void openDashboard(ActionEvent event) throws IOException {
-
+        SceneController.openScene(event, "home", stage, scene);
     }
 
     public void openSchedule(ActionEvent event) throws IOException {
-
+        SceneController.openScene(event, "schedule", stage, scene);
     }
 
     public void openPayroll(ActionEvent event) throws IOException {
-
+        SceneController.openScene(event, "payroll", stage, scene);
     }
 
     public void openPeople(ActionEvent event) throws IOException {
-
+        SceneController.openScene(event, "people", stage, scene);
     }
 
     public void openTimeoff(ActionEvent event) throws IOException {
-
+        SceneController.openScene(event, "timeoff", stage, scene);
     }
 
     public void openHelp(ActionEvent event) throws IOException {
-
+        SceneController.openScene(event, "help", stage, scene);
     }
 
 }

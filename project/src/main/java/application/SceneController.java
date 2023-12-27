@@ -26,8 +26,6 @@ public class SceneController {
     @FXML
     private TextField passwordTextField;
 
-
-
     public void loginButtonOnAction(ActionEvent event) throws IOException {
 
         int loginCheck = checkLoginDetails();
@@ -56,6 +54,15 @@ public class SceneController {
         }
     }
 
+    public void openScene(String url) throws IOException {
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("./views/" + url + "-view.fxml")));
+        Scene scene = new Scene(root);
+        stage.initStyle(StageStyle.DECORATED);
+        stage.setTitle("Payroll - " + url);
+        stage.setScene(scene);
+        stage.show();
+    }
+
     public void closeApplication(ActionEvent event) {
         Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
         stage.close();
@@ -76,5 +83,16 @@ public class SceneController {
         }
 
         return loginStatus;
+    }
+
+    public static void openScene(ActionEvent event, String name, Stage stg, Scene scn) throws IOException {
+        Parent root = FXMLLoader.load(Objects.requireNonNull(application.Main.class.getResource("views/" + name + "-view.fxml")));
+        stg = (Stage)((Node)event.getSource()).getScene().getWindow();
+        scn = new Scene(root);
+        stg.setTitle("Payroll - " + name);
+        stg.setScene(scn);
+        stg.show();
+
+        System.out.println("Opening " + name);
     }
 }

@@ -1,12 +1,13 @@
 package application.home;
 
+import application.SceneController;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -22,27 +23,27 @@ public class HomeController {
     }
 
     public void openDashboard(ActionEvent event) throws IOException {
-
+        SceneController.openScene(event, "home", stage, scene);
     }
 
     public void openSchedule(ActionEvent event) throws IOException {
-
+        SceneController.openScene(event, "schedule", stage, scene);
     }
 
     public void openPayroll(ActionEvent event) throws IOException {
-
+        SceneController.openScene(event, "payroll", stage, scene);
     }
 
     public void openPeople(ActionEvent event) throws IOException {
-
+        SceneController.openScene(event, "people", stage, scene);
     }
 
     public void openTimeoff(ActionEvent event) throws IOException {
-
+        SceneController.openScene(event, "timeoff", stage, scene);
     }
 
     public void openHelp(ActionEvent event) throws IOException {
-
+        SceneController.openScene(event, "help", stage, scene);
     }
 
 }

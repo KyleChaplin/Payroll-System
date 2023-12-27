@@ -38,7 +38,7 @@
                         <Insets bottom="9.0" left="9.0" right="9.0" top="5.0" />
                      </VBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openSchedule" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Schedule" textAlignment="CENTER" textFill="WHITE">
+                  <Button fx:id="scheduleBtn" mnemonicParsing="false" onAction="#openSchedule" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Schedule" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
