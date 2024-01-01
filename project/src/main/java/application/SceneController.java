@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -30,7 +31,7 @@ public class SceneController {
 
         int loginCheck = checkLoginDetails();
 
-        loginCheck = 1;
+        //loginCheck = 1;
 
         switch (loginCheck) {
             case 0:
@@ -54,15 +55,6 @@ public class SceneController {
         }
     }
 
-    public void openScene(String url) throws IOException {
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("./views/" + url + "-view.fxml")));
-        Scene scene = new Scene(root);
-        stage.initStyle(StageStyle.DECORATED);
-        stage.setTitle("Payroll - " + url);
-        stage.setScene(scene);
-        stage.show();
-    }
-
     public void closeApplication(ActionEvent event) {
         Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
         stage.close();
@@ -75,7 +67,7 @@ public class SceneController {
         if (usernameTextField.getText().isBlank() && passwordTextField.getText().isBlank()) {
             loginStatus = 0;
         }
-        else if (usernameTextField.getText().equals("admin") && passwordTextField.getText().equals("admin")) {
+        else if (DatabaseController.checkLogin(usernameTextField.getText(), passwordTextField.getText())) {
             loginStatus = 1;
         }
         else {
