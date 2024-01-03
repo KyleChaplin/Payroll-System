@@ -65,11 +65,19 @@ public class DatabaseController {
         // Connect to Oracle Database
         try {
             Connection connection = DriverManager.getConnection(url, username, password);
-            System.out.println("Connected to Oracle Database.");
+            System.out.println("Connected to Oracle Database.\n");
 
             // Check if tables exist
             DatabaseMetaData metaData = connection.getMetaData();
-            String[] tableNames = {"NPS_LOGIN"};
+            String[] tableNames = {
+                    "NPS_EMPLOYEE",
+                    "NPS_BANK_DETAILS",
+                    "NPS_PAYROLL",
+                    "NPS_LOGIN",
+                    "NPS_EMERGENCY_CONTACT",
+                    "NPS_ADDRESSES",
+                    "NPS_SCHEDULE",
+            };
 
             // Loop to check all tables
             for (String tableName : tableNames) {
@@ -82,21 +90,10 @@ public class DatabaseController {
                     System.out.println("Table " + tableName + " does not exist.");
                     System.out.println("Creating table " + tableName + "...");
                     // Create table if it does not exist
+                    createTables(connection, tableName);
+                    // Update tables to include foreign keys and other constraints
+                    updateTables(connection, tableName);
 
-                    //************************************************
-                    //             DO THIS FOR ALL TABLES?
-                    //************************************************
-                    try(Statement statement = connection.createStatement()) {
-                        statement.executeUpdate("CREATE TABLE NPS_LOGIN (" +
-                                "ID NUMBER(*) GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
-                                "USERNAME VARCHAR2(100) UNIQUE NOT NULL, " +
-                                "PASSWORD VARCHAR2(100) NOT NULL" +
-                                ")");
-                        System.out.println("Table " + tableName + " created.");
-                    } catch (SQLException e) {
-                        System.out.println("Table " + tableName + " could not be created.");
-                        e.printStackTrace();
-                    }
                 }
             }
         } catch (SQLException e) {
@@ -106,8 +103,146 @@ public class DatabaseController {
         }
     }
 
+    private static void createTables(Connection connection, String tableName) {
+        // Create tables if they do not exist
+        switch (tableName) {
+            case "NPS_EMPLOYEE":
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate("CREATE TABLE NPS_EMPLOYEE (" +
+                            "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
+                            "FIRST_NAME VARCHAR2(50) NOT NULL, " +
+                            "LAST_NAME VARCHAR2(50) NOT NULL, " +
+                            "EMAIL VARCHAR2(100) UNIQUE NOT NULL, " +
+                            "PHONE VARCHAR2(20) NOT NULL" +
+                            ")");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "NPS_BANK_DETAILS":
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate("CREATE TABLE NPS_BANK_DETAILS (" +
+                            "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
+                            "EMPLOYEE_ID NUMBER NOT NULL, " +
+                            "BANK_NAME VARCHAR2(50) NOT NULL, " +
+                            "ACCOUNT_NUMBER VARCHAR2(20) NOT NULL, " +
+                            "SORT_CODE VARCHAR2(20) NOT NULL" +
+                            ")");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "NPS_PAYROLL":
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate("CREATE TABLE NPS_PAYROLL (" +
+                            "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
+                            "EMPLOYEE_ID NUMBER NOT NULL, " +
+                            "PAY_DATE DATE NOT NULL, " +
+                            "HOURS_WORKED DECIMAL(10, 2) NOT NULL, " +
+                            "OVERTIME_HOURS DECIMAL(10, 2) NOT NULL, " +
+                            "OVERTIME_PAY DECIMAL(10, 2) NOT NULL, " +
+                            "GROSS_PAY DECIMAL(10, 2) NOT NULL, " +
+                            "TAXES DECIMAL(10, 2) NOT NULL, " +
+                            "NET_PAY DECIMAL(10, 2) NOT NULL" +
+                            ")");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "NPS_LOGIN":
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate("CREATE TABLE NPS_LOGIN (" +
+                            "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
+                            "EMPLOYEE_ID NUMBER NOT NULL, " +
+                            "USERNAME VARCHAR2(50) UNIQUE NOT NULL, " +
+                            "PASSWORD VARCHAR2(50) NOT NULL" +
+                            ")");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "NPS_EMERGENCY_CONTACT":
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate("CREATE TABLE NPS_EMERGENCY_CONTACT (" +
+                            "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
+                            "EMPLOYEE_ID NUMBER NOT NULL, " +
+                            "FIRST_NAME VARCHAR2(50) NOT NULL, " +
+                            "LAST_NAME VARCHAR2(50) NOT NULL, " +
+                            "PHONE VARCHAR2(20) NOT NULL, " +
+                            "RELATIONSHIP VARCHAR2(50) NOT NULL" +
+                            ")");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "NPS_ADDRESSES":
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate("CREATE TABLE NPS_ADDRESSES (" +
+                            "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
+                            "EMPLOYEE_ID NUMBER NOT NULL, " +
+                            "ADDRESS_LINE_1 VARCHAR2(100) NOT NULL, " +
+                            "ADDRESS_LINE_2 VARCHAR2(100), " +
+                            "CITY VARCHAR2(50) NOT NULL, " +
+                            "POSTCODE VARCHAR2(10) NOT NULL" +
+                            ")");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+            // Add cases for other tables...
+        }
+    }
+
+    private static void updateTables(Connection connection, String tableName) {
+        // Update tables to include foreign keys and other constraints
+        switch (tableName) {
+            case "NPS_BANK_DETAILS":
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate("ALTER TABLE NPS_BANK_DETAILS ADD CONSTRAINT fk_bank_employee " +
+                            "FOREIGN KEY (EMPLOYEE_ID) REFERENCES NPS_EMPLOYEE(ID)");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "NPS_PAYROLL":
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate("ALTER TABLE NPS_PAYROLL ADD CONSTRAINT fk_payroll_employee " +
+                            "FOREIGN KEY (EMPLOYEE_ID) REFERENCES NPS_EMPLOYEE(ID)");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "NPS_LOGIN":
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate("ALTER TABLE NPS_LOGIN ADD CONSTRAINT fk_login_employee " +
+                            "FOREIGN KEY (EMPLOYEE_ID) REFERENCES NPS_EMPLOYEE(ID)");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "NPS_EMERGENCY_CONTACT":
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate("ALTER TABLE NPS_EMERGENCY_CONTACT ADD CONSTRAINT fk_emergency_employee " +
+                            "FOREIGN KEY (EMPLOYEE_ID) REFERENCES NPS_EMPLOYEE(ID)");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "NPS_ADDRESSES":
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate("ALTER TABLE NPS_ADDRESSES ADD CONSTRAINT fk_employee " +
+                            "FOREIGN KEY (EMPLOYEE_ID) REFERENCES NPS_EMPLOYEE(ID)");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+            // Add cases for other tables...
+        }
+    }
+
+
+
     public static boolean checkLogin(String username, String password) {
-        // Connection details
         // Connection details
         String url = DatabaseController.getEnvVariable("DB_URL");
         String dbUsername = DatabaseController.getEnvVariable("DB_USERNAME");
