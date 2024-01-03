@@ -1,14 +1,71 @@
 package application;
 
-import javax.xml.transform.Result;
 import java.sql.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DatabaseController {
+    private static Map<String, String> envVariables = new HashMap<>();
+
+    public static void loadEnvVariables() {
+        String envPath = "src/main/resources/.env";
+
+        // Check if the .env file exists
+        File envFile = new File(envPath);
+
+        try {
+            if (envFile.createNewFile()) {
+                System.out.println(".env file created.");
+
+                // Write default content to the file if needed
+                FileWriter writer = new FileWriter(envFile);
+                writer.write("DB_URL=you_db_url\n");
+                writer.write("DB_USERNAME=your_db_username\n");
+                writer.write("DB_PASSWORD=your_db_password\n");
+                writer.close();
+
+            } else {
+                System.out.println(".env file already exists.");
+            }
+        } catch (IOException e) {
+            System.out.println("An error occurred while creating the file.");
+            e.printStackTrace();
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(envPath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split("=", 2);
+                if (parts.length >= 2) {
+                    String key = parts[0].trim();
+                    String value = parts[1].trim();
+                    envVariables.put(key, value);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String getEnvVariable(String key) {
+        return envVariables.get(key);
+    }
+
     public static void openConnection() {
         // Connection details
-        String url = "jdbc:oracle:thin:@localhost:1521:ORCL";
-        String username = "system";
-        String password = "Zj80cQ)pzp):h>H.";
+        String url = DatabaseController.getEnvVariable("DB_URL");
+        String username = DatabaseController.getEnvVariable("DB_USERNAME");
+        String password = DatabaseController.getEnvVariable("DB_PASSWORD");
+
+        System.out.println("url: " + url);
+        System.out.println("username: " + username);
+        System.out.println("password: " + password);
+
 
         // Connect to Oracle Database
         try {

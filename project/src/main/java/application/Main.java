@@ -14,7 +14,7 @@ import java.util.Objects;
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-
+        DatabaseController.loadEnvVariables();
         DatabaseController.openConnection();
 
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("views/login-view.fxml")));
