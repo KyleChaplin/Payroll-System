@@ -62,11 +62,6 @@ public class DatabaseController {
         String username = DatabaseController.getEnvVariable("DB_USERNAME");
         String password = DatabaseController.getEnvVariable("DB_PASSWORD");
 
-        System.out.println("url: " + url);
-        System.out.println("username: " + username);
-        System.out.println("password: " + password);
-
-
         // Connect to Oracle Database
         try {
             Connection connection = DriverManager.getConnection(url, username, password);
@@ -113,9 +108,10 @@ public class DatabaseController {
 
     public static boolean checkLogin(String username, String password) {
         // Connection details
-        String url = "jdbc:oracle:thin:@localhost:1521:ORCL";
-        String dbUsername = "system";
-        String dbPassword = "Zj80cQ)pzp):h>H.";
+        // Connection details
+        String url = DatabaseController.getEnvVariable("DB_URL");
+        String dbUsername = DatabaseController.getEnvVariable("DB_USERNAME");
+        String dbPassword = DatabaseController.getEnvVariable("DB_PASSWORD");
 
         // SQL query to check if the username and password match
         String query = "SELECT COUNT(*) AS count FROM NPS_LOGIN WHERE USERNAME = ? AND PASSWORD = ?";

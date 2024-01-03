@@ -40,14 +40,8 @@ public class SceneController {
             case 1:
                 loginMessageLabel.setText("Login Successful");
 
-                Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("views/home-view.fxml")));
-                stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-                scene = new Scene(root);
-                stage.setTitle("Payroll - Home");
-                //stage.setFullScreen(true);
-                //stage.initStyle(StageStyle.DECORATED);
-                stage.setScene(scene);
-                stage.show();
+                openScene(event, "home", stage, scene);
+
                 break;
             case -1:
                 loginMessageLabel.setText("Invalid Login. Please try again.");
