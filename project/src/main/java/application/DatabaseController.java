@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class DatabaseController {
     private static Map<String, String> envVariables = new HashMap<>();
+    private static Connection connection = null;
 
     public static void loadEnvVariables() {
         String envPath = "src/main/resources/.env";
@@ -55,55 +56,177 @@ public class DatabaseController {
     public static String getEnvVariable(String key) {
         return envVariables.get(key);
     }
+    
+    public static void getConnectionToDB() {
+        if (connection == null) {
+            try {
+                // Establish the database connection
+                String url = DatabaseController.getEnvVariable("DB_URL");
+                String username = DatabaseController.getEnvVariable("DB_USERNAME");
+                String password = DatabaseController.getEnvVariable("DB_PASSWORD");
 
-    public static void openConnection() {
-        // Connection details
-        String url = DatabaseController.getEnvVariable("DB_URL");
-        String username = DatabaseController.getEnvVariable("DB_USERNAME");
-        String password = DatabaseController.getEnvVariable("DB_PASSWORD");
+                connection = DriverManager.getConnection(url, username, password);
+                System.out.println("Connected to Oracle Database.\n");
 
-        // Connect to Oracle Database
-        try {
-            Connection connection = DriverManager.getConnection(url, username, password);
-            System.out.println("Connected to Oracle Database.\n");
-
-            // Check if tables exist
-            DatabaseMetaData metaData = connection.getMetaData();
-            String[] tableNames = {
-                    "NPS_EMPLOYEE",
-                    "NPS_BANK_DETAILS",
-                    "NPS_PAYROLL",
-                    "NPS_LOGIN",
-                    "NPS_EMERGENCY_CONTACT",
-                    "NPS_ADDRESSES",
-                    "NPS_SCHEDULE",
-            };
-
-            // Loop to check all tables
-            for (String tableName : tableNames) {
-                ResultSet tablesExists = metaData.getTables(null, null, tableName, null);
-
-                // If table exists, print message
-                if (tablesExists.next()) {
-                    System.out.println("Table " + tableName + " exists.");
-                } else {
-                    System.out.println("Table " + tableName + " does not exist.");
-                    System.out.println("Creating table " + tableName + "...");
-                    // Create table if it does not exist
-                    createTables(connection, tableName);
-                    // Update tables to include foreign keys and other constraints
-                    updateTables(connection, tableName);
-
-                }
+            } catch (SQLException e) {
+                System.out.println("Connection to Oracle Database failed.");
+                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            System.out.println("Connection to Oracle Database failed.");
-            e.printStackTrace();
-            return;
         }
     }
 
+    public static void closeConnectionToDb() {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void openConnection() throws SQLException {
+
+        getConnectionToDB();
+
+        // Check if tables exist
+        DatabaseMetaData metaData = connection.getMetaData();
+        String[] tableNames = {
+                "NPS_EMPLOYEE",
+                "NPS_BANK_DETAILS",
+                "NPS_PAYROLL",
+                "NPS_LOGIN",
+                "NPS_EMERGENCY_CONTACT",
+                "NPS_ADDRESSES",
+                //"NPS_SCHEDULE",
+        };
+
+        // Loop to check all tables
+        for (String tableName : tableNames) {
+            ResultSet tablesExists = metaData.getTables(null, null, tableName, null);
+
+            // If table exists, print message
+            if (tablesExists.next()) {
+                System.out.println("Table " + tableName + " exists.\n");
+            } else {
+                // Create table if it does not exist
+                createTables(connection, tableName);
+                // Update tables to include foreign keys and other constraints
+                updateTables(connection, tableName);
+            }
+        }
+
+        // Check if an admin account exists
+        if (checkLoginWithAccessLevelZero()) {
+            System.out.println("Admin account exists.\n");
+        } else {
+            System.out.println("Admin account does not exist.\n");
+            addEmployee("Admin", "Admin", "Admin@admin.com", "01234567890", 0);
+        }
+
+        // Close connection to Oracle Database
+        closeConnectionToDb();
+    }
+
+    // Method to add an employee record
+    public static void addEmployee(String firstName, String lastName, String email, String phone, int accessLevel) {
+        // Establish the database connection
+        getConnectionToDB();
+
+        // Add employee record
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO NPS_EMPLOYEE (FIRST_NAME, LAST_NAME, EMAIL, PHONE) VALUES (?, ?, ?, ?)")) {
+            preparedStatement.setString(1, firstName);
+            preparedStatement.setString(2, lastName);
+            preparedStatement.setString(3, email);
+            preparedStatement.setString(4, phone);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Employee added successfully.");
+
+                // Create a login for the employee
+                int employeeId = getEmployeeId(email);
+                createLogin(employeeId, firstName, accessLevel);
+
+            } else {
+                System.out.println("Failed to add employee.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Close connection to Oracle Database
+            closeConnectionToDb();
+        }
+    }
+
+    // Method to get the employee ID by email
+    private static int getEmployeeId(String email) throws SQLException {
+        int employeeId = -1;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT ID FROM NPS_EMPLOYEE WHERE EMAIL = ?")) {
+            preparedStatement.setString(1, email);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                employeeId = resultSet.getInt("ID");
+            }
+        }
+        return employeeId;
+    }
+
+    // Method to create a login using the employee ID
+    private static void createLogin(int employeeId, String firstName, int accessLevel) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO NPS_LOGIN (EMPLOYEE_ID, ACCESS_LEVEL, USERNAME, PASSWORD) VALUES (?, ?, ?, ?)")) {
+            preparedStatement.setInt(1, employeeId);
+            preparedStatement.setInt(2, accessLevel);
+            preparedStatement.setString(3, firstName + "_" + employeeId);
+            preparedStatement.setString(4, createPassword());
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Login created successfully.");
+            } else {
+                System.out.println("Failed to create login.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static boolean checkLoginWithAccessLevelZero() {
+        boolean loginExists = false;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_LOGIN WHERE ACCESS_LEVEL = 0")) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            loginExists = resultSet.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return loginExists;
+    }
+
+    private static String createPassword() {
+        String password = "";
+        String[] passwordCharacters = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+                                       "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
+                                       "u", "v", "w", "x", "y", "z", "1", "2", "3", "4",
+                                       "5", "6", "7", "8", "9", "0", "!", "@", "#", "$",
+                                       "%", "^", "&", "*", "(", ")", "-", "_", "+", "=",
+                                       "{", "}", "[", "]", "|", "\\", ":", ";", "\"", "'",
+                                       "<", ">", ",", ".", "?", "/", "`", "~"};
+        for (int i = 0; i < 8; i++) {
+            int randomIndex = (int) (Math.random() * passwordCharacters.length);
+            password += passwordCharacters[randomIndex];
+        }
+        return password;
+    }
+
     private static void createTables(Connection connection, String tableName) {
+        System.out.println("Table " + tableName + " does not exist.");
+        System.out.println("Creating table " + tableName + "...");
+
         // Create tables if they do not exist
         switch (tableName) {
             case "NPS_EMPLOYEE":
@@ -154,6 +277,7 @@ public class DatabaseController {
                     statement.executeUpdate("CREATE TABLE NPS_LOGIN (" +
                             "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
                             "EMPLOYEE_ID NUMBER NOT NULL, " +
+                            "ACCESS_LEVEL NUMBER NOT NULL, " +
                             "USERNAME VARCHAR2(50) UNIQUE NOT NULL, " +
                             "PASSWORD VARCHAR2(50) NOT NULL" +
                             ")");
@@ -194,6 +318,8 @@ public class DatabaseController {
     }
 
     private static void updateTables(Connection connection, String tableName) {
+        System.out.println("Updating table " + tableName + "...");
+
         // Update tables to include foreign keys and other constraints
         switch (tableName) {
             case "NPS_BANK_DETAILS":
@@ -239,8 +365,6 @@ public class DatabaseController {
             // Add cases for other tables...
         }
     }
-
-
 
     public static boolean checkLogin(String username, String password) {
         // Connection details
