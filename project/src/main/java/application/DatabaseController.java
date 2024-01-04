@@ -56,7 +56,7 @@ public class DatabaseController {
     public static String getEnvVariable(String key) {
         return envVariables.get(key);
     }
-    
+
     public static void getConnectionToDB() {
         if (connection == null) {
             try {
@@ -216,7 +216,7 @@ public class DatabaseController {
                                        "%", "^", "&", "*", "(", ")", "-", "_", "+", "=",
                                        "{", "}", "[", "]", "|", "\\", ":", ";", "\"", "'",
                                        "<", ">", ",", ".", "?", "/", "`", "~"};
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 12; i++) {
             int randomIndex = (int) (Math.random() * passwordCharacters.length);
             password += passwordCharacters[randomIndex];
         }

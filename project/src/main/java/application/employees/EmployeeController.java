@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class EmployeeController {
-
+    //List<Employee> employees = new ArrayList<Employee>();
     private Stage stage;
     private Scene scene;
 
