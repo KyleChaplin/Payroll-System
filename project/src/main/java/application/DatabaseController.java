@@ -13,51 +13,14 @@ public class DatabaseController {
     private static Map<String, String> envVariables = new HashMap<>();
     private static Connection connection = null;
 
-    public static void loadEnvVariables() {
-        String envPath = "src/main/resources/.env";
+    
 
-        // Check if the .env file exists
-        File envFile = new File(envPath);
+    // ********************************************
+    // ************* DATABASE METHODS *************
+    // ********************************************
 
-        try {
-            if (envFile.createNewFile()) {
-                System.out.println(".env file created.");
-
-                // Write default content to the file if needed
-                FileWriter writer = new FileWriter(envFile);
-                writer.write("DB_URL=you_db_url\n");
-                writer.write("DB_USERNAME=your_db_username\n");
-                writer.write("DB_PASSWORD=your_db_password\n");
-                writer.close();
-
-            } else {
-                System.out.println(".env file already exists.");
-            }
-        } catch (IOException e) {
-            System.out.println("An error occurred while creating the file.");
-            e.printStackTrace();
-        }
-
-        try (BufferedReader br = new BufferedReader(new FileReader(envPath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split("=", 2);
-                if (parts.length >= 2) {
-                    String key = parts[0].trim();
-                    String value = parts[1].trim();
-                    envVariables.put(key, value);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static String getEnvVariable(String key) {
-        return envVariables.get(key);
-    }
-
-    public static void getConnectionToDB() {
+    // Method to get a connection to the database
+    private static void getConnectionToDB() {
         if (connection == null) {
             try {
                 // Establish the database connection
@@ -75,7 +38,8 @@ public class DatabaseController {
         }
     }
 
-    public static void closeConnectionToDb() {
+    // Method to close the connection to the database
+    private static void closeConnectionToDb() {
         if (connection != null) {
             try {
                 connection.close();
@@ -85,7 +49,8 @@ public class DatabaseController {
         }
     }
 
-    public static void openConnection() throws SQLException {
+    // Method to start the database checks - Called from Main.java in the start() method
+    public static void databaseChecks() throws SQLException {
 
         getConnectionToDB();
 
@@ -128,101 +93,59 @@ public class DatabaseController {
         closeConnectionToDb();
     }
 
-    // Method to add an employee record
-    public static void addEmployee(String firstName, String lastName, String email, String phone, int accessLevel) {
-        // Establish the database connection
-        getConnectionToDB();
+    // Method to load environment variables from the .env file
+    public static void loadEnvVariables() {
+        String envPath = "src/main/resources/.env";
 
-        // Add employee record
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "INSERT INTO NPS_EMPLOYEE (FIRST_NAME, LAST_NAME, EMAIL, PHONE) VALUES (?, ?, ?, ?)")) {
-            preparedStatement.setString(1, firstName);
-            preparedStatement.setString(2, lastName);
-            preparedStatement.setString(3, email);
-            preparedStatement.setString(4, phone);
+        // Check if the .env file exists
+        File envFile = new File(envPath);
 
-            int rowsAffected = preparedStatement.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Employee added successfully.");
+        try {
+            if (envFile.createNewFile()) {
+                System.out.println(".env file created.");
 
-                // Create a login for the employee
-                int employeeId = getEmployeeId(email);
-                createLogin(employeeId, firstName, accessLevel);
+                // Write default content to the file if needed
+                FileWriter writer = new FileWriter(envFile);
+                writer.write("DB_URL=you_db_url\n");
+                writer.write("DB_USERNAME=your_db_username\n");
+                writer.write("DB_PASSWORD=your_db_password\n");
+                writer.close();
 
             } else {
-                System.out.println("Failed to add employee.");
+                System.out.println(".env file already exists.");
             }
-        } catch (SQLException e) {
+        } catch (IOException e) {
+            System.out.println("An error occurred while creating the file.");
             e.printStackTrace();
-        } finally {
-            // Close connection to Oracle Database
-            closeConnectionToDb();
         }
-    }
 
-    // Method to get the employee ID by email
-    private static int getEmployeeId(String email) throws SQLException {
-        int employeeId = -1;
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT ID FROM NPS_EMPLOYEE WHERE EMAIL = ?")) {
-            preparedStatement.setString(1, email);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                employeeId = resultSet.getInt("ID");
+        try (BufferedReader br = new BufferedReader(new FileReader(envPath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split("=", 2);
+                if (parts.length >= 2) {
+                    String key = parts[0].trim();
+                    String value = parts[1].trim();
+                    envVariables.put(key, value);
+                }
             }
-        }
-        return employeeId;
-    }
-
-    // Method to create a login using the employee ID
-    private static void createLogin(int employeeId, String firstName, int accessLevel) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "INSERT INTO NPS_LOGIN (EMPLOYEE_ID, ACCESS_LEVEL, USERNAME, PASSWORD) VALUES (?, ?, ?, ?)")) {
-            preparedStatement.setInt(1, employeeId);
-            preparedStatement.setInt(2, accessLevel);
-            preparedStatement.setString(3, firstName + "_" + employeeId);
-            preparedStatement.setString(4, createPassword());
-
-            int rowsAffected = preparedStatement.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Login created successfully.");
-            } else {
-                System.out.println("Failed to create login.");
-            }
-        } catch (SQLException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static boolean checkLoginWithAccessLevelZero() {
-        boolean loginExists = false;
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT * FROM NPS_LOGIN WHERE ACCESS_LEVEL = 0")) {
-            ResultSet resultSet = preparedStatement.executeQuery();
-            loginExists = resultSet.next();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return loginExists;
+    // Method to get an environment variable
+    private static String getEnvVariable(String key) {
+        return envVariables.get(key);
     }
 
-    private static String createPassword() {
-        String password = "";
-        String[] passwordCharacters = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
-                                       "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
-                                       "u", "v", "w", "x", "y", "z", "1", "2", "3", "4",
-                                       "5", "6", "7", "8", "9", "0", "!", "@", "#", "$",
-                                       "%", "^", "&", "*", "(", ")", "-", "_", "+", "=",
-                                       "{", "}", "[", "]", "|", "\\", ":", ";", "\"", "'",
-                                       "<", ">", ",", ".", "?", "/", "`", "~"};
-        for (int i = 0; i < 12; i++) {
-            int randomIndex = (int) (Math.random() * passwordCharacters.length);
-            password += passwordCharacters[randomIndex];
-        }
-        return password;
-    }
 
+
+    // ********************************************
+    // *********** TABLE CREATE METHODS ***********
+    // ********************************************
+
+    // Method to create tables if they do not exist
     private static void createTables(Connection connection, String tableName) {
         System.out.println("Table " + tableName + " does not exist.");
         System.out.println("Creating table " + tableName + "...");
@@ -317,6 +240,13 @@ public class DatabaseController {
         }
     }
 
+
+
+    // ********************************************
+    // *********** TABLE UPDATE METHODS ***********
+    // ********************************************
+
+    // Method to update tables to include foreign keys and other constraintss
     private static void updateTables(Connection connection, String tableName) {
         System.out.println("Updating table " + tableName + "...");
 
@@ -366,6 +296,101 @@ public class DatabaseController {
         }
     }
 
+
+
+    // ********************************************
+    // *********** TABLE INSERT METHODS ***********
+    // ********************************************
+
+    // Method to add an employee record
+    public static void addEmployee(String firstName, String lastName, String email, String phone, int accessLevel) {
+        // Establish the database connection
+        getConnectionToDB();
+
+        // Add employee record
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO NPS_EMPLOYEE (FIRST_NAME, LAST_NAME, EMAIL, PHONE) VALUES (?, ?, ?, ?)")) {
+            preparedStatement.setString(1, firstName);
+            preparedStatement.setString(2, lastName);
+            preparedStatement.setString(3, email);
+            preparedStatement.setString(4, phone);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Employee added successfully.");
+
+                // Create a login for the employee
+                int employeeId = getEmployeeId(email);
+                createLogin(employeeId, firstName, accessLevel);
+
+            } else {
+                System.out.println("Failed to add employee.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Close connection to Oracle Database
+            closeConnectionToDb();
+        }
+    }
+
+    // Method to create a login using the employee ID
+    private static void createLogin(int employeeId, String firstName, int accessLevel) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO NPS_LOGIN (EMPLOYEE_ID, ACCESS_LEVEL, USERNAME, PASSWORD) VALUES (?, ?, ?, ?)")) {
+            preparedStatement.setInt(1, employeeId);
+            preparedStatement.setInt(2, accessLevel);
+            preparedStatement.setString(3, firstName + "_" + employeeId);
+            preparedStatement.setString(4, createPassword());
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Login created successfully.");
+            } else {
+                System.out.println("Failed to create login.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    // ********************************************
+    // ************** OTHER METHODS ***************
+    // ********************************************
+
+    // Method to create a random password
+    private static String createPassword() {
+        String password = "";
+        String[] passwordCharacters = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+                "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
+                "u", "v", "w", "x", "y", "z", "1", "2", "3", "4",
+                "5", "6", "7", "8", "9", "0", "!", "@", "#", "$",
+                "%", "^", "&", "*", "(", ")", "-", "_", "+", "=",
+                "{", "}", "[", "]", "|", "\\", ":", ";", "\"", "'",
+                "<", ">", ",", ".", "?", "/", "`", "~"};
+        for (int i = 0; i < 12; i++) {
+            int randomIndex = (int) (Math.random() * passwordCharacters.length);
+            password += passwordCharacters[randomIndex];
+        }
+        return password;
+    }
+
+    // Method to encrypt a string
+    private static String encryptString(String stringToEncrypt) {
+        String encryptedString = stringToEncrypt;
+
+        return encryptedString;
+    }
+
+
+
+    // ********************************************
+    // ******* INTERACTING WITH DB METHODS ********
+    // ********************************************
+
+    // Method to check if the username and password match
     public static boolean checkLogin(String username, String password) {
         // Connection details
         String url = DatabaseController.getEnvVariable("DB_URL");
@@ -402,6 +427,36 @@ public class DatabaseController {
 
         return false; // Default to false if an exception occurs or no match is found
     }
+
+    // Method to get the employee ID by email
+    private static int getEmployeeId(String email) throws SQLException {
+        int employeeId = -1;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT ID FROM NPS_EMPLOYEE WHERE EMAIL = ?")) {
+            preparedStatement.setString(1, email);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                employeeId = resultSet.getInt("ID");
+            }
+        }
+        return employeeId;
+    }
+
+    private static boolean checkLoginWithAccessLevelZero() {
+        boolean loginExists = false;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_LOGIN WHERE ACCESS_LEVEL = 0")) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            loginExists = resultSet.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return loginExists;
+    }
+
+
+
 
 
 }

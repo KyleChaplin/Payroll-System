@@ -15,7 +15,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException, SQLException {
         DatabaseController.loadEnvVariables();
-        DatabaseController.openConnection();
+        DatabaseController.databaseChecks();
 
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("views/login-view.fxml")));
         Scene scene = new Scene(root);
