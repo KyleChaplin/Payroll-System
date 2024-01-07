@@ -1,11 +1,15 @@
 package application;
 
+import javafx.scene.Node;
+import javafx.stage.Stage;
+
 import java.sql.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.File;
 import java.io.IOException;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +17,7 @@ public class DatabaseController {
     private static Map<String, String> envVariables = new HashMap<>();
     private static Connection connection = null;
 
-    
+
 
     // ********************************************
     // ************* DATABASE METHODS *************
@@ -81,12 +85,16 @@ public class DatabaseController {
             }
         }
 
+        // Change this so if the admin account does not exist, a popup is displayed to the user to create one
+        // Can possibly have the first login details inputted be the admin account?
+
         // Check if an admin account exists
         if (checkLoginWithAccessLevelZero()) {
             System.out.println("Admin account exists.\n");
         } else {
             System.out.println("Admin account does not exist.\n");
             addEmployee("Admin", "Admin", "Admin@admin.com", "01234567890", 0);
+            getLoginInfoForAccessLevelZero();
         }
 
         // Close connection to Oracle Database
@@ -357,37 +365,7 @@ public class DatabaseController {
 
 
     // ********************************************
-    // ************** OTHER METHODS ***************
-    // ********************************************
-
-    // Method to create a random password
-    private static String createPassword() {
-        String password = "";
-        String[] passwordCharacters = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
-                "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
-                "u", "v", "w", "x", "y", "z", "1", "2", "3", "4",
-                "5", "6", "7", "8", "9", "0", "!", "@", "#", "$",
-                "%", "^", "&", "*", "(", ")", "-", "_", "+", "=",
-                "{", "}", "[", "]", "|", "\\", ":", ";", "\"", "'",
-                "<", ">", ",", ".", "?", "/", "`", "~"};
-        for (int i = 0; i < 12; i++) {
-            int randomIndex = (int) (Math.random() * passwordCharacters.length);
-            password += passwordCharacters[randomIndex];
-        }
-        return password;
-    }
-
-    // Method to encrypt a string
-    private static String encryptString(String stringToEncrypt) {
-        String encryptedString = stringToEncrypt;
-
-        return encryptedString;
-    }
-
-
-
-    // ********************************************
-    // ******* INTERACTING WITH DB METHODS ********
+    // ************* READ DB METHODS **************
     // ********************************************
 
     // Method to check if the username and password match
@@ -443,6 +421,7 @@ public class DatabaseController {
         return employeeId;
     }
 
+    // Method to check if an admin account exists
     private static boolean checkLoginWithAccessLevelZero() {
         boolean loginExists = false;
         try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -455,8 +434,54 @@ public class DatabaseController {
         return loginExists;
     }
 
+    // Method to get the login information of a user
+    // Used to get the username and password when the first account is created
+    private static void getLoginInfoForAccessLevelZero() {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_LOGIN WHERE ACCESS_LEVEL = 0")) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                String username = resultSet.getString("USERNAME");
+                String password = resultSet.getString("PASSWORD");
+
+                // Display or use retrieved login information
+                System.out.println("Username: " + username);
+                System.out.println("Password: " + password);
+            } else {
+                System.out.println("No login found with access level 0");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 
+    // ********************************************
+    // ************** OTHER METHODS ***************
+    // ********************************************
 
+    // Method to create a random password
+    private static String createPassword() {
+        String password = "";
+        String[] passwordCharacters = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+                "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
+                "u", "v", "w", "x", "y", "z", "1", "2", "3", "4",
+                "5", "6", "7", "8", "9", "0", "!", "@", "#", "$",
+                "%", "^", "&", "*", "(", ")", "-", "_", "+", "=",
+                "{", "}", "[", "]", "|", "\\", ":", ";", "\"", "'",
+                "<", ">", ",", ".", "?", "/", "`", "~"};
+        for (int i = 0; i < 12; i++) {
+            int randomIndex = (int) (Math.random() * passwordCharacters.length);
+            password += passwordCharacters[randomIndex];
+        }
+        return password;
+    }
+
+    // Method to encrypt a string << NOT IMPLEMENTED >>
+    private static String encryptString(String stringToEncrypt) {
+        String encryptedString = stringToEncrypt;
+
+        return encryptedString;
+    }
 }
