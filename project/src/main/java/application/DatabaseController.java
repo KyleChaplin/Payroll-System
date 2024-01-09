@@ -91,8 +91,7 @@ public class DatabaseController {
             System.out.println("Admin account exists.\n");
         } else {
             System.out.println("Admin account does not exist.\n");
-            addEmployee("Admin", "Admin", "Admin@admin.com", "01234567890", 0, true);
-            getLoginInfoForAccessLevelZero();
+            addEmployee("admin", "admin", "admin", "-", "-", 0, true);
         }
 
         // Close connection to Oracle Database
@@ -165,7 +164,8 @@ public class DatabaseController {
                             "FIRST_NAME VARCHAR2(50) NOT NULL, " +
                             "LAST_NAME VARCHAR2(50) NOT NULL, " +
                             "EMAIL VARCHAR2(100) UNIQUE NOT NULL, " +
-                            "PHONE VARCHAR2(20) NOT NULL" +
+                            "PHONE VARCHAR2(20) NOT NULL," +
+                            "NI_NUMBER VARCHAR2(20) NOT NULL" +
                             ")");
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -309,17 +309,18 @@ public class DatabaseController {
     // ********************************************
 
     // Method to add an employee record
-    public static void addEmployee(String firstName, String lastName, String email, String phone, int accessLevel, boolean firstLogin) {
+    public static void addEmployee(String firstName, String lastName, String email, String phone, String niNumber, int accessLevel, boolean firstLogin) {
         // Establish the database connection
         getConnectionToDB();
 
         // Add employee record
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "INSERT INTO NPS_EMPLOYEE (FIRST_NAME, LAST_NAME, EMAIL, PHONE) VALUES (?, ?, ?, ?)")) {
+                "INSERT INTO NPS_EMPLOYEE (FIRST_NAME, LAST_NAME, EMAIL, PHONE, NI_NUMBER) VALUES (?, ?, ?, ?, ?)")) {
             preparedStatement.setString(1, firstName);
             preparedStatement.setString(2, lastName);
             preparedStatement.setString(3, email);
             preparedStatement.setString(4, phone);
+            preparedStatement.setString(5, niNumber);
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
@@ -327,7 +328,7 @@ public class DatabaseController {
 
                 // Create a login for the employee
                 int employeeId = getEmployeeId(email);
-                createLogin(employeeId, firstName, accessLevel, firstLogin);
+                createLogin(employeeId, email, firstName, niNumber, accessLevel, firstLogin);
 
             } else {
                 System.out.println("Failed to add employee.");
@@ -341,7 +342,7 @@ public class DatabaseController {
     }
 
     // Method to create a login using the employee ID
-    private static void createLogin(int employeeId, String firstName, int accessLevel, boolean firstLogin) {
+    private static void createLogin(int employeeId, String email, String firstName, String niNumber, int accessLevel, boolean firstLogin) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO NPS_LOGIN (EMPLOYEE_ID, ACCESS_LEVEL, USERNAME, PASSWORD) VALUES (?, ?, ?, ?)")) {
             preparedStatement.setInt(1, employeeId);
@@ -352,8 +353,11 @@ public class DatabaseController {
                 preparedStatement.setString(3, "admin");
                 preparedStatement.setString(4, "admin");
             } else {
-                preparedStatement.setString(3, firstName + "_" + employeeId);
-                preparedStatement.setString(4, createPassword());
+                preparedStatement.setString(3, email);
+
+                // Get last 4 digits of NI number
+                niNumber = niNumber.substring(niNumber.length() - 4);
+                preparedStatement.setString(4, firstName + "_" + niNumber);
             }
 
             int rowsAffected = preparedStatement.executeUpdate();
@@ -439,28 +443,6 @@ public class DatabaseController {
         return loginExists;
     }
 
-    // Method to get the login information of a user
-    // Used to get the username and password when the first account is created
-    private static void getLoginInfoForAccessLevelZero() {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT * FROM NPS_LOGIN WHERE ACCESS_LEVEL = 0")) {
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                String username = resultSet.getString("USERNAME");
-                String password = resultSet.getString("PASSWORD");
-
-                // Display or use retrieved login information
-                System.out.println("Username: " + username);
-                System.out.println("Password: " + password);
-            } else {
-                System.out.println("No login found with access level 0");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
     // Method to get all employees from the database and return an ObservableList
     public static ObservableList<Person> getAllEmployees() {
         ObservableList<Person> data = FXCollections.observableArrayList();
@@ -475,15 +457,12 @@ public class DatabaseController {
                 String lastName = resultSet.getString("LAST_NAME");
                 String email = resultSet.getString("EMAIL");
                 String phone = resultSet.getString("PHONE");
+                String niNumber = resultSet.getString("NI_NUMBER");
 
-                Person person = new Person(id, firstName, lastName, email, phone);
+                // Get access level
+                String accessLevel = getAccessLevel(email);
 
-                // Output for testing
-                System.out.println(person.getEmployeeID());
-                System.out.println(person.getFirstName());
-                System.out.println(person.getLastName());
-                System.out.println(person.getEmail());
-                System.out.println(person.getPhone());
+                Person person = new Person(id, firstName, lastName, email, phone, accessLevel, niNumber);
 
                 data.add(person);
             }
@@ -493,6 +472,21 @@ public class DatabaseController {
         }
 
         return data;
+    }
+
+    // Method to get employee access level by email
+    private static String getAccessLevel(String email) throws SQLException {
+        String accessLevel = "";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT ACCESS_LEVEL FROM NPS_LOGIN WHERE USERNAME = ?")) {
+            preparedStatement.setString(1, email);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                accessLevel = resultSet.getString("ACCESS_LEVEL");
+            }
+        }
+        return accessLevel;
     }
 
 

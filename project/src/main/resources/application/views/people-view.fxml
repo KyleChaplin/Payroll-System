@@ -28,6 +28,11 @@
                         <Pane prefHeight="55.0" prefWidth="1034.0">
                            <children>
                               <TextField layoutX="21.0" layoutY="17.0" />
+                              <Button layoutX="984.0" layoutY="12.0" mnemonicParsing="false" onAction="#btnRefresh" prefHeight="28.0" prefWidth="34.0" style="-fx-background-radius: 0; -fx-background-color: #00000000;" text="⟳" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                              </Button>
                            </children>
                         </Pane>
                         <Separator prefWidth="200.0">
@@ -42,6 +47,8 @@
                               <TableColumn fx:id="LastName" prefWidth="75.0" text="Last Name" />
                               <TableColumn fx:id="Email" prefWidth="75.0" text="Email" />
                               <TableColumn fx:id="Phone" prefWidth="75.0" text="Phone" />
+                              <TableColumn fx:id="NiNumber" prefWidth="75.0" text="NI Number" />
+                              <TableColumn fx:id="AccessLevel" prefWidth="75.0" text="Access Level" />
                           </columns>
                            <VBox.margin>
                               <Insets left="15.0" right="15.0" />
@@ -107,16 +114,6 @@
                                     <Font name="System Bold" size="16.0" />
                                  </font>
                               </Button>
-                              <Label layoutX="526.0" layoutY="78.0" text="Access Level:">
-                                 <font>
-                                    <Font size="16.0" />
-                                 </font>
-                              </Label>
-                              <ComboBox fx:id="cboAccessLevel" layoutX="626.0" layoutY="78.0" prefHeight="25.0" prefWidth="300.0" promptText="Access level">
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
-                              </ComboBox>
                               <Label layoutX="108.0" layoutY="172.0" prefHeight="152.0" prefWidth="92.0" text="0 - Admin&#10;1 - rgebvre&#10;2 - &#10;3 - &#10;4 - &#10;5 - " wrapText="true">
                                  <font>
                                     <Font size="16.0" />
@@ -127,6 +124,22 @@
                                     <Font size="16.0" />
                                  </font>
                               </Label>
+                              <Label layoutX="108.0" layoutY="110.0" text="Access Level:">
+                                 <font>
+                                    <Font size="16.0" />
+                                 </font>
+                              </Label>
+                              <ComboBox fx:id="cboAccessLevel" layoutX="208.0" layoutY="110.0" prefHeight="25.0" prefWidth="300.0" promptText="Access level">
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </ComboBox>
+                              <Label layoutX="526.0" layoutY="78.0" text="NI Number:">
+                                 <font>
+                                    <Font size="16.0" />
+                                 </font>
+                              </Label>
+                              <TextField fx:id="txtNiNumber" layoutX="626.0" layoutY="78.0" prefWidth="300.0" promptText="National Insurance Number" />
                            </children>
                         </Pane>
                      </children>

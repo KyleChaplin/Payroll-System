@@ -6,13 +6,17 @@ public class Person {
     private String lastName;
     private String email;
     private String phone;
+    private String accessLevel;
+    private String niNumber;
 
-    public Person(String employeeID, String firstName, String lastName, String email, String phone) {
+    public Person(String employeeID, String firstName, String lastName, String email, String phone, String accessLevel, String niNumber) {
         this.employeeID = employeeID;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phone = phone;
+        this.accessLevel = accessLevel;
+        this.niNumber = niNumber;
     }
 
     public String getEmployeeID() {
@@ -35,4 +39,11 @@ public class Person {
         return phone;
     }
 
+    public String getAccessLevel() {
+        return accessLevel;
+    }
+
+    public String getNiNumber() {
+        return niNumber;
+    }
 }

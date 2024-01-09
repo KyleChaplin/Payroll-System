@@ -5,10 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
@@ -42,6 +39,12 @@ public class EmployeeController implements Initializable {
     private TableColumn<Person, String> Phone;
 
     @FXML
+    private TableColumn<Person, String> AccessLevel;
+
+    @FXML
+    private TableColumn<Person, String> NiNumber;
+
+    @FXML
     private TextField txtID;
 
     @FXML
@@ -55,6 +58,9 @@ public class EmployeeController implements Initializable {
 
     @FXML
     private TextField txtPhone;
+
+    @FXML
+    private TextField txtNiNumber;
 
     @FXML
     private ComboBox cboAccessLevel;
@@ -79,16 +85,24 @@ public class EmployeeController implements Initializable {
         LastName.setCellValueFactory(new PropertyValueFactory<Person, String>("LastName"));
         Email.setCellValueFactory(new PropertyValueFactory<Person, String>("Email"));
         Phone.setCellValueFactory(new PropertyValueFactory<Person, String>("Phone"));
+        AccessLevel.setCellValueFactory(new PropertyValueFactory<Person, String>("AccessLevel"));
+        NiNumber.setCellValueFactory(new PropertyValueFactory<Person, String>("NiNumber"));
 
         EmployeeTable.setItems(getAllEmployees());
     }
 
     @FXML
     private void btnAdd(ActionEvent event) throws IOException {
-        addEmployee(txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(), txtPhone.getText(), Integer.parseInt((String)cboAccessLevel.getValue()), false);
+        addEmployee(txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(), txtPhone.getText(), txtNiNumber.getText(), Integer.parseInt((String)cboAccessLevel.getValue()), false);
 
         // Refresh the table
-        EmployeeTable.refresh();
+        EmployeeTable.setItems(getAllEmployees());
+    }
+
+    @FXML
+    private void btnRefresh(ActionEvent event) throws IOException {
+        // Refresh the table
+        EmployeeTable.setItems(getAllEmployees());
     }
 
     @FXML
