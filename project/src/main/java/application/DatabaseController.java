@@ -1,17 +1,14 @@
 package application;
 
-import javafx.scene.Node;
-import javafx.stage.Stage;
-
 import java.sql.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.File;
 import java.io.IOException;
-import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
+
 
 public class DatabaseController {
     private static Map<String, String> envVariables = new HashMap<>();
@@ -85,15 +82,12 @@ public class DatabaseController {
             }
         }
 
-        // Change this so if the admin account does not exist, a popup is displayed to the user to create one
-        // Can possibly have the first login details inputted be the admin account?
-
         // Check if an admin account exists
         if (checkLoginWithAccessLevelZero()) {
             System.out.println("Admin account exists.\n");
         } else {
             System.out.println("Admin account does not exist.\n");
-            addEmployee("Admin", "Admin", "Admin@admin.com", "01234567890", 0);
+            addEmployee("Admin", "Admin", "Admin@admin.com", "01234567890", 0, true);
             getLoginInfoForAccessLevelZero();
         }
 
@@ -311,7 +305,7 @@ public class DatabaseController {
     // ********************************************
 
     // Method to add an employee record
-    public static void addEmployee(String firstName, String lastName, String email, String phone, int accessLevel) {
+    public static void addEmployee(String firstName, String lastName, String email, String phone, int accessLevel, boolean firstLogin) {
         // Establish the database connection
         getConnectionToDB();
 
@@ -329,7 +323,7 @@ public class DatabaseController {
 
                 // Create a login for the employee
                 int employeeId = getEmployeeId(email);
-                createLogin(employeeId, firstName, accessLevel);
+                createLogin(employeeId, firstName, accessLevel, firstLogin);
 
             } else {
                 System.out.println("Failed to add employee.");
@@ -343,13 +337,20 @@ public class DatabaseController {
     }
 
     // Method to create a login using the employee ID
-    private static void createLogin(int employeeId, String firstName, int accessLevel) {
+    private static void createLogin(int employeeId, String firstName, int accessLevel, boolean firstLogin) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO NPS_LOGIN (EMPLOYEE_ID, ACCESS_LEVEL, USERNAME, PASSWORD) VALUES (?, ?, ?, ?)")) {
             preparedStatement.setInt(1, employeeId);
             preparedStatement.setInt(2, accessLevel);
-            preparedStatement.setString(3, firstName + "_" + employeeId);
-            preparedStatement.setString(4, createPassword());
+
+            // If first login, use default username and password
+            if (firstLogin) {
+                preparedStatement.setString(3, "admin");
+                preparedStatement.setString(4, "admin");
+            } else {
+                preparedStatement.setString(3, firstName + "_" + employeeId);
+                preparedStatement.setString(4, createPassword());
+            }
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
