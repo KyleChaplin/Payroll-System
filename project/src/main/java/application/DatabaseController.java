@@ -374,6 +374,28 @@ public class DatabaseController {
 
 
     // ********************************************
+    // *********** TABLE DELETE METHODS ***********
+    // ********************************************
+
+    // Method to delete an employee record
+    public static void deleteEmployee(String employeeId) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "DELETE FROM NPS_EMPLOYEE WHERE ID = ?")) {
+            preparedStatement.setString(1, employeeId);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Employee record deleted successfully.");
+            } else {
+                System.out.println("No employee found with the given ID.");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ********************************************
     // ************* READ DB METHODS **************
     // ********************************************
 

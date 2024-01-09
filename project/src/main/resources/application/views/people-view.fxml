@@ -40,7 +40,7 @@
                               <Insets bottom="8.0" left="15.0" right="15.0" top="8.0" />
                            </VBox.margin>
                         </Separator>
-                        <TableView fx:id="EmployeeTable" editable="true" prefHeight="368.0" prefWidth="1004.0">
+                        <TableView fx:id="EmployeeTable" editable="true" onMouseClicked="#onTableClick" prefHeight="368.0" prefWidth="1004.0">
                           <columns>
                             <TableColumn fx:id="ID" prefWidth="75.0" text="Employee ID" />
                             <TableColumn fx:id="FirstName" prefWidth="75.0" text="First Name" />
@@ -140,6 +140,11 @@
                                  </font>
                               </Label>
                               <TextField fx:id="txtNiNumber" layoutX="626.0" layoutY="78.0" prefWidth="300.0" promptText="National Insurance Number" />
+                              <Label fx:id="txtEmptyError" layoutX="716.0" layoutY="235.0" textFill="RED">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Label>
                            </children>
                         </Pane>
                      </children>

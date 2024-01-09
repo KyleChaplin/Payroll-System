@@ -1,6 +1,7 @@
 package application.employees;
 
 import application.SceneController;
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -13,8 +14,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import static application.DatabaseController.addEmployee;
-import static application.DatabaseController.getAllEmployees;
+import static application.DatabaseController.*;
 
 public class EmployeeController implements Initializable {
     private Stage stage;
@@ -65,6 +65,9 @@ public class EmployeeController implements Initializable {
     @FXML
     private ComboBox cboAccessLevel;
 
+    @FXML
+    private Label txtEmptyError;
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -93,10 +96,18 @@ public class EmployeeController implements Initializable {
 
     @FXML
     private void btnAdd(ActionEvent event) throws IOException {
-        addEmployee(txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(), txtPhone.getText(), txtNiNumber.getText(), Integer.parseInt((String)cboAccessLevel.getValue()), false);
+        // Check if the text fields are empty
+        // Only add the employee if all the text fields are filled in
+        if (txtFirstName.getText().isEmpty() || txtLastName.getText().isEmpty() || txtEmail.getText().isEmpty() || txtPhone.getText().isEmpty() || txtNiNumber.getText().isEmpty() || cboAccessLevel.getSelectionModel().isEmpty()) {
+            // Show an error message
+            txtEmptyError.setText("Fields should not be empty!");
+        } else {
+            // Add the employee
+            addEmployee(txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(), txtPhone.getText(), txtNiNumber.getText(), Integer.parseInt((String)cboAccessLevel.getValue()), false);
 
-        // Refresh the table
-        EmployeeTable.setItems(getAllEmployees());
+            btnClear(event);
+            btnRefresh(event);
+        }
     }
 
     @FXML
@@ -112,7 +123,21 @@ public class EmployeeController implements Initializable {
 
     @FXML
     private void btnDelete(ActionEvent event) throws IOException {
+        // Select the employee from the tableview and delete them
+        TableView.TableViewSelectionModel<Person> selectionModel = EmployeeTable.getSelectionModel();
+        if (selectionModel.isEmpty()) {
+            // Show an error message
+            txtEmptyError.setText("Please select an employee to delete!");
+        } else {
+            // Delete the employee
+            deleteEmployee(selectionModel.getSelectedItem().getEmployeeID());
 
+            btnClear(event);
+            btnRefresh(event);
+        }
+
+
+        deleteEmployee(txtID.getText());
     }
 
     @FXML
@@ -125,6 +150,22 @@ public class EmployeeController implements Initializable {
         txtPhone.clear();
         cboAccessLevel.getSelectionModel().clearSelection();
         cboAccessLevel.setPromptText("Access Level");
+    }
+
+    @FXML
+    private void onTableClick() {
+        // Check if the tableview is empty
+        if (!EmployeeTable.getSelectionModel().isEmpty()) {
+            // Get the selected employee from the tableview
+            Person person = EmployeeTable.getSelectionModel().getSelectedItem();
+            txtID.setText(person.getEmployeeID());
+            txtFirstName.setText(person.getFirstName());
+            txtLastName.setText(person.getLastName());
+            txtEmail.setText(person.getEmail());
+            txtPhone.setText(person.getPhone());
+            cboAccessLevel.setValue(person.getAccessLevel());
+            txtNiNumber.setText(person.getNiNumber());
+        }
     }
 
 
