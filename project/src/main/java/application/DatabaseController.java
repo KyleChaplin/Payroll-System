@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class DatabaseController {
     private static Map<String, String> envVariables = new HashMap<>();
     private static Connection connection = null;
@@ -100,7 +99,7 @@ public class DatabaseController {
 
     // Method to load environment variables from the .env file
     public static void loadEnvVariables() {
-        String envPath = "src/main/resources/.env";
+        String envPath = "project/src/main/resources/.env";
 
         // Check if the .env file exists
         File envFile = new File(envPath);
