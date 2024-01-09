@@ -1,5 +1,9 @@
 package application;
 
+import application.employees.Person;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.sql.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -13,8 +17,6 @@ import java.util.Map;
 public class DatabaseController {
     private static Map<String, String> envVariables = new HashMap<>();
     private static Connection connection = null;
-
-
 
     // ********************************************
     // ************* DATABASE METHODS *************
@@ -36,6 +38,8 @@ public class DatabaseController {
                 System.out.println("Connection to Oracle Database failed.");
                 e.printStackTrace();
             }
+        } else {
+            System.out.println("Connection to Oracle Database already exists.\n");
         }
     }
 
@@ -92,7 +96,7 @@ public class DatabaseController {
         }
 
         // Close connection to Oracle Database
-        closeConnectionToDb();
+        //closeConnectionToDb();
     }
 
     // Method to load environment variables from the .env file
@@ -332,7 +336,7 @@ public class DatabaseController {
             e.printStackTrace();
         } finally {
             // Close connection to Oracle Database
-            closeConnectionToDb();
+            //closeConnectionToDb();
         }
     }
 
@@ -441,6 +445,7 @@ public class DatabaseController {
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "SELECT * FROM NPS_LOGIN WHERE ACCESS_LEVEL = 0")) {
             ResultSet resultSet = preparedStatement.executeQuery();
+
             if (resultSet.next()) {
                 String username = resultSet.getString("USERNAME");
                 String password = resultSet.getString("PASSWORD");
@@ -456,6 +461,39 @@ public class DatabaseController {
         }
     }
 
+    // Method to get all employees from the database and return an ObservableList
+    public static ObservableList<Person> getAllEmployees() {
+        ObservableList<Person> data = FXCollections.observableArrayList();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_EMPLOYEE")) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String id = resultSet.getString("ID");
+                String firstName = resultSet.getString("FIRST_NAME");
+                String lastName = resultSet.getString("LAST_NAME");
+                String email = resultSet.getString("EMAIL");
+                String phone = resultSet.getString("PHONE");
+
+                Person person = new Person(id, firstName, lastName, email, phone);
+
+                // Output for testing
+                System.out.println(person.getEmployeeID());
+                System.out.println(person.getFirstName());
+                System.out.println(person.getLastName());
+                System.out.println(person.getEmail());
+                System.out.println(person.getPhone());
+
+                data.add(person);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return data;
+    }
 
 
     // ********************************************

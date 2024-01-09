@@ -7,11 +7,12 @@ module org.example.project {
     requires java.sql;
 
     exports application;
-    opens application  to javafx.fxml;
+    opens application to javafx.fxml;
     exports application.home;
     exports application.schedule;
     exports application.payroll;
     exports application.employees;
+    opens application.employees to javafx.fxml;
     exports application.timeoff;
     exports application.help;
 }

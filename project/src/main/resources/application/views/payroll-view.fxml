@@ -11,7 +11,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.home.HomeController">
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.payroll.PayrollController">
    <center>
       <AnchorPane minHeight="830.0" minWidth="1000.0" prefHeight="830.0" prefWidth="1071.0" BorderPane.alignment="CENTER">
          <children>
