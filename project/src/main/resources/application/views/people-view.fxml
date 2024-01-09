@@ -69,7 +69,7 @@
                                     <Font size="16.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="txtID" editable="false" layoutX="208.0" layoutY="14.0" prefHeight="25.0" prefWidth="300.0" />
+                              <TextField fx:id="txtID" editable="false" layoutX="208.0" layoutY="14.0" prefHeight="25.0" prefWidth="300.0" promptText="Employee ID (Auto Fill)" />
                               <Label layoutX="108.0" layoutY="46.0" text="First Name:">
                                  <font>
                                     <Font size="16.0" />

@@ -118,7 +118,18 @@ public class EmployeeController implements Initializable {
 
     @FXML
     private void btnUpdate(ActionEvent event) throws IOException {
+        // Check if the text fields are empty
+        // Only update the employee if all the text fields are filled in
+        if (txtID.getText().isEmpty() || txtFirstName.getText().isEmpty() || txtLastName.getText().isEmpty() || txtEmail.getText().isEmpty() || txtPhone.getText().isEmpty() || txtNiNumber.getText().isEmpty() || cboAccessLevel.getSelectionModel().isEmpty()) {
+            // Show an error message
+            txtEmptyError.setText("Fields should not be empty!");
+        } else {
+            // Update the employee
+            updateEmployee(txtID.getText(), txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(), txtPhone.getText(), txtNiNumber.getText(), Integer.parseInt((String)cboAccessLevel.getValue()));
 
+            btnClear(event);
+            btnRefresh(event);
+        }
     }
 
     @FXML
@@ -148,8 +159,8 @@ public class EmployeeController implements Initializable {
         txtLastName.clear();
         txtEmail.clear();
         txtPhone.clear();
-        cboAccessLevel.getSelectionModel().clearSelection();
-        cboAccessLevel.setPromptText("Access Level");
+        txtNiNumber.clear();
+        cboAccessLevel.setValue(null);
     }
 
     @FXML

@@ -302,6 +302,80 @@ public class DatabaseController {
         }
     }
 
+    // Method to update employee records
+    public static void updateEmployee(String employeeId, String firstName, String lastName, String email, String phone, String niNumber, int accessLevel) {
+        try {
+            // Check if the access level is being updated
+            String oldAccessLevel = getAccessLevel(email); // Retrieve the old access level from the database
+            boolean accessLevelUpdated = String.valueOf(accessLevel) != oldAccessLevel;
+
+            // Update the employee login if the access level is being updated
+            if (accessLevelUpdated) {
+                // Update the login access level
+                try (PreparedStatement preparedStatement = connection.prepareStatement(
+                        "UPDATE NPS_LOGIN SET ACCESS_LEVEL = ? WHERE EMPLOYEE_ID = ?")) {
+                    preparedStatement.setInt(1, accessLevel);
+                    preparedStatement.setString(2, employeeId);
+
+                    int rowsAffected = preparedStatement.executeUpdate();
+                    if (rowsAffected > 0) {
+                        System.out.println("Login access level updated successfully.");
+                    } else {
+                        System.out.println("Failed to update login access level.");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            // Check if the email is being updated
+            String oldEmail = getEmailById(employeeId); // Retrieve the old email from the database
+            boolean emailUpdated = !email.equals(oldEmail);
+
+            // Update the employee login if the email is being updated
+            if (emailUpdated) {
+                // Update the login username
+                try (PreparedStatement preparedStatement = connection.prepareStatement(
+                        "UPDATE NPS_LOGIN SET USERNAME = ? WHERE EMPLOYEE_ID = ?")) {
+                    preparedStatement.setString(1, email);
+                    preparedStatement.setString(2, employeeId);
+
+                    int rowsAffected = preparedStatement.executeUpdate();
+                    if (rowsAffected > 0) {
+                        System.out.println("Login username updated successfully.");
+                    } else {
+                        System.out.println("Failed to update login username.");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            // Update the employee record
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    "UPDATE NPS_EMPLOYEE SET FIRST_NAME = ?, LAST_NAME = ?, EMAIL = ?, PHONE = ?, NI_NUMBER = ? WHERE ID = ?")) {
+                preparedStatement.setString(1, firstName);
+                preparedStatement.setString(2, lastName);
+                preparedStatement.setString(3, email);
+                preparedStatement.setString(4, phone);
+                preparedStatement.setString(5, niNumber);
+                preparedStatement.setString(6, employeeId);
+
+                int rowsAffected = preparedStatement.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Employee record updated successfully.");
+                } else {
+                    System.out.println("No employee found with the given ID.");
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     // ********************************************
@@ -379,6 +453,22 @@ public class DatabaseController {
 
     // Method to delete an employee record
     public static void deleteEmployee(String employeeId) {
+        // Delete the login details
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "DELETE FROM NPS_LOGIN WHERE EMPLOYEE_ID = ?")) {
+            preparedStatement.setString(1, employeeId);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Login record deleted successfully.");
+            } else {
+                System.out.println("No login found with the given ID.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Delete the employee details
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "DELETE FROM NPS_EMPLOYEE WHERE ID = ?")) {
             preparedStatement.setString(1, employeeId);
@@ -393,6 +483,8 @@ public class DatabaseController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+
     }
 
     // ********************************************
@@ -509,6 +601,21 @@ public class DatabaseController {
             }
         }
         return accessLevel;
+    }
+
+    // Method to retrieve the email by employee ID
+    private static String getEmailById(String employeeId) throws SQLException {
+        String email = null;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT EMAIL FROM NPS_EMPLOYEE WHERE ID = ?")) {
+            preparedStatement.setString(1, employeeId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                email = resultSet.getString("EMAIL");
+            }
+        }
+        return email;
     }
 
 
