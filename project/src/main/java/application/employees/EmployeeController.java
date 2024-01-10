@@ -201,6 +201,10 @@ public class EmployeeController implements Initializable {
         SceneController.openScene(event, "people", stage, scene);
     }
 
+    public void openProfile(ActionEvent event) throws IOException {
+        SceneController.openScene(event, "profile", stage, scene);
+    }
+
     public void openTimeoff(ActionEvent event) throws IOException {
         SceneController.openScene(event, "timeoff", stage, scene);
     }

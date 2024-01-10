@@ -218,6 +218,21 @@
                         <Insets bottom="9.0" left="9.0" right="9.0" top="5.0" />
                      </VBox.margin>
                   </Button>
+                  <Button mnemonicParsing="false" onAction="#openProfile" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Profile" textAlignment="CENTER" textFill="WHITE">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                     <effect>
+                        <DropShadow height="15.0" radius="7.0" width="15.0">
+                           <color>
+                              <Color red="1.0" green="1.0" blue="1.0" />
+                           </color>
+                        </DropShadow>
+                     </effect>
+                     <VBox.margin>
+                        <Insets bottom="9.0" left="9.0" right="9.0" top="5.0" />
+                     </VBox.margin>
+                  </Button>
                   <Button mnemonicParsing="false" onAction="#openTimeoff" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Timeoff" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />

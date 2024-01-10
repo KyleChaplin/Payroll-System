@@ -16,6 +16,7 @@ import java.util.Map;
 public class DatabaseController {
     private static Map<String, String> envVariables = new HashMap<>();
     private static Connection connection = null;
+    private static String currentLoggedInEmployeeId;
 
     // ********************************************
     // ************* DATABASE METHODS *************
@@ -99,7 +100,7 @@ public class DatabaseController {
 
     // Method to load environment variables from the .env file
     public static void loadEnvVariables() {
-        String envPath = "project/src/main/resources/.env";
+        String envPath = "src/main/resources/.env";
 
         // Check if the .env file exists
         File envFile = new File(envPath);
@@ -452,38 +453,39 @@ public class DatabaseController {
 
     // Method to delete an employee record
     public static void deleteEmployee(String employeeId) {
-        // Delete the login details
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "DELETE FROM NPS_LOGIN WHERE EMPLOYEE_ID = ?")) {
-            preparedStatement.setString(1, employeeId);
+        // Check that you're not trying to delete the current logged-in user
+        if (!employeeId.equals(currentLoggedInEmployeeId)) {
+            // Delete the login details
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    "DELETE FROM NPS_LOGIN WHERE EMPLOYEE_ID = ?")) {
+                preparedStatement.setString(1, employeeId);
 
-            int rowsAffected = preparedStatement.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Login record deleted successfully.");
-            } else {
-                System.out.println("No login found with the given ID.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        // Delete the employee details
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "DELETE FROM NPS_EMPLOYEE WHERE ID = ?")) {
-            preparedStatement.setString(1, employeeId);
-
-            int rowsAffected = preparedStatement.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Employee record deleted successfully.");
-            } else {
-                System.out.println("No employee found with the given ID.");
+                int rowsAffected = preparedStatement.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Login record deleted successfully.");
+                } else {
+                    System.out.println("No login found with the given ID.");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
+            // Delete the employee details
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    "DELETE FROM NPS_EMPLOYEE WHERE ID = ?")) {
+                preparedStatement.setString(1, employeeId);
+
+                int rowsAffected = preparedStatement.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Employee record deleted successfully.");
+                } else {
+                    System.out.println("No employee found with the given ID.");
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-
-
     }
 
     // ********************************************
@@ -515,6 +517,7 @@ public class DatabaseController {
 
                 if (count > 0) {
                     System.out.println("Login successful.");
+                    currentLoggedInEmployeeId = String.valueOf(getEmployeeId(username));
                 } else {
                     System.out.println("Login failed.");
                 }
@@ -585,6 +588,36 @@ public class DatabaseController {
         }
 
         return data;
+    }
+
+    // Method to get an employees details by ID
+    public static Person getEmployeeInfo() {
+        Person person = null;
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_EMPLOYEE WHERE ID = ?")) {
+            preparedStatement.setString(1, currentLoggedInEmployeeId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String id = currentLoggedInEmployeeId;
+                String firstName = resultSet.getString("FIRST_NAME");
+                String lastName = resultSet.getString("LAST_NAME");
+                String email = resultSet.getString("EMAIL");
+                String phone = resultSet.getString("PHONE");
+                String niNumber = resultSet.getString("NI_NUMBER");
+
+                // Get access level
+                String accessLevel = getAccessLevel(email);
+
+                person = new Person(id, firstName, lastName, email, phone, accessLevel, niNumber);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+        return person;
     }
 
     // Method to get employee access level by email

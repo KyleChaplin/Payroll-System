@@ -13,6 +13,8 @@ module org.example.project {
     exports application.payroll;
     exports application.employees;
     opens application.employees to javafx.fxml;
+    exports application.profile;
+    opens application.profile to javafx.fxml;
     exports application.timeoff;
     exports application.help;
 }
