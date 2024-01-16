@@ -19,6 +19,10 @@ public class Main extends Application {
 
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("views/login-view.fxml")));
         Scene scene = new Scene(root);
+
+        // Setting css
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("css/dark.css")).toExternalForm());
+
         stage.initStyle(StageStyle.DECORATED);
         stage.setTitle("Payroll - Login");
         stage.setScene(scene);

@@ -45,7 +45,7 @@ public class ProfileController implements Initializable {
     private TextField txtlName;
 
     @FXML
-    private Button btnUpdate;
+    private Button btnGreen; // This button will either be "Edit" or "Update"
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -65,17 +65,17 @@ public class ProfileController implements Initializable {
         // Check if the text fields are editable
         if (txtfName.isEditable()) {
             // If they are editable, change the button text to "Update"
-            btnUpdate.setText("Update");
+            btnGreen.setText("Update");
         } else {
             // If they are not editable, change the button text to "Cancel"
-            btnUpdate.setText("Edit");
+            btnGreen.setText("Edit");
         }
     }
 
     public void btnToggleUpdate() {
 
         // Check if the text fields are editable
-        if (Objects.equals(btnUpdate.getText(), "Update")) {
+        if (Objects.equals(btnGreen.getText(), "Update")) {
             // Update the user's information
 
 
@@ -86,7 +86,7 @@ public class ProfileController implements Initializable {
             txtPhone.setEditable(!txtPhone.isEditable());
             txtNiNumber.setEditable(!txtNiNumber.isEditable());
 
-            btnUpdate.setText("Edit");
+            btnGreen.setText("Edit");
 
         } else {
             // Toggle the text fields to be editable or not
@@ -96,7 +96,7 @@ public class ProfileController implements Initializable {
             txtPhone.setEditable(!txtPhone.isEditable());
             txtNiNumber.setEditable(!txtNiNumber.isEditable());
 
-            btnUpdate.setText("Update");
+            btnGreen.setText("Update");
         }
 
 

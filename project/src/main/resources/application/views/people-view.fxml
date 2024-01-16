@@ -9,19 +9,18 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.employees.EmployeeController">
    <center>
       <AnchorPane minHeight="830.0" minWidth="1000.0" prefHeight="830.0" prefWidth="1071.0" BorderPane.alignment="CENTER">
          <children>
-            <Pane layoutX="20.0" layoutY="21.0" prefHeight="791.0" prefWidth="1032.0" style="-fx-border-color: lightblue; -fx-border-radius: 25;">
+            <Pane fx:id="contentPane" layoutX="20.0" layoutY="21.0">
                <children>
                   <VBox prefHeight="793.0" prefWidth="1034.0">
                      <children>
@@ -40,7 +39,7 @@
                               <Insets bottom="8.0" left="15.0" right="15.0" top="8.0" />
                            </VBox.margin>
                         </Separator>
-                        <TableView fx:id="EmployeeTable" editable="true" onMouseClicked="#onTableClick" prefHeight="368.0" prefWidth="1004.0">
+                        <TableView fx:id="EmployeeTable" onMouseClicked="#onTableClick" prefHeight="368.0" prefWidth="1004.0">
                           <columns>
                             <TableColumn fx:id="ID" prefWidth="75.0" text="Employee ID" />
                             <TableColumn fx:id="FirstName" prefWidth="75.0" text="First Name" />
@@ -64,88 +63,106 @@
                         </Separator>
                         <Pane prefHeight="332.0" prefWidth="1034.0">
                            <children>
-                              <Label layoutX="108.0" layoutY="14.0" text="Employee ID:">
-                                 <font>
-                                    <Font size="16.0" />
-                                 </font>
-                              </Label>
-                              <TextField fx:id="txtID" editable="false" layoutX="208.0" layoutY="14.0" prefHeight="25.0" prefWidth="300.0" promptText="Employee ID (Auto Fill)" />
-                              <Label layoutX="108.0" layoutY="46.0" text="First Name:">
-                                 <font>
-                                    <Font size="16.0" />
-                                 </font>
-                              </Label>
-                              <TextField fx:id="txtFirstName" layoutX="208.0" layoutY="46.0" prefWidth="300.0" promptText="First name" />
-                              <Label layoutX="108.0" layoutY="78.0" text="Last Name:">
-                                 <font>
-                                    <Font size="16.0" />
-                                 </font>
-                              </Label>
-                              <TextField fx:id="txtLastName" layoutX="208.0" layoutY="78.0" prefWidth="300.0" promptText="Last name" />
-                              <Label layoutX="526.0" layoutY="14.0" text="Email:">
-                                 <font>
-                                    <Font size="16.0" />
-                                 </font>
-                              </Label>
-                              <TextField fx:id="txtEmail" layoutX="626.0" layoutY="14.0" prefWidth="300.0" promptText="Email" />
-                              <Label layoutX="526.0" layoutY="46.0" text="Phone:">
-                                 <font>
-                                    <Font size="16.0" />
-                                 </font>
-                              </Label>
-                              <TextField fx:id="txtPhone" layoutX="626.0" layoutY="46.0" prefWidth="300.0" promptText="Phone" />
-                              <Button layoutX="726.0" layoutY="272.0" mnemonicParsing="false" onAction="#btnClear" prefHeight="46.0" prefWidth="92.0" style="-fx-background-radius: 9; -fx-background-color: MEDIUMPURPLE;" text="Clear" textAlignment="CENTER" textFill="WHITE">
-                                 <font>
-                                    <Font name="System Bold" size="16.0" />
-                                 </font>
-                              </Button>
-                              <Button layoutX="626.0" layoutY="272.0" mnemonicParsing="false" onAction="#btnDelete" prefHeight="46.0" prefWidth="92.0" style="-fx-background-radius: 9; -fx-background-color: INDIANRED;" text="Delete" textAlignment="CENTER" textFill="WHITE">
-                                 <font>
-                                    <Font name="System Bold" size="16.0" />
-                                 </font>
-                              </Button>
-                              <Button layoutX="826.0" layoutY="272.0" mnemonicParsing="false" onAction="#btnUpdate" prefHeight="46.0" prefWidth="92.0" style="-fx-background-radius: 9; -fx-background-color: DARKSEAGREEN;" text="Update" textAlignment="CENTER" textFill="WHITE">
-                                 <font>
-                                    <Font name="System Bold" size="16.0" />
-                                 </font>
-                              </Button>
-                              <Button layoutX="926.0" layoutY="272.0" mnemonicParsing="false" onAction="#btnAdd" prefHeight="46.0" prefWidth="92.0" style="-fx-background-radius: 9; -fx-background-color: CORNFLOWERBLUE;" text="Add" textAlignment="CENTER" textFill="WHITE">
-                                 <font>
-                                    <Font name="System Bold" size="16.0" />
-                                 </font>
-                              </Button>
-                              <Label layoutX="108.0" layoutY="172.0" prefHeight="152.0" prefWidth="92.0" text="0 - Admin&#10;1 - rgebvre&#10;2 - &#10;3 - &#10;4 - &#10;5 - " wrapText="true">
-                                 <font>
-                                    <Font size="16.0" />
-                                 </font>
-                              </Label>
-                              <Label layoutX="108.0" layoutY="147.0" text="Access levels" textFill="RED">
-                                 <font>
-                                    <Font size="16.0" />
-                                 </font>
-                              </Label>
-                              <Label layoutX="108.0" layoutY="110.0" text="Access Level:">
-                                 <font>
-                                    <Font size="16.0" />
-                                 </font>
-                              </Label>
-                              <ComboBox fx:id="cboAccessLevel" layoutX="208.0" layoutY="110.0" prefHeight="25.0" prefWidth="300.0" promptText="Access level">
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
-                              </ComboBox>
-                              <Label layoutX="526.0" layoutY="78.0" text="NI Number:">
-                                 <font>
-                                    <Font size="16.0" />
-                                 </font>
-                              </Label>
-                              <TextField fx:id="txtNiNumber" layoutX="626.0" layoutY="78.0" prefWidth="300.0" promptText="National Insurance Number" />
                               <Label fx:id="txtEmptyError" layoutX="716.0" layoutY="235.0" textFill="RED">
                                  <font>
                                     <Font size="18.0" />
                                  </font>
                               </Label>
+                              <VBox alignment="CENTER" layoutX="11.0" prefHeight="335.0" prefWidth="1002.0">
+                                 <children>
+                                    <HBox prefHeight="100.0" prefWidth="1035.0" spacing="25.0">
+                                       <children>
+                                          <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <Label text="Employee ID:">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField fx:id="txtID" editable="false" prefHeight="25.0" prefWidth="300.0" promptText="Employee ID (Auto Fill)" />
+                                                <Label text="First Name:">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField fx:id="txtFirstName" prefWidth="300.0" promptText="First name" />
+                                                <Label text="Last Name:">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField fx:id="txtLastName" prefWidth="300.0" promptText="Last name" />
+                                                <Label text="Access Level:">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cboAccessLevel" prefHeight="25.0" prefWidth="300.0" promptText="Access level">
+                                                   <cursor>
+                                                      <Cursor fx:constant="HAND" />
+                                                   </cursor>
+                                                </ComboBox>
+                                             </children>
+                                          </VBox>
+                                          <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <Label text="Email:">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField fx:id="txtEmail" prefWidth="300.0" promptText="Email" />
+                                                <Label text="Phone:">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField fx:id="txtPhone" prefWidth="300.0" promptText="Phone" />
+                                                <Label text="NI Number:">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField fx:id="txtNiNumber" prefWidth="300.0" promptText="National Insurance Number" />
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </HBox>
+                                    <HBox prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                          <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                          <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <Button fx:id="btnPurple" mnemonicParsing="false" onAction="#btnClear" prefHeight="46.0" prefWidth="92.0" text="Clear" textAlignment="CENTER" textFill="WHITE">
+                                                   <font>
+                                                      <Font name="System Bold" size="16.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button fx:id="btnRed" mnemonicParsing="false" onAction="#btnDelete" prefHeight="46.0" prefWidth="92.0" text="Delete" textAlignment="CENTER" textFill="WHITE">
+                                                   <font>
+                                                      <Font name="System Bold" size="16.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button fx:id="btnGreen" mnemonicParsing="false" onAction="#btnUpdate" prefHeight="46.0" prefWidth="92.0" text="Update" textAlignment="CENTER" textFill="WHITE">
+                                                   <font>
+                                                      <Font name="System Bold" size="16.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button fx:id="btnBlue" mnemonicParsing="false" onAction="#btnAdd" prefHeight="46.0" prefWidth="92.0" text="Add" textAlignment="CENTER" textFill="WHITE">
+                                                   <font>
+                                                      <Font name="System Bold" size="16.0" />
+                                                   </font>
+                                                </Button>
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
                            </children>
+                           <VBox.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </VBox.margin>
                         </Pane>
                      </children>
                   </VBox>
@@ -154,113 +171,64 @@
          </children></AnchorPane>
    </center>
    <left>
-      <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: lightblue;" BorderPane.alignment="CENTER">
+      <Pane fx:id="sideBar" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
             <VBox layoutY="101.0" prefHeight="435.0" prefWidth="200.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#openDashboard" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Dashboard" textAlignment="CENTER" textFill="WHITE" underline="true">
+                  <Button mnemonicParsing="false" onAction="#openDashboard" prefHeight="60.0" prefWidth="200.0" text="Dashboard" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
-                     <effect>
-                        <DropShadow height="15.0" radius="7.0" width="15.0">
-                           <color>
-                              <Color red="1.0" green="1.0" blue="1.0" />
-                           </color>
-                        </DropShadow>
-                     </effect>
                      <VBox.margin>
-                        <Insets bottom="9.0" left="9.0" right="9.0" top="5.0" />
+                        <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openSchedule" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Schedule" textAlignment="CENTER" textFill="WHITE">
+                  <Button mnemonicParsing="false" onAction="#openSchedule" prefHeight="60.0" prefWidth="200.0" text="Schedule" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
-                     <effect>
-                        <DropShadow height="15.0" radius="7.0" width="15.0">
-                           <color>
-                              <Color red="1.0" green="1.0" blue="1.0" />
-                           </color>
-                        </DropShadow>
-                     </effect>
                      <VBox.margin>
-                        <Insets bottom="9.0" left="9.0" right="9.0" top="5.0" />
+                        <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openPayroll" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Payroll" textAlignment="CENTER" textFill="WHITE">
+                  <Button mnemonicParsing="false" onAction="#openPayroll" prefHeight="60.0" prefWidth="200.0" text="Payroll" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
-                     <effect>
-                        <DropShadow height="15.0" radius="7.0" width="15.0">
-                           <color>
-                              <Color red="1.0" green="1.0" blue="1.0" />
-                           </color>
-                        </DropShadow>
-                     </effect>
                      <VBox.margin>
-                        <Insets bottom="9.0" left="9.0" right="9.0" top="5.0" />
+                        <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openPeople" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="People" textAlignment="CENTER" textFill="WHITE">
+                  <Button mnemonicParsing="false" onAction="#openPeople" prefHeight="60.0" prefWidth="200.0" text="People" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
-                     <effect>
-                        <DropShadow height="15.0" radius="7.0" width="15.0">
-                           <color>
-                              <Color red="1.0" green="1.0" blue="1.0" />
-                           </color>
-                        </DropShadow>
-                     </effect>
                      <VBox.margin>
-                        <Insets bottom="9.0" left="9.0" right="9.0" top="5.0" />
+                        <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openProfile" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Profile" textAlignment="CENTER" textFill="WHITE">
+                  <Button mnemonicParsing="false" onAction="#openProfile" prefHeight="60.0" prefWidth="200.0" text="Profile" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
-                     <effect>
-                        <DropShadow height="15.0" radius="7.0" width="15.0">
-                           <color>
-                              <Color red="1.0" green="1.0" blue="1.0" />
-                           </color>
-                        </DropShadow>
-                     </effect>
                      <VBox.margin>
-                        <Insets bottom="9.0" left="9.0" right="9.0" top="5.0" />
+                        <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openTimeoff" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Timeoff" textAlignment="CENTER" textFill="WHITE">
+                  <Button mnemonicParsing="false" onAction="#openTimeoff" prefHeight="60.0" prefWidth="200.0" text="Timeoff" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
-                     <effect>
-                        <DropShadow height="15.0" radius="7.0" width="15.0">
-                           <color>
-                              <Color red="1.0" green="1.0" blue="1.0" />
-                           </color>
-                        </DropShadow>
-                     </effect>
                      <VBox.margin>
-                        <Insets bottom="9.0" left="9.0" right="9.0" top="5.0" />
+                        <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openHelp" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Help" textAlignment="CENTER" textFill="WHITE">
+                  <Button mnemonicParsing="false" onAction="#openHelp" prefHeight="60.0" prefWidth="200.0" text="Help" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
-                     <effect>
-                        <DropShadow height="15.0" radius="7.0" width="15.0">
-                           <color>
-                              <Color red="1.0" green="1.0" blue="1.0" />
-                           </color>
-                        </DropShadow>
-                     </effect>
                      <VBox.margin>
-                        <Insets bottom="9.0" left="9.0" right="9.0" top="5.0" />
+                        <Insets />
                      </VBox.margin>
                   </Button>
                </children>

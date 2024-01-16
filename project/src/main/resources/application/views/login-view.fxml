@@ -6,48 +6,47 @@
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.paint.Color?>
-<?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SceneController">
    <left>
-      <AnchorPane prefHeight="465.0" prefWidth="300.0" style="-fx-background-color: lightblue;" BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="278.0" prefWidth="288.0" BorderPane.alignment="CENTER">
          <children>
-            <Circle fill="#1f93ff00" layoutX="150.0" layoutY="203.0" radius="121.0" stroke="WHITE" strokeType="INSIDE">
-               <effect>
-                  <DropShadow height="15.0" radius="7.0" width="15.0">
-                     <color>
-                        <Color red="0.40789473056793213" green="0.40789473056793213" blue="0.40789473056793213" />
-                     </color>
-                  </DropShadow>
-               </effect>
-            </Circle>
-            <Label layoutX="73.0" layoutY="142.0" lineSpacing="1.0" text="Welcome" textFill="WHITE">
+            <ImageView fitHeight="321.0" fitWidth="298.0" layoutY="-43.0" pickOnBounds="true" visible="false">
+               <image>
+                  <Image url="@../../images/background.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="153.0" fitWidth="182.0" layoutX="93.0" layoutY="-12.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../images/login-icon.png" />
+               </image>
+            </ImageView>
+            <Button fx:id="loginButton" layoutX="169.0" layoutY="209.0" mnemonicParsing="false" onAction="#loginButtonOnAction" prefHeight="16.0" prefWidth="104.0" text="Login" textAlignment="CENTER" textFill="WHITE">
                <font>
-                  <Font name="System Bold" size="35.0" />
+                  <Font name="System Bold" size="12.0" />
                </font>
-               <effect>
-                  <DropShadow blurType="TWO_PASS_BOX" height="15.0" radius="7.0" width="15.0">
-                     <color>
-                        <Color red="0.28947368264198303" green="0.28947368264198303" blue="0.28947368264198303" />
-                     </color>
-                  </DropShadow>
-               </effect>
-            </Label>
-            <Pane layoutX="50.0" layoutY="202.0" prefHeight="4.0" prefWidth="200.0" style="-fx-background-color: white; -fx-background-radius: 5;">
-               <effect>
-                  <DropShadow height="15.0" radius="7.0" width="15.0">
-                     <color>
-                        <Color red="0.42105263471603394" green="0.42105263471603394" blue="0.42105263471603394" />
-                     </color>
-                  </DropShadow>
-               </effect>
-            </Pane>
-            <Label layoutX="68.0" layoutY="435.0" lineSpacing="1.0" text="Copyright (c). All Rights Reserved." textFill="WHITE">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <TextField fx:id="usernameTextField" layoutX="22.0" layoutY="141.0" prefHeight="25.0" prefWidth="255.0" promptText="Username">
+               <cursor>
+                  <Cursor fx:constant="TEXT" />
+               </cursor>
+            </TextField>
+            <Label fx:id="loginMessageLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="23.0" layoutY="119.0" prefHeight="17.0" prefWidth="255.0" textAlignment="CENTER" textFill="#ff0202" />
+            <PasswordField fx:id="passwordTextField" layoutX="22.0" layoutY="174.0" prefHeight="25.0" prefWidth="255.0" promptText="Password">
+               <cursor>
+                  <Cursor fx:constant="TEXT" />
+               </cursor>
+            </PasswordField>
+            <Label layoutX="69.0" layoutY="254.0" lineSpacing="1.0" text="Copyright (c). All Rights Reserved.">
                <font>
                   <Font size="11.0" />
                </font>
@@ -59,9 +58,9 @@
                   </DropShadow>
                </effect>
             </Label>
-            <Label layoutX="108.0" layoutY="218.0" lineSpacing="1.0" text="Payroll" textFill="WHITE">
+            <Label fx:id="lblForgotP" layoutX="29.0" layoutY="214.0" lineSpacing="1.0" prefHeight="16.0" prefWidth="85.0" text="Forgot Password?">
                <font>
-                  <Font size="28.0" />
+                  <Font name="System Italic" size="11.0" />
                </font>
                <effect>
                   <DropShadow blurType="TWO_PASS_BOX" height="15.0" radius="7.0" width="15.0">
@@ -74,57 +73,4 @@
          </children>
       </AnchorPane>
    </left>
-   <center>
-      <AnchorPane prefHeight="465.0" prefWidth="300.0" BorderPane.alignment="CENTER">
-         <children>
-            <Button fx:id="loginButton" layoutX="28.0" layoutY="337.0" mnemonicParsing="false" onAction="#loginButtonOnAction" prefHeight="40.0" prefWidth="244.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Login" textAlignment="CENTER" textFill="WHITE">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font>
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-            </Button>
-            <Button layoutX="28.0" layoutY="383.0" mnemonicParsing="false" onAction="#closeApplication" prefHeight="40.0" prefWidth="244.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Cancel" textAlignment="CENTER" textFill="WHITE">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font>
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-            </Button>
-            <TextField fx:id="usernameTextField" layoutX="97.0" layoutY="185.0" prefHeight="25.0" prefWidth="178.0" promptText="Username">
-               <cursor>
-                  <Cursor fx:constant="TEXT" />
-               </cursor></TextField>
-            <Label layoutX="15.0" layoutY="187.0" text="Username">
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </Label>
-            <Label fx:id="loginMessageLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="23.0" layoutY="162.0" prefHeight="17.0" prefWidth="255.0" textAlignment="CENTER" textFill="#ff0202" />
-            <Label layoutX="14.0" layoutY="222.0" text="Passsword">
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </Label>
-            <Label layoutX="96.0" layoutY="52.0" text="Login">
-               <font>
-                  <Font size="44.0" />
-               </font>
-               <effect>
-                  <DropShadow blurType="TWO_PASS_BOX" height="15.0" radius="7.0" width="15.0">
-                     <color>
-                        <Color red="0.28947368264198303" green="0.28947368264198303" blue="0.28947368264198303" />
-                     </color>
-                  </DropShadow>
-               </effect>
-            </Label>
-            <PasswordField fx:id="passwordTextField" layoutX="97.0" layoutY="220.0" prefHeight="25.0" prefWidth="178.0" promptText="Password">
-               <cursor>
-                  <Cursor fx:constant="TEXT" />
-               </cursor></PasswordField>
-         </children>
-      </AnchorPane>
-   </center>
 </BorderPane>

@@ -1,0 +1,54 @@
+.root {
+    /*-fx-background-color: linear-gradient(from 2% 55% to 100% 100%, #ADD8E6, #FFFFFF, #FFFFFF);*/
+    -fx-background-color: #00000000;
+}
+
+/* button */
+
+.button {
+    -fx-background-color: #ADD8E6;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 5;
+}
+
+.button:hover {
+    -fx-background-color: #99cfe0;
+}
+
+.button:pressed {
+    -fx-background-color: #86c5da;
+}
+
+/* label */
+
+.label {
+    -fx-text-fill: #000000;
+}
+
+/* text field */
+
+.text-field {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #000000;
+    -fx-background-radius: 5;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+    -fx-border-color: #ADD8E6;
+}
+
+.text-field:hover {
+    -fx-border-color: #99cfe0;
+}
+
+.text-field:focused {
+    -fx-border-color: #86c5da;
+    -fx-border-width: 1;
+}
+
+/* separator */
+
+.separator {
+    -fx-background-color: #000000;
+    -fx-background-radius: 5;
+    -fx-stroke: 0;
+}

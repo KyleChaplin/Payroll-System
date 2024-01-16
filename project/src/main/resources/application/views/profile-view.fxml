@@ -67,7 +67,7 @@
                                           <Insets left="20.0" />
                                        </padding>
                                     </Label>
-                                    <Button fx:id="btnUpdate" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#btnToggleUpdate" prefHeight="43.0" prefWidth="68.0" style="-fx-background-radius: 8; -fx-background-color: DARKSEAGREEN;" text="Update" textFill="WHITE">
+                                    <Button fx:id="btnGreen" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#btnToggleUpdate" prefHeight="43.0" prefWidth="68.0" style="-fx-background-radius: 8; -fx-background-color: DARKSEAGREEN;" text="Update" textFill="WHITE">
                                        <HBox.margin>
                                           <Insets left="850.0" />
                                        </HBox.margin>
@@ -115,12 +115,12 @@
                                     </VBox>
                                     <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">
                                        <children>
-                                          <TextField editable="false" style="-fx-background-radius: 8; -fx-background-color: #FFFFFF;" />
-                                          <TextField fx:id="txtfName" editable="false" style="-fx-background-radius: 8; -fx-background-color: #FFFFFF;" />
-                                          <TextField fx:id="txtlName" editable="false" style="-fx-background-radius: 8; -fx-background-color: #FFFFFF;" />
-                                          <TextField fx:id="txtEmail" editable="false" style="-fx-background-radius: 8; -fx-background-color: #FFFFFF;" />
-                                          <TextField fx:id="txtPhone" editable="false" style="-fx-background-radius: 8; -fx-background-color: #FFFFFF;" />
-                                          <TextField fx:id="txtNiNumber" editable="false" style="-fx-background-radius: 8; -fx-background-color: #FFFFFF;" />
+                                          <TextField editable="false" />
+                                          <TextField fx:id="txtfName" editable="false" />
+                                          <TextField fx:id="txtlName" editable="false" />
+                                          <TextField fx:id="txtEmail" editable="false" />
+                                          <TextField fx:id="txtPhone" editable="false" />
+                                          <TextField fx:id="txtNiNumber" editable="false" />
                                        </children>
                                     </VBox>
                                     <VBox alignment="CENTER_RIGHT" maxWidth="100.0" prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">
@@ -386,113 +386,64 @@
          </children></AnchorPane>
    </center>
    <left>
-      <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: lightblue;" BorderPane.alignment="CENTER">
+      <Pane fx:id="sideBar" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
             <VBox layoutY="101.0" prefHeight="435.0" prefWidth="200.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#openDashboard" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Dashboard" textAlignment="CENTER" textFill="WHITE" underline="true">
+                  <Button mnemonicParsing="false" onAction="#openDashboard" prefHeight="60.0" prefWidth="200.0" text="Dashboard" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
-                     <effect>
-                        <DropShadow height="15.0" radius="7.0" width="15.0">
-                           <color>
-                              <Color red="1.0" green="1.0" blue="1.0" />
-                           </color>
-                        </DropShadow>
-                     </effect>
                      <VBox.margin>
-                        <Insets bottom="9.0" left="9.0" right="9.0" top="5.0" />
+                        <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openSchedule" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Schedule" textAlignment="CENTER" textFill="WHITE">
+                  <Button mnemonicParsing="false" onAction="#openSchedule" prefHeight="60.0" prefWidth="200.0" text="Schedule" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
-                     <effect>
-                        <DropShadow height="15.0" radius="7.0" width="15.0">
-                           <color>
-                              <Color red="1.0" green="1.0" blue="1.0" />
-                           </color>
-                        </DropShadow>
-                     </effect>
                      <VBox.margin>
-                        <Insets bottom="9.0" left="9.0" right="9.0" top="5.0" />
+                        <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openPayroll" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Payroll" textAlignment="CENTER" textFill="WHITE">
+                  <Button mnemonicParsing="false" onAction="#openPayroll" prefHeight="60.0" prefWidth="200.0" text="Payroll" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
-                     <effect>
-                        <DropShadow height="15.0" radius="7.0" width="15.0">
-                           <color>
-                              <Color red="1.0" green="1.0" blue="1.0" />
-                           </color>
-                        </DropShadow>
-                     </effect>
                      <VBox.margin>
-                        <Insets bottom="9.0" left="9.0" right="9.0" top="5.0" />
+                        <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openPeople" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="People" textAlignment="CENTER" textFill="WHITE">
+                  <Button mnemonicParsing="false" onAction="#openPeople" prefHeight="60.0" prefWidth="200.0" text="People" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
-                     <effect>
-                        <DropShadow height="15.0" radius="7.0" width="15.0">
-                           <color>
-                              <Color red="1.0" green="1.0" blue="1.0" />
-                           </color>
-                        </DropShadow>
-                     </effect>
                      <VBox.margin>
-                        <Insets bottom="9.0" left="9.0" right="9.0" top="5.0" />
+                        <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openProfile" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Profile" textAlignment="CENTER" textFill="WHITE">
+                  <Button mnemonicParsing="false" onAction="#openProfile" prefHeight="60.0" prefWidth="200.0" text="Profile" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
-                     <effect>
-                        <DropShadow height="15.0" radius="7.0" width="15.0">
-                           <color>
-                              <Color red="1.0" green="1.0" blue="1.0" />
-                           </color>
-                        </DropShadow>
-                     </effect>
                      <VBox.margin>
-                        <Insets bottom="9.0" left="9.0" right="9.0" top="5.0" />
+                        <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openTimeoff" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Timeoff" textAlignment="CENTER" textFill="WHITE">
+                  <Button mnemonicParsing="false" onAction="#openTimeoff" prefHeight="60.0" prefWidth="200.0" text="Timeoff" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
-                     <effect>
-                        <DropShadow height="15.0" radius="7.0" width="15.0">
-                           <color>
-                              <Color red="1.0" green="1.0" blue="1.0" />
-                           </color>
-                        </DropShadow>
-                     </effect>
                      <VBox.margin>
-                        <Insets bottom="9.0" left="9.0" right="9.0" top="5.0" />
+                        <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openHelp" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: lightblue; -fx-background-radius: 5;" text="Help" textAlignment="CENTER" textFill="WHITE">
+                  <Button mnemonicParsing="false" onAction="#openHelp" prefHeight="60.0" prefWidth="200.0" text="Help" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
-                     <effect>
-                        <DropShadow height="15.0" radius="7.0" width="15.0">
-                           <color>
-                              <Color red="1.0" green="1.0" blue="1.0" />
-                           </color>
-                        </DropShadow>
-                     </effect>
                      <VBox.margin>
-                        <Insets bottom="9.0" left="9.0" right="9.0" top="5.0" />
+                        <Insets />
                      </VBox.margin>
                   </Button>
                </children>

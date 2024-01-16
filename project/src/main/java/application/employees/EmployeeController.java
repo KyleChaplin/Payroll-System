@@ -95,7 +95,12 @@ public class EmployeeController implements Initializable {
     }
 
     @FXML
-    private void btnAdd(ActionEvent event) throws IOException {
+    private void btnRefresh(ActionEvent event) throws IOException {
+        // Refresh the table
+        EmployeeTable.setItems(getAllEmployees());
+    }
+
+    public void btnAdd(ActionEvent event) throws IOException {
         // Check if the text fields are empty
         // Only add the employee if all the text fields are filled in
         if (txtFirstName.getText().isEmpty() || txtLastName.getText().isEmpty() || txtEmail.getText().isEmpty() || txtPhone.getText().isEmpty() || txtNiNumber.getText().isEmpty() || cboAccessLevel.getSelectionModel().isEmpty()) {
@@ -110,14 +115,7 @@ public class EmployeeController implements Initializable {
         }
     }
 
-    @FXML
-    private void btnRefresh(ActionEvent event) throws IOException {
-        // Refresh the table
-        EmployeeTable.setItems(getAllEmployees());
-    }
-
-    @FXML
-    private void btnUpdate(ActionEvent event) throws IOException {
+    public void btnUpdate(ActionEvent event) throws IOException {
         // Check if the text fields are empty
         // Only update the employee if all the text fields are filled in
         if (txtID.getText().isEmpty() || txtFirstName.getText().isEmpty() || txtLastName.getText().isEmpty() || txtEmail.getText().isEmpty() || txtPhone.getText().isEmpty() || txtNiNumber.getText().isEmpty() || cboAccessLevel.getSelectionModel().isEmpty()) {
@@ -132,8 +130,7 @@ public class EmployeeController implements Initializable {
         }
     }
 
-    @FXML
-    private void btnDelete(ActionEvent event) throws IOException {
+    public void btnDelete(ActionEvent event) throws IOException {
         // Select the employee from the tableview and delete them
         TableView.TableViewSelectionModel<Person> selectionModel = EmployeeTable.getSelectionModel();
         if (selectionModel.isEmpty()) {
@@ -151,8 +148,7 @@ public class EmployeeController implements Initializable {
         deleteEmployee(txtID.getText());
     }
 
-    @FXML
-    private void btnClear(ActionEvent event) throws IOException {
+    public void btnClear(ActionEvent event) throws IOException {
         // Clear the text fields
         txtID.clear();
         txtFirstName.clear();
