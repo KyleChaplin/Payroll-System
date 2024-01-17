@@ -6,6 +6,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.Button?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.help.HelpController">
    <center>
@@ -15,65 +18,135 @@
          </children></AnchorPane>
    </center>
    <left>
-      <Pane fx:id="sideBar" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <Pane fx:id="sideBar" prefHeight="830.0" prefWidth="65.0" BorderPane.alignment="CENTER">
          <children>
-            <VBox layoutY="101.0" prefHeight="435.0" prefWidth="200.0">
+            <VBox layoutY="101.0" prefHeight="435.0" prefWidth="54.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#openDashboard" prefHeight="60.0" prefWidth="200.0" text="Dashboard" textAlignment="CENTER" textFill="WHITE">
+                  <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openDashboard" prefHeight="60.0" prefWidth="200.0" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
+                     <graphic>
+                        <ImageView fitHeight="40.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true" styleClass="image-view">
+                           <image>
+                              <Image url="@../../images/home.png" />
+                           </image>
+                           <effect>
+                              <ColorAdjust brightness="1.0" />
+                           </effect>
+                        </ImageView>
+                     </graphic>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openSchedule" prefHeight="60.0" prefWidth="200.0" text="Schedule" textAlignment="CENTER" textFill="WHITE">
+                  <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openSchedule" prefHeight="60.0" prefWidth="200.0" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
+                     <graphic>
+                        <ImageView fitHeight="40.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true" styleClass="image-view">
+                           <image>
+                              <Image url="@../../images/calendar.png" />
+                           </image>
+                           <effect>
+                              <ColorAdjust brightness="1.0" />
+                           </effect>
+                        </ImageView>
+                     </graphic>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openPayroll" prefHeight="60.0" prefWidth="200.0" text="Payroll" textAlignment="CENTER" textFill="WHITE">
+                  <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openPayroll" prefHeight="60.0" prefWidth="200.0" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
+                     <graphic>
+                        <ImageView fitHeight="40.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true" styleClass="image-view">
+                           <image>
+                              <Image url="@../../images/payroll.png" />
+                           </image>
+                           <effect>
+                              <ColorAdjust brightness="1.0" />
+                           </effect>
+                        </ImageView>
+                     </graphic>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openPeople" prefHeight="60.0" prefWidth="200.0" text="People" textAlignment="CENTER" textFill="WHITE">
+                  <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openPeople" prefHeight="60.0" prefWidth="200.0" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
+                     <graphic>
+                        <ImageView fitHeight="40.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true" styleClass="image-view">
+                           <image>
+                              <Image url="@../../images/people.png" />
+                           </image>
+                           <effect>
+                              <ColorAdjust brightness="1.0" />
+                           </effect>
+                        </ImageView>
+                     </graphic>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openProfile" prefHeight="60.0" prefWidth="200.0" text="Profile" textAlignment="CENTER" textFill="WHITE">
+                  <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openProfile" prefHeight="60.0" prefWidth="200.0" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
+                     <graphic>
+                        <ImageView fitHeight="40.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true" styleClass="image-view">
+                           <image>
+                              <Image url="@../../images/profile.png" />
+                           </image>
+                           <effect>
+                              <ColorAdjust brightness="1.0" />
+                           </effect>
+                        </ImageView>
+                     </graphic>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openTimeoff" prefHeight="60.0" prefWidth="200.0" text="Timeoff" textAlignment="CENTER" textFill="WHITE">
+                  <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openTimeoff" prefHeight="60.0" prefWidth="200.0" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
+                     <graphic>
+                        <ImageView fitHeight="40.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true" styleClass="image-view">
+                           <image>
+                              <Image url="@../../images/schedule.png" />
+                           </image>
+                           <effect>
+                              <ColorAdjust brightness="1.0" />
+                           </effect>
+                        </ImageView>
+                     </graphic>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#openHelp" prefHeight="60.0" prefWidth="200.0" text="Help" textAlignment="CENTER" textFill="WHITE">
+                  <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openHelp" prefHeight="60.0" prefWidth="200.0" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
                      </font>
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
+                     <graphic>
+                        <ImageView fitHeight="40.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true" styleClass="image-view">
+                           <image>
+                              <Image url="@../../images/help.png" />
+                           </image>
+                           <effect>
+                              <ColorAdjust brightness="1.0" />
+                           </effect>
+                        </ImageView>
+                     </graphic>
                   </Button>
                </children>
             </VBox>

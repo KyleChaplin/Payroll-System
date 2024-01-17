@@ -94,6 +94,18 @@
     -fx-background-color: #2f2f2f;
 }
 
+#sideBar .button .image-view {
+    -fx-opacity: 0.5;
+}
+
+#sideBar .button:hover .image-view {
+    -fx-opacity: 0.8;
+}
+
+#sideBar .button:pressed .image-view {
+    -fx-opacity: 1.0;
+}
+
 /* label */
 
 .label {

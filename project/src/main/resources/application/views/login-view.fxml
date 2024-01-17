@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.ColorAdjust?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -22,10 +23,13 @@
                   <Image url="@../../images/background.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="153.0" fitWidth="182.0" layoutX="93.0" layoutY="-12.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="loginImage" fitHeight="153.0" fitWidth="182.0" layoutX="93.0" layoutY="-12.0" pickOnBounds="true" preserveRatio="true" style="-fx-opacity: 0.3;">
                <image>
                   <Image url="@../../images/login-icon.png" />
                </image>
+               <effect>
+                  <ColorAdjust brightness="1.0" />
+               </effect>
             </ImageView>
             <Button fx:id="loginButton" layoutX="169.0" layoutY="209.0" mnemonicParsing="false" onAction="#loginButtonOnAction" prefHeight="16.0" prefWidth="104.0" text="Login" textAlignment="CENTER" textFill="WHITE">
                <font>
