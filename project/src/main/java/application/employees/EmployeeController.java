@@ -1,7 +1,6 @@
 package application.employees;
 
 import application.SceneController;
-import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

@@ -68,6 +68,7 @@ public class DatabaseController {
                 "NPS_LOGIN",
                 "NPS_EMERGENCY_CONTACT",
                 "NPS_ADDRESSES",
+                "NPS_HELP_INFO"
                 //"NPS_SCHEDULE",
         };
 
@@ -242,6 +243,17 @@ public class DatabaseController {
                     e.printStackTrace();
                 }
                 break;
+            case "NPS_HELP_INFO":
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate("CREATE TABLE NPS_HELP_INFO (" +
+                            "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
+                            "TITLE VARCHAR2(100) NOT NULL, " +
+                            "DESCRIPTION VARCHAR2(1000) NOT NULL," +
+                            "ERROR_CODE VARCHAR2(10) NOT NULL" +
+                            ")");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             // Add cases for other tables...
         }
     }

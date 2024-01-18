@@ -17,4 +17,5 @@ module org.example.project {
     opens application.profile to javafx.fxml;
     exports application.timeoff;
     exports application.help;
+    opens application.help to javafx.fxml;
 }

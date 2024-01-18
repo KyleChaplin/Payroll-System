@@ -254,3 +254,46 @@
     -fx-background-radius: 1;
 }
 
+/* scroll pane */
+.scroll-pane {
+    -fx-background-color: transparent;
+    /*-fx-background-radius: 15;*/
+    -fx-border-color: #3d3d3d;
+    /*-fx-border-radius: 15;*/
+    -fx-border-width: 2;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: #575958;
+    /*-fx-background-radius: 15;*/
+}
+
+/* scroll bar */
+
+.scroll-bar {
+    -fx-background-color: #434443;
+    -fx-background-radius: 15;
+    -fx-arrows-visible: false;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color :transparent;
+    -fx-background-radius : 0.0em;
+    -fx-padding :0.0 0.0 10.0 0.0;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-background-color :transparent;
+    -fx-background-radius : 0.0em;
+    -fx-padding :0.0 0.0 00.0 0.0;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #b4b3b3;
+    -fx-background-radius: 15;
+}
+
+
+
