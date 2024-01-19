@@ -1,6 +1,7 @@
 package application.profile;
 
 import application.SceneController;
+import application.ThemeManager;
 import application.employees.Person;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -50,7 +51,6 @@ public class ProfileController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Populate the text fields with the current user's information
-
         Person person = getEmployeeInfo();
 
         lblName.setText("Employee: " + person.getFirstName() + " " + person.getLastName());
@@ -134,6 +134,10 @@ public class ProfileController implements Initializable {
 
     public void openHelp(ActionEvent event) throws IOException {
         SceneController.openScene(event, "help", stage, scene);
+    }
+
+    public void toggleTheme(ActionEvent event) throws IOException {
+        ThemeManager.toggleMode();
     }
 
 }

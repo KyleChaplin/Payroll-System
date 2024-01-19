@@ -542,6 +542,18 @@
                   </Button>
                </children>
             </VBox>
+            <Button fx:id="btnDark" layoutY="769.0" mnemonicParsing="false" onAction="#toggleTheme" prefHeight="60.0" prefWidth="63.0">
+               <graphic>
+                  <ImageView pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/theme.png" />
+                     </image>
+                     <effect>
+                        <ColorAdjust brightness="1.0" />
+                     </effect>
+                  </ImageView>
+               </graphic>
+            </Button>
          </children>
       </Pane>
    </left>

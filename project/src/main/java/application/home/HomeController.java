@@ -1,6 +1,7 @@
 package application.home;
 
 import application.SceneController;
+import application.ThemeManager;
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -43,6 +44,10 @@ public class HomeController {
 
     public void openHelp(ActionEvent event) throws IOException {
         SceneController.openScene(event, "help", stage, scene);
+    }
+
+    public void toggleTheme(ActionEvent event) throws IOException {
+        ThemeManager.toggleMode();
     }
 
 }

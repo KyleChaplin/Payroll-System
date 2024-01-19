@@ -1,6 +1,7 @@
 package application.timeoff;
 
 import application.SceneController;
+import application.ThemeManager;
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -45,4 +46,7 @@ public class TimeoffController {
         SceneController.openScene(event, "help", stage, scene);
     }
 
+    public void toggleTheme(ActionEvent event) throws IOException {
+        ThemeManager.toggleMode();
+    }
 }

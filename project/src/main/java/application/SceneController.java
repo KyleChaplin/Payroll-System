@@ -75,7 +75,19 @@ public class SceneController {
         Parent root = FXMLLoader.load(Objects.requireNonNull(application.Main.class.getResource("views/" + name + "-view.fxml")));
         stg = (Stage)((Node)event.getSource()).getScene().getWindow();
         scn = new Scene(root);
-        scn.getStylesheets().add(Objects.requireNonNull(application.Main.class.getResource("css/dark.css")).toExternalForm());
+
+
+        // Add a listener to the currentModeProperty
+        Scene finalScn = scn;
+        ThemeManager.currentModeProperty().addListener((observable, oldValue, newValue) -> {
+            finalScn.getStylesheets().clear(); // Clear existing stylesheets
+            finalScn.getStylesheets().add(Objects.requireNonNull(application.Main.class.getResource("css/" + newValue + ".css")).toExternalForm());
+        });
+
+        // Manually set the initial stylesheet
+        scn.getStylesheets().add(Objects.requireNonNull(application.Main.class.getResource("css/" + ThemeManager.getCurrentMode() + ".css")).toExternalForm());
+        //scn.getStylesheets().add(Objects.requireNonNull(application.Main.class.getResource("css/" + ThemeManager.getCurrentMode() + ".css")).toExternalForm());
+
         stg.setTitle("Payroll - " + name);
         stg.setScene(scn);
         stg.show();

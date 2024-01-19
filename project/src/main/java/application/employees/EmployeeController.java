@@ -1,6 +1,7 @@
 package application.employees;
 
 import application.SceneController;
+import application.ThemeManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -206,5 +207,9 @@ public class EmployeeController implements Initializable {
 
     public void openHelp(ActionEvent event) throws IOException {
         SceneController.openScene(event, "help", stage, scene);
+    }
+
+    public void toggleTheme(ActionEvent event) throws IOException {
+        ThemeManager.toggleMode();
     }
 }

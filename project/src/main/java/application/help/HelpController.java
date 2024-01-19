@@ -2,6 +2,7 @@ package application.help;
 
 import application.DatabaseController;
 import application.SceneController;
+import application.ThemeManager;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -131,5 +132,9 @@ public class HelpController implements Initializable {
 
     public void openHelp(ActionEvent event) throws IOException {
         SceneController.openScene(event, "help", stage, scene);
+    }
+
+    public void toggleTheme(ActionEvent event) throws IOException {
+        ThemeManager.toggleMode();
     }
 }

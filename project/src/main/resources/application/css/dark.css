@@ -23,7 +23,6 @@
 
 #btnRed {
     -fx-background-color: #CD5C5C;
-    -fx-background-radius: 15;
 }
 
 #btnRed:hover {
@@ -36,7 +35,6 @@
 
 #btnGreen {
     -fx-background-color: #8FBC8F;
-    -fx-background-radius: 15;
 }
 
 #btnGreen:hover {
@@ -49,7 +47,6 @@
 
 #btnBlue {
     -fx-background-color: #6495ED;
-    -fx-background-radius: 15;
 }
 
 #btnBlue:hover {
@@ -62,7 +59,6 @@
 
 #btnPurple {
     -fx-background-color: #9370DB;
-    -fx-background-radius: 15;
 }
 
 #btnPurple:hover {
@@ -77,7 +73,6 @@
 
 #sideBar {
     -fx-background-color: #434443;
-    -fx-background-radius: 0;
 }
 
 #sideBar .button {
@@ -257,15 +252,12 @@
 /* scroll pane */
 .scroll-pane {
     -fx-background-color: transparent;
-    /*-fx-background-radius: 15;*/
     -fx-border-color: #3d3d3d;
-    /*-fx-border-radius: 15;*/
     -fx-border-width: 2;
 }
 
 .scroll-pane .viewport {
     -fx-background-color: #575958;
-    /*-fx-background-radius: 15;*/
 }
 
 /* scroll bar */

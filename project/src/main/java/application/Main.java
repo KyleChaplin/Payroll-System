@@ -26,7 +26,17 @@ public class Main extends Application {
         Scene scene = new Scene(root);
 
         // Setting css
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("css/dark.css")).toExternalForm());
+        //scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("css/" + ThemeManager.getCurrentMode() + ".css")).toExternalForm());
+
+        // Add a listener to the currentModeProperty
+        ThemeManager.currentModeProperty().addListener((observable, oldValue, newValue) -> {
+            scene.getStylesheets().clear(); // Clear existing stylesheets
+            scene.getStylesheets().add(Objects.requireNonNull(application.Main.class.getResource("css/" + newValue + ".css")).toExternalForm());
+        });
+
+        // Manually set the initial stylesheet
+        scene.getStylesheets().add(Objects.requireNonNull(application.Main.class.getResource("css/" + ThemeManager.getCurrentMode() + ".css")).toExternalForm());
+
 
         stage.initStyle(StageStyle.DECORATED);
         stage.setTitle("Payroll - Login");
