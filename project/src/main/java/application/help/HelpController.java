@@ -1,12 +1,16 @@
 package application.help;
 
+import application.DatabaseController;
 import application.SceneController;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -34,23 +38,42 @@ public class HelpController implements Initializable {
     @FXML
     private Pane pane;
 
+    @FXML
+    private Pane addPane;
+
+    @FXML
+    private TextField txtErrorCode;
+
+    @FXML
+    private TextField txtTitle;
+
+    @FXML
+    private TextArea txtDescription;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // TODO: This will populate the scroll pane with the help information
         //  by dynamically creating the labels and text
 
+        ObservableList<HelpInfo> helpInfo = (ObservableList<HelpInfo>) DatabaseController.getHelpInfo();
+
         VBox helpVbox = new VBox();
 
         // For loop to create the labels and text
-        for (int i = 0; i < 100; i++) {
+        for (HelpInfo info : helpInfo) {
+
+            Label errorCode = new Label();
+            errorCode.setText(info.getErrorCode());
+
             Label title = new Label();
-            title.setText("This is a test");
+            title.setText(info.getTitle());
 
             Label description = new Label();
-            description.setText("This is a test description");
+            description.setText(info.getDescription());
 
             VBox vbox = new VBox();
-            vbox.setStyle("-fx-padding: 20px; -fx-spacing: 10px;" );
+            vbox.setStyle("-fx-padding: 20px; -fx-spacing: 10px;");
+            vbox.getChildren().add(errorCode);
             vbox.getChildren().add(title);
             vbox.getChildren().add(description);
 
@@ -63,6 +86,18 @@ public class HelpController implements Initializable {
         }
 
         scrollHelp.setContent(helpVbox);
+    }
+
+    public void showAddPanel(ActionEvent event) throws IOException {
+        addPane.setVisible(true);
+        addPane.setDisable(false);
+    }
+
+    public void addHelpInfoToDB(ActionEvent event) throws IOException {
+        DatabaseController.addHelp(txtErrorCode.getText(), txtTitle.getText(), txtDescription.getText());
+
+        addPane.setVisible(false);
+        addPane.setDisable(true);
     }
 
     public void CloseApplication(ActionEvent event) throws IOException {

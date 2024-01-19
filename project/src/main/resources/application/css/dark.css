@@ -295,5 +295,11 @@
     -fx-background-radius: 15;
 }
 
-
+/* Help pane */
+#addPane {
+    -fx-background-color: #4a4c4b;
+    -fx-background-radius: 15;
+    -fx-border-color: #575958;
+    -fx-border-radius: 15;
+}
 

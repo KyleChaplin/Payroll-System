@@ -1,6 +1,7 @@
 package application;
 
 import application.employees.Person;
+import application.help.HelpInfo;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -247,9 +248,9 @@ public class DatabaseController {
                 try (Statement statement = connection.createStatement()) {
                     statement.executeUpdate("CREATE TABLE NPS_HELP_INFO (" +
                             "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
-                            "TITLE VARCHAR2(100) NOT NULL, " +
+                            "TITLE VARCHAR2(250) NOT NULL, " +
                             "DESCRIPTION VARCHAR2(1000) NOT NULL," +
-                            "ERROR_CODE VARCHAR2(10) NOT NULL" +
+                            "ERROR_CODE VARCHAR2(25) NOT NULL" +
                             ")");
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -457,6 +458,25 @@ public class DatabaseController {
         }
     }
 
+    // Method to add help info
+    public static void addHelp(String errorCode, String Title, String Description) {
+        // Add employee record
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO NPS_HELP_INFO (ERROR_CODE, TITLE, DESCRIPTION) VALUES (?, ?, ?)")) {
+            preparedStatement.setString(1, errorCode);
+            preparedStatement.setString(2, Title);
+            preparedStatement.setString(3, Description);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Help info added successfully.");
+            } else {
+                System.out.println("Failed to add help info.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     // ********************************************
@@ -544,7 +564,7 @@ public class DatabaseController {
     }
 
     // Method to get the employee ID by email
-    private static int getEmployeeId(String email) throws SQLException {
+    public static int getEmployeeId(String email) throws SQLException {
         int employeeId = -1;
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "SELECT ID FROM NPS_EMPLOYEE WHERE EMAIL = ?")) {
@@ -660,6 +680,30 @@ public class DatabaseController {
             }
         }
         return email;
+    }
+
+    // Method to get all help info
+    public static ObservableList<HelpInfo> getHelpInfo() {
+        ObservableList<HelpInfo> data = FXCollections.observableArrayList();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_HELP_INFO")) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String title = resultSet.getString("TITLE");
+                String description = resultSet.getString("DESCRIPTION");
+                String errorCode = resultSet.getString("ERROR_CODE");
+
+                HelpInfo info = new HelpInfo(errorCode, title, description);
+
+                data.add(info);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return data;
     }
 
 

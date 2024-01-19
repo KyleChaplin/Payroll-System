@@ -4,12 +4,14 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.ColorAdjust?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -18,9 +20,9 @@
    <center>
       <AnchorPane minHeight="830.0" minWidth="1000.0" prefHeight="830.0" prefWidth="1071.0" BorderPane.alignment="CENTER">
          <children>
-            <VBox prefHeight="830.0" prefWidth="1071.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <VBox alignment="BOTTOM_RIGHT" prefHeight="830.0" prefWidth="1071.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <padding>
-                  <Insets bottom="40.0" left="20.0" right="20.0" top="40.0" />
+                  <Insets bottom="10.0" left="20.0" right="20.0" top="15.0" />
                </padding>
                <children>
                   <VBox alignment="CENTER" prefHeight="103.0" prefWidth="1031.0" VBox.vgrow="NEVER">
@@ -35,11 +37,12 @@
                               <Font size="15.0" />
                            </font>
                         </Label>
-                        <TextField fx:id="txtHelp" prefHeight="25.0" prefWidth="792.0" promptText="Search for help...">
-                           <VBox.margin>
-                              <Insets left="20.0" right="20.0" top="25.0" />
-                           </VBox.margin>
-                        </TextField>
+                        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="5.0">
+                           <children>
+                              <TextField fx:id="txtHelp" prefHeight="25.0" prefWidth="792.0" promptText="Search for help..." />
+                              <Button mnemonicParsing="false" text="Search" />
+                           </children>
+                        </HBox>
                      </children>
                   </VBox>
                   <ScrollPane fx:id="scrollHelp" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
@@ -58,8 +61,26 @@
                         <Insets top="20.0" />
                      </VBox.margin>
                   </ScrollPane>
+                  <Button fx:id="btnGreen" mnemonicParsing="false" onAction="#showAddPanel" prefHeight="25.0" prefWidth="48.0" text="ADD">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </Button>
                </children>
             </VBox>
+            <Pane fx:id="addPane" disable="true" prefHeight="830.0" prefWidth="1071.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <VBox alignment="CENTER" fillWidth="false" layoutX="229.0" layoutY="125.0" prefHeight="540.0" prefWidth="623.0" spacing="25.0">
+                     <children>
+                        <Label text="Add help info" />
+                        <TextField fx:id="txtErrorCode" prefHeight="25.0" prefWidth="308.0" promptText="Error Code" />
+                        <TextField fx:id="txtTitle" prefWidth="308.0" promptText="Title" />
+                        <TextArea fx:id="txtDescription" prefHeight="183.0" prefWidth="308.0" promptText="Description" VBox.vgrow="NEVER" />
+                        <Button fx:id="btnGreen" mnemonicParsing="false" onAction="#addHelpInfoToDB" text="ADD" />
+                     </children>
+                  </VBox>
+               </children>
+            </Pane>
          </children></AnchorPane>
    </center>
    <left>
