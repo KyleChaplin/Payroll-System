@@ -1,108 +1,108 @@
 .root {
-    -fx-background-color: #E6F7FF; /* Light blue background */
+    -fx-background-color: #F2F2F2; /* Light gray background */
 }
 
 /* button */
 
 .button {
-    -fx-background-color: #007BFF; /* Light blue button */
+    -fx-background-color: #3498DB; /* Light blue button */
     -fx-text-fill: #FFFFFF;
     -fx-background-radius: 15;
 }
 
 .button:hover {
-    -fx-background-color: #0056b3; /* Darker blue on hover */
+    -fx-background-color: #2980B9; /* Darker blue on hover */
 }
 
 .button:pressed {
-    -fx-background-color: #003366; /* Even darker blue when pressed */
+    -fx-background-color: #1F618D; /* Even darker blue when pressed */
 }
 
 /* coloured buttons */
 
 #btnRed {
-    -fx-background-color: #FF6F61; /* Light red button */
+    -fx-background-color: #E74C3C; /* Light red button */
 }
 
 #btnRed:hover {
-    -fx-background-color: #E74C3C; /* Darker red on hover */
+    -fx-background-color: #C0392B; /* Darker red on hover */
 }
 
 #btnRed:pressed {
-    -fx-background-color: #943126; /* Even darker red when pressed */
+    -fx-background-color: #922B21; /* Even darker red when pressed */
 }
 
 #btnGreen {
-    -fx-background-color: #98FB98; /* Light green button */
+    -fx-background-color: #2ECC71; /* Light green button */
 }
 
 #btnGreen:hover {
-    -fx-background-color: #2E8B57; /* Darker green on hover */
+    -fx-background-color: #27AE60; /* Darker green on hover */
 }
 
 #btnGreen:pressed {
-    -fx-background-color: #006400; /* Even darker green when pressed */
+    -fx-background-color: #196F3D; /* Even darker green when pressed */
 }
 
 #btnBlue {
-    -fx-background-color: #87CEFA; /* Light blue button */
+    -fx-background-color: #3498DB; /* Light blue button */
 }
 
 #btnBlue:hover {
-    -fx-background-color: #4682B4; /* Darker blue on hover */
+    -fx-background-color: #2980B9; /* Darker blue on hover */
 }
 
 #btnBlue:pressed {
-    -fx-background-color: #1E90FF; /* Even darker blue when pressed */
+    -fx-background-color: #1F618D; /* Even darker blue when pressed */
 }
 
 #btnPurple {
-    -fx-background-color: #D8BFD8; /* Light purple button */
+    -fx-background-color: #9B59B6; /* Light purple button */
 }
 
 #btnPurple:hover {
-    -fx-background-color: #8A2BE2; /* Darker purple on hover */
+    -fx-background-color: #8E44AD; /* Darker purple on hover */
 }
 
 #btnPurple:pressed {
-    -fx-background-color: #800080; /* Even darker purple when pressed */
+    -fx-background-color: #6C3483; /* Even darker purple when pressed */
 }
 
 /* Sidebar */
 
 #sideBar {
-    -fx-background-color: #007BFF; /* Light blue sidebar */
+    -fx-background-color: #3498DB; /* Light blue sidebar */
 }
 
 #sideBar .button {
-    -fx-background-color: #007BFF; /* Light blue button in sidebar */
+    -fx-background-color: #3498DB; /* Light blue button in sidebar */
     -fx-text-fill: #FFFFFF;
     -fx-background-radius: 0;
 }
 
 #sideBar .button:hover {
-    -fx-background-color: #0056b3; /* Darker blue on hover in sidebar */
+    -fx-background-color: #2980B9; /* Darker blue on hover in sidebar */
 }
 
 #sideBar .button:pressed {
-    -fx-background-color: #003366; /* Even darker blue when pressed in sidebar */
+    -fx-background-color: #1F618D; /* Even darker blue when pressed in sidebar */
 }
 
 /* label */
 
 .label {
-    -fx-text-fill: #333333; /* Dark gray text color */
+    -fx-text-fill: #555555; /* Dark gray text color */
 }
 
 #loginMessageLabel,
 #txtEmptyError {
-    -fx-text-fill: #d30000; /* Dark red error message */
+    -fx-text-fill: #D35400; /* Dark orange error message */
     -fx-font-size: 12;
     -fx-font-weight: bold;
 }
 
 #lblForgotP:hover {
-    -fx-text-fill: #007BFF; /* Light blue on hover for hyperlink */
+    -fx-text-fill: #3498DB; /* Light blue on hover for hyperlink */
     -fx-underline: true;
 }
 
@@ -110,19 +110,19 @@
 
 .text-field {
     -fx-background-color: #FFFFFF; /* White text field */
-    -fx-text-fill: #333333; /* Dark gray text color */
+    -fx-text-fill: #555555; /* Dark gray text color */
     -fx-background-radius: 15;
     -fx-border-width: 2;
     -fx-border-radius: 15;
-    -fx-border-color: #007BFF; /* Light blue border */
+    -fx-border-color: #3498DB; /* Light blue border */
 }
 
 .text-field:hover {
-    -fx-border-color: #0056b3; /* Darker blue on hover */
+    -fx-border-color: #2980B9; /* Darker blue on hover */
 }
 
 .text-field:focused {
-    -fx-border-color: #0056b3; /* Darker blue when focused */
+    -fx-border-color: #2980B9; /* Darker blue when focused */
     -fx-border-width: 2;
 }
 
@@ -130,21 +130,21 @@
 
 .combo-box {
     -fx-background-color: #FFFFFF; /* White combo box background */
-    -fx-text-fill: #333333; /* Dark gray text color */
+    -fx-text-fill: #555555; /* Dark gray text color */
     -fx-background-radius: 15;
     -fx-border-width: 2;
     -fx-border-radius: 15;
-    -fx-border-color: #007BFF; /* Light blue border */
+    -fx-border-color: #3498DB; /* Light blue border */
 }
 
 .combo-box .list-cell {
     -fx-background-color: #FFFFFF; /* White list cell background */
-    -fx-text-fill: #333333; /* Dark gray text color */
+    -fx-text-fill: #555555; /* Dark gray text color */
 }
 
 .combo-box-popup .list-view {
     -fx-background-color: #FFFFFF; /* White popup background */
-    -fx-text-fill: #333333; /* Dark gray text color */
+    -fx-text-fill: #555555; /* Dark gray text color */
     -fx-background-radius: 15;
 }
 
@@ -155,14 +155,14 @@
 
 .combo-box-popup .list-view .list-cell:filled:selected,
 .combo-box-popup .list-view .list-cell:filled:selected:hover {
-    -fx-background: #007BFF; /* Light blue on selection */
-    -fx-background-color: #007BFF; /* Light blue on selection */
+    -fx-background: #3498DB; /* Light blue on selection */
+    -fx-background-color: #3498DB; /* Light blue on selection */
     -fx-text-fill: #FFFFFF;
 }
 
 .combo-box-popup .list-view .list-cell:filled:hover {
     -fx-background-color: #D3D3D3; /* Light gray on hover */
-    -fx-text-fill: #333333; /* Dark gray text color */
+    -fx-text-fill: #555555; /* Dark gray text color */
 }
 
 /* separator */
@@ -177,9 +177,9 @@
 
 #contentPane,
 #addPane {
-    -fx-background-color: #F0F8FF; /* Light blue content pane background */
+    -fx-background-color: #F2F2F2; /* Light gray content pane background */
     -fx-background-radius: 15;
-    -fx-border-color: #007BFF; /* Light blue border */
+    -fx-border-color: #3498DB; /* Light blue border */
     -fx-border-radius: 15;
 }
 
@@ -195,7 +195,7 @@
 }
 
 .table-view .column-header {
-    -fx-background-color: #007BFF; /* Light blue column header */
+    -fx-background-color: #3498DB; /* Light blue column header */
     -fx-background-radius: 0;
     -fx-border-color: transparent;
     -fx-border-radius: 0;
@@ -207,11 +207,11 @@
 }
 
 .table-view .table-cell {
-    -fx-text-fill: #333333; /* Dark gray text color */
+    -fx-text-fill: #555555; /* Dark gray text color */
 }
 
 .table-row-cell {
-    -fx-background-color: #E6F7FF; /* Light blue table row background */
+    -fx-background-color: #F2F2F2; /* Light gray table row background */
     -fx-background-insets: 0, 0 0 1 0;
     -fx-padding: 0.0em; /* 0 */
 }
@@ -223,7 +223,7 @@
 }
 
 .table-row-cell:selected {
-    -fx-background-color: #007BFF; /* Light blue on selection */
+    -fx-background-color: #3498DB; /* Light blue on selection */
     -fx-background-insets: 0;
     -fx-background-radius: 1;
 }
@@ -232,18 +232,18 @@
 
 .scroll-pane {
     -fx-background-color: #FFFFFF; /* White scroll pane background */
-    -fx-border-color: #0056b3; /* Darker blue border */
+    -fx-border-color: #2980B9; /* Darker blue border */
     -fx-border-width: 2;
 }
 
 .scroll-pane .viewport {
-    -fx-background-color: #E6F7FF; /* Light blue viewport background */
+    -fx-background-color: #F2F2F2; /* Light gray viewport background */
 }
 
 /* scroll bar */
 
 .scroll-bar {
-    -fx-background-color: #007BFF; /* Light blue scroll bar */
+    -fx-background-color: #3498DB; /* Light blue scroll bar */
     -fx-background-radius: 15;
     -fx-arrows-visible: false;
 }
@@ -270,8 +270,8 @@
 /* Help pane */
 
 #addPane {
-    -fx-background-color: #F0F8FF; /* Light blue background for help pane */
+    -fx-background-color: #F2F2F2; /* Light gray background for help pane */
     -fx-background-radius: 15;
-    -fx-border-color: #007BFF; /* Light blue border */
+    -fx-border-color: #3498DB; /* Light blue border */
     -fx-border-radius: 15;
 }
