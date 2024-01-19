@@ -648,6 +648,34 @@ public class DatabaseController {
             e.printStackTrace();
         }
 
+        return person;
+    }
+
+    // Method to get employee details by ID
+    public static Person getEmployeeInfoByID(String ID) {
+        Person person = null;
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_EMPLOYEE WHERE ID = ?")) {
+            preparedStatement.setString(1, ID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String id = resultSet.getString("ID");
+                String firstName = resultSet.getString("FIRST_NAME");
+                String lastName = resultSet.getString("LAST_NAME");
+                String email = resultSet.getString("EMAIL");
+                String phone = resultSet.getString("PHONE");
+                String niNumber = resultSet.getString("NI_NUMBER");
+
+                // Get access level
+                String accessLevel = getAccessLevel(email);
+
+                person = new Person(id, firstName, lastName, email, phone, accessLevel, niNumber);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         return person;
     }
@@ -706,7 +734,6 @@ public class DatabaseController {
         return data;
     }
 
-
     // ********************************************
     // ************** OTHER METHODS ***************
     // ********************************************
@@ -733,5 +760,10 @@ public class DatabaseController {
         String encryptedString = stringToEncrypt;
 
         return encryptedString;
+    }
+
+    // Method to get the current logged in employee ID
+    public static String getCurrentLoggedInEmployeeId() {
+        return currentLoggedInEmployeeId;
     }
 }

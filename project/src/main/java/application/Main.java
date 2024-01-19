@@ -11,11 +11,16 @@ import java.io.*;
 import java.sql.SQLException;
 import java.util.Objects;
 
+import application.email.PDFBox;
+
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException, SQLException {
         DatabaseController.loadEnvVariables();
         DatabaseController.databaseChecks();
+
+        // Testing directory creation for PDFs
+        PDFBox.createPDF("1");
 
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("views/login-view.fxml")));
         Scene scene = new Scene(root);

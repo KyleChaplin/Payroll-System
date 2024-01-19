@@ -5,6 +5,9 @@ module org.example.project {
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
     requires java.sql;
+    requires org.apache.pdfbox;
+    requires java.datatransfer;
+
 
     exports application;
     opens application to javafx.fxml;
