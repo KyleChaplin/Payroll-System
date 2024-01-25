@@ -21,11 +21,10 @@
                <children>
                   <TableView fx:id="tblPayroll" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                     <columns>
-                      <TableColumn prefWidth="75.0" text="Pay Date" />
-                      <TableColumn prefWidth="75.0" text="Pay Period" />
-                        <TableColumn prefWidth="75.0" text="Total" />
-                        <TableColumn prefWidth="75.0" text="No. Employees" />
-                        <TableColumn prefWidth="75.0" text="Status" />
+                      <TableColumn fx:id="PayDate" prefWidth="75.0" text="Pay Date" />
+                      <TableColumn fx:id="Month" prefWidth="75.0" text="Month" />
+                        <TableColumn fx:id="Total" prefWidth="75.0" text="Total" />
+                        <TableColumn fx:id="NoEmployees" prefWidth="75.0" text="No. Employees" />
                     </columns>
                      <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -33,14 +32,14 @@
                   </TableView>
                   <TableView fx:id="tblEmployee" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                     <columns>
-                      <TableColumn prefWidth="75.0" text="Employee ID" />
-                      <TableColumn prefWidth="75.0" text="First Name" />
-                        <TableColumn prefWidth="75.0" text="Last Name" />
-                        <TableColumn prefWidth="75.0" text="Hours Worked" />
-                        <TableColumn prefWidth="75.0" text="Base Pay" />
-                        <TableColumn prefWidth="75.0" text="Overtime Worked" />
-                        <TableColumn prefWidth="75.0" text="OverTime Pay" />
-                        <TableColumn prefWidth="75.0" text="Tax Paid" />
+                      <TableColumn fx:id="EmployeeID" prefWidth="75.0" text="Employee ID" />
+                      <TableColumn fx:id="FirstName" prefWidth="75.0" text="First Name" />
+                        <TableColumn fx:id="LastName" prefWidth="75.0" text="Last Name" />
+                        <TableColumn fx:id="HoursWorked" prefWidth="75.0" text="Hours Worked" />
+                        <TableColumn fx:id="BasePay" prefWidth="75.0" text="Base Pay" />
+                        <TableColumn fx:id="OvertimeWorked" prefWidth="75.0" text="Overtime Worked" />
+                        <TableColumn fx:id="OvertimePay" prefWidth="75.0" text="OverTime Pay" />
+                        <TableColumn fx:id="TaxPaid" prefWidth="75.0" text="Tax Paid" />
                     </columns>
                      <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

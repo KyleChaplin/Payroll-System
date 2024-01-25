@@ -42,15 +42,20 @@
                               <Insets bottom="8.0" left="15.0" right="15.0" top="8.0" />
                            </VBox.margin>
                         </Separator>
-                        <TableView fx:id="EmployeeTable" onMouseClicked="#onTableClick" prefHeight="368.0" prefWidth="1004.0">
+                        <TableView fx:id="EmployeeTable" onMouseClicked="#onTableClick" prefHeight="414.0" prefWidth="1004.0">
                           <columns>
                             <TableColumn fx:id="ID" prefWidth="75.0" text="Employee ID" />
                             <TableColumn fx:id="FirstName" prefWidth="75.0" text="First Name" />
                               <TableColumn fx:id="LastName" prefWidth="75.0" text="Last Name" />
                               <TableColumn fx:id="Email" prefWidth="75.0" text="Email" />
                               <TableColumn fx:id="Phone" prefWidth="75.0" text="Phone" />
+                              <TableColumn fx:id="HourlySalary" prefWidth="75.0" text="Hourly Salary" />
                               <TableColumn fx:id="NiNumber" prefWidth="75.0" text="NI Number" />
                               <TableColumn fx:id="AccessLevel" prefWidth="75.0" text="Access Level" />
+                              <TableColumn fx:id="Location" prefWidth="75.0" text="Location" />
+                              <TableColumn fx:id="ContractType" prefWidth="75.0" text="Contract Type" />
+                              <TableColumn fx:id="Department" prefWidth="75.0" text="Department" />
+                              <TableColumn fx:id="JobTitle" prefWidth="75.0" text="Job Title" />
                           </columns>
                            <VBox.margin>
                               <Insets left="15.0" right="15.0" />
@@ -59,21 +64,16 @@
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
                         </TableView>
-                        <Separator prefWidth="200.0">
-                           <VBox.margin>
-                              <Insets bottom="8.0" left="15.0" right="15.0" top="8.0" />
-                           </VBox.margin>
-                        </Separator>
-                        <Pane prefHeight="332.0" prefWidth="1034.0">
+                        <Pane prefHeight="248.0" prefWidth="1024.0" VBox.vgrow="ALWAYS">
                            <children>
                               <Label fx:id="txtEmptyError" layoutX="716.0" layoutY="235.0" textFill="RED">
                                  <font>
                                     <Font size="18.0" />
                                  </font>
                               </Label>
-                              <VBox alignment="CENTER" layoutX="11.0" prefHeight="335.0" prefWidth="1002.0">
+                              <VBox alignment="CENTER" layoutX="11.0" layoutY="5.0" prefHeight="275.0" prefWidth="1002.0">
                                  <children>
-                                    <HBox prefHeight="100.0" prefWidth="1035.0" spacing="25.0">
+                                    <HBox prefHeight="272.0" prefWidth="1002.0" spacing="25.0">
                                        <children>
                                           <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                                              <children>
@@ -100,7 +100,7 @@
                                                       <Font size="16.0" />
                                                    </font>
                                                 </Label>
-                                                <ComboBox fx:id="cboAccessLevel" prefHeight="25.0" prefWidth="300.0" promptText="Access level">
+                                                <ComboBox fx:id="cboAccessLevel" prefHeight="25.0" prefWidth="318.0" promptText="Access level" VBox.vgrow="ALWAYS">
                                                    <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                    </cursor>
@@ -127,6 +127,40 @@
                                                    </font>
                                                 </Label>
                                                 <TextField fx:id="txtNiNumber" prefWidth="300.0" promptText="National Insurance Number" />
+                                                <Label text="Salary /h:">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField fx:id="txtHourlySalary" prefWidth="300.0" promptText="Salary /h" />
+                                             </children>
+                                          </VBox>
+                                          <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <Label text="Location:">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField fx:id="txtLocation" prefWidth="300.0" promptText="Location" />
+                                                <Label fx:id="txtContract" text="Contract Type:">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField fx:id="txtContractType" prefWidth="300.0" promptText="Contract Type" />
+                                                <Label text="Department:">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField fx:id="txtDepartment" prefWidth="300.0" promptText="National Insurance Number" />
+                                                <Label text="Job Title:">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField fx:id="txtJobTitle" prefWidth="300.0" promptText="Job Title" />
                                              </children>
                                           </VBox>
                                        </children>
@@ -161,12 +195,20 @@
                                        </children>
                                     </HBox>
                                  </children>
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
                               </VBox>
                            </children>
                            <VBox.margin>
                               <Insets left="5.0" right="5.0" />
                            </VBox.margin>
                         </Pane>
+                        <Separator prefWidth="200.0">
+                           <VBox.margin>
+                              <Insets bottom="8.0" left="15.0" right="15.0" top="8.0" />
+                           </VBox.margin>
+                        </Separator>
                      </children>
                   </VBox>
                </children>

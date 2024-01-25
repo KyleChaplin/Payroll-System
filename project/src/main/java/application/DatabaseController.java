@@ -2,9 +2,12 @@ package application;
 
 import application.employees.Person;
 import application.help.HelpInfo;
+import application.payroll.DetailedPayroll;
+import application.payroll.PayrollOverview;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -93,7 +96,8 @@ public class DatabaseController {
             System.out.println("Admin account exists.\n");
         } else {
             System.out.println("Admin account does not exist.\n");
-            addEmployee("admin", "admin", "admin", "-", "-", 0, true);
+            addEmployee("admin", "admin", "admin", "-", "0.0", "-",
+                    0, "admin", "delete me", "IT", "admin", true);
         }
 
         // Close connection to Oracle Database
@@ -146,8 +150,6 @@ public class DatabaseController {
         return envVariables.get(key);
     }
 
-
-
     // ********************************************
     // *********** TABLE CREATE METHODS ***********
     // ********************************************
@@ -167,7 +169,12 @@ public class DatabaseController {
                             "LAST_NAME VARCHAR2(50) NOT NULL, " +
                             "EMAIL VARCHAR2(100) UNIQUE NOT NULL, " +
                             "PHONE VARCHAR2(20) NOT NULL," +
-                            "NI_NUMBER VARCHAR2(20) NOT NULL" +
+                            "SALARY DECIMAL NOT NULL," +
+                            "NI_NUMBER VARCHAR2(20) NOT NULL," +
+                            "LOCATION VARCHAR2(100) NOT NULL," +
+                            "CONTRACT_TYPE VARCHAR2(50) NOT NULL," +
+                            "DEPARTMENT VARCHAR2(20) NOT NULL," +
+                            "JOB_TITLE VARCHAR2(20) NOT NULL" +
                             ")");
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -192,7 +199,9 @@ public class DatabaseController {
                             "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
                             "EMPLOYEE_ID NUMBER NOT NULL, " +
                             "PAY_DATE DATE NOT NULL, " +
+                            "MONTH VARCHAR(3) NOT NULL, " +
                             "HOURS_WORKED DECIMAL(10, 2) NOT NULL, " +
+                            "PENSION DECIMAL(10, 2) NOT NULL, " +
                             "OVERTIME_HOURS DECIMAL(10, 2) NOT NULL, " +
                             "OVERTIME_PAY DECIMAL(10, 2) NOT NULL, " +
                             "GROSS_PAY DECIMAL(10, 2) NOT NULL, " +
@@ -259,8 +268,6 @@ public class DatabaseController {
         }
     }
 
-
-
     // ********************************************
     // *********** TABLE UPDATE METHODS ***********
     // ********************************************
@@ -315,8 +322,169 @@ public class DatabaseController {
         }
     }
 
+    public static void updateEmployeeProfile(String employeeId, String firstName, String lastName, String email,
+                                             String phone, String niNumber, String address1, String address2,
+                                             String city, String postcode, String bankName, String accountNumber,
+                                             String sortCode, String emergencyContactFName, String emergencyContactLName,
+                                             String emergencyContactMobile, String emergencyContactRelationship) {
+
+        // Check if the email is being updated
+        String oldEmail = getEmailById(employeeId); // Retrieve the old email from the database
+        boolean emailUpdated = !email.equals(oldEmail);
+
+        // Update the employee login if the email is being updated
+        if (emailUpdated) {
+            // Update the login username
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    "UPDATE NPS_LOGIN SET USERNAME = ? WHERE EMPLOYEE_ID = ?")) {
+                preparedStatement.setString(1, email);
+                preparedStatement.setString(2, employeeId);
+
+                int rowsAffected = preparedStatement.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Login username updated successfully.");
+                } else {
+                    System.out.println("Failed to update login username.");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Update the employee record
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "UPDATE NPS_EMPLOYEE SET FIRST_NAME = ?, LAST_NAME = ?, EMAIL = ?, PHONE = ?, NI_NUMBER = ? WHERE ID = ?")) {
+            preparedStatement.setString(1, firstName);
+            preparedStatement.setString(2, lastName);
+            preparedStatement.setString(3, email);
+            preparedStatement.setString(4, phone);
+            preparedStatement.setString(5, niNumber);
+            preparedStatement.setString(6, employeeId);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Employee record updated successfully.");
+            } else {
+                System.out.println("No employee found with the given ID.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Update the employee address
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "UPDATE NPS_ADDRESSES SET ADDRESS_LINE_1 = ?, ADDRESS_LINE_2 = ?, CITY = ?, POSTCODE = ? WHERE EMPLOYEE_ID = ?")) {
+            preparedStatement.setString(1, address1);
+            preparedStatement.setString(2, address2);
+            preparedStatement.setString(3, postcode);
+            preparedStatement.setString(4, city);
+            preparedStatement.setString(5, employeeId);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Employee address updated successfully.");
+            } else {
+                System.out.println("No employee found with the given ID.");
+                // Add the address if it doesn't exist
+                try (PreparedStatement preparedStatement2 = connection.prepareStatement(
+                        "INSERT INTO NPS_ADDRESSES (EMPLOYEE_ID, ADDRESS_LINE_1, ADDRESS_LINE_2, CITY, POSTCODE) VALUES (?, ?, ?, ?, ?)")) {
+                    preparedStatement2.setInt(1, Integer.parseInt(employeeId));
+                    preparedStatement2.setString(2, address1);
+                    preparedStatement2.setString(3, address2);
+                    preparedStatement2.setString(4, city);
+                    preparedStatement2.setString(5, postcode);
+
+                    int rowsAffected2 = preparedStatement2.executeUpdate();
+                    if (rowsAffected2 > 0) {
+                        System.out.println("Employee address added successfully.");
+                    } else {
+                        System.out.println("Failed to add employee address.");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Update the employee bank details
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "UPDATE NPS_BANK_DETAILS SET BANK_NAME = ?, ACCOUNT_NUMBER = ?, SORT_CODE = ? WHERE EMPLOYEE_ID = ?")) {
+            preparedStatement.setString(1, bankName);
+            preparedStatement.setString(2, accountNumber);
+            preparedStatement.setString(3, sortCode);
+            preparedStatement.setString(4, employeeId);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Employee bank details updated successfully.");
+            } else {
+                System.out.println("No employee found with the given ID.");
+                // Add the bank details if they don't exist
+                try (PreparedStatement preparedStatement2 = connection.prepareStatement(
+                        "INSERT INTO NPS_BANK_DETAILS (EMPLOYEE_ID, BANK_NAME, ACCOUNT_NUMBER, SORT_CODE) VALUES (?, ?, ?, ?)")) {
+                    preparedStatement2.setInt(1, Integer.parseInt(employeeId));
+                    preparedStatement2.setString(2, bankName);
+                    preparedStatement2.setString(3, accountNumber);
+                    preparedStatement2.setString(4, sortCode);
+
+                    int rowsAffected2 = preparedStatement2.executeUpdate();
+                    if (rowsAffected2 > 0) {
+                        System.out.println("Employee bank details added successfully.");
+                    } else {
+                        System.out.println("Failed to add employee bank details.");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Update the employee emergency contact details
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "UPDATE NPS_EMERGENCY_CONTACT SET FIRST_NAME = ?, LAST_NAME = ?, PHONE = ?, RELATIONSHIP = ? WHERE EMPLOYEE_ID = ?")) {
+            preparedStatement.setString(1, emergencyContactFName);
+            preparedStatement.setString(2, emergencyContactLName);
+            preparedStatement.setString(3, emergencyContactMobile);
+            preparedStatement.setString(4, emergencyContactRelationship);
+            preparedStatement.setString(5, employeeId);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Employee emergency contact details updated successfully.");
+            } else {
+                System.out.println("No employee found with the given ID.");
+                // Add the emergency contact details if they don't exist
+                try (PreparedStatement preparedStatement2 = connection.prepareStatement(
+                        "INSERT INTO NPS_EMERGENCY_CONTACT (EMPLOYEE_ID, FIRST_NAME, LAST_NAME, PHONE, RELATIONSHIP) VALUES (?, ?, ?, ?, ?)")) {
+                    preparedStatement2.setInt(1, Integer.parseInt(employeeId));
+                    preparedStatement2.setString(2, emergencyContactFName);
+                    preparedStatement2.setString(3, emergencyContactLName);
+                    preparedStatement2.setString(4, emergencyContactMobile);
+                    preparedStatement2.setString(5, emergencyContactRelationship);
+
+                    int rowsAffected2 = preparedStatement2.executeUpdate();
+                    if (rowsAffected2 > 0) {
+                        System.out.println("Employee emergency contact details added successfully.");
+                    } else {
+                        System.out.println("Failed to add employee emergency contact details.");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     // Method to update employee records
-    public static void updateEmployee(String employeeId, String firstName, String lastName, String email, String phone, String niNumber, int accessLevel) {
+    public static void updateEmployee(String employeeId, String firstName, String lastName, String email, String phone,
+                                      String salary, String niNumber, int accessLevel, String location,
+                                      String contractType, String department, String jobTitle) {
         try {
             // Check if the access level is being updated
             String oldAccessLevel = getAccessLevel(email); // Retrieve the old access level from the database
@@ -366,13 +534,21 @@ public class DatabaseController {
 
             // Update the employee record
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    "UPDATE NPS_EMPLOYEE SET FIRST_NAME = ?, LAST_NAME = ?, EMAIL = ?, PHONE = ?, NI_NUMBER = ? WHERE ID = ?")) {
+                    "UPDATE NPS_EMPLOYEE SET FIRST_NAME = ?, LAST_NAME = ?, EMAIL = ?, PHONE = ?, SALARY = ?, " +
+                            "NI_NUMBER = ?, LOCATION = ?, CONTRACT_TYPE = ?, DEPARTMENT = ?, JOB_TITLE = ? WHERE ID = ?")) {
+                BigDecimal salaryDecimal = new BigDecimal(salary);
+
                 preparedStatement.setString(1, firstName);
                 preparedStatement.setString(2, lastName);
                 preparedStatement.setString(3, email);
                 preparedStatement.setString(4, phone);
-                preparedStatement.setString(5, niNumber);
-                preparedStatement.setString(6, employeeId);
+                preparedStatement.setBigDecimal(5, salaryDecimal);
+                preparedStatement.setString(6, niNumber);
+                preparedStatement.setString(7, location);
+                preparedStatement.setString(8, contractType);
+                preparedStatement.setString(9, department);
+                preparedStatement.setString(10, jobTitle);
+                preparedStatement.setString(11, employeeId);
 
                 int rowsAffected = preparedStatement.executeUpdate();
                 if (rowsAffected > 0) {
@@ -387,27 +563,35 @@ public class DatabaseController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+
     }
-
-
 
     // ********************************************
     // *********** TABLE INSERT METHODS ***********
     // ********************************************
 
     // Method to add an employee record
-    public static void addEmployee(String firstName, String lastName, String email, String phone, String niNumber, int accessLevel, boolean firstLogin) {
+    public static void addEmployee(String firstName, String lastName, String email, String phone, String salary,
+                                   String niNumber, int accessLevel, String location, String contractType,
+                                   String department, String jobTitle, boolean firstLogin) {
         // Establish the database connection
         getConnectionToDB();
 
         // Add employee record
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "INSERT INTO NPS_EMPLOYEE (FIRST_NAME, LAST_NAME, EMAIL, PHONE, NI_NUMBER) VALUES (?, ?, ?, ?, ?)")) {
+                "INSERT INTO NPS_EMPLOYEE (FIRST_NAME, LAST_NAME, EMAIL, PHONE, SALARY, NI_NUMBER, LOCATION," +
+                        "CONTRACT_TYPE, DEPARTMENT, JOB_TITLE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
             preparedStatement.setString(1, firstName);
             preparedStatement.setString(2, lastName);
             preparedStatement.setString(3, email);
             preparedStatement.setString(4, phone);
-            preparedStatement.setString(5, niNumber);
+            preparedStatement.setString(5, salary);
+            preparedStatement.setString(6, niNumber);
+            preparedStatement.setString(7, location);
+            preparedStatement.setString(8, contractType);
+            preparedStatement.setString(9, department);
+            preparedStatement.setString(10, jobTitle);
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
@@ -417,14 +601,20 @@ public class DatabaseController {
                 int employeeId = getEmployeeId(email);
                 createLogin(employeeId, email, firstName, niNumber, accessLevel, firstLogin);
 
+                // Add bank details for the employee
+                addBankDetails(String.valueOf(employeeId), "Bank Name", "Account Number", "Sort Code");
+
+                // Add payroll info for the employee
+                addPayrollInfo(String.valueOf(employeeId), "Pay Date", "Month", "Hours Worked", "Pension", "Overtime Hours", "Overtime Pay", "Gross Pay", "Taxes", "Net Pay");
+
+                // Add emergency contact info for the employee
+                addEmergencyDetails("First Name", "Last Name", "Mobile", "Relationship");
+
             } else {
                 System.out.println("Failed to add employee.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            // Close connection to Oracle Database
-            //closeConnectionToDb();
         }
     }
 
@@ -452,6 +642,76 @@ public class DatabaseController {
                 System.out.println("Login created successfully.");
             } else {
                 System.out.println("Failed to create login.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to add bank details
+    public static void addBankDetails(String employeeId, String bankName, String accountNumber, String sortCode) {
+        // Add employee record
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO NPS_BANK_DETAILS (EMPLOYEE_ID, BANK_NAME, ACCOUNT_NUMBER, SORT_CODE) VALUES (?, ?, ?, ?)")) {
+            preparedStatement.setInt(1, Integer.parseInt(employeeId));
+            preparedStatement.setString(2, bankName);
+            preparedStatement.setString(3, accountNumber);
+            preparedStatement.setString(4, sortCode);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Bank details added successfully.");
+            } else {
+                System.out.println("Failed to add bank details.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to add payroll info
+    public static void addPayrollInfo(String employeeId, String payDate, String month, String hoursWorked, String pension, String overtimeHours, String overtimePay, String grossPay, String taxes, String netPay) {
+        // Add employee record
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO NPS_PAYROLL (EMPLOYEE_ID, PAY_DATE, MONTH, HOURS_WORKED, PENSION, OVERTIME_HOURS, OVERTIME_PAY, GROSS_PAY, TAXES, NET_PAY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+            preparedStatement.setInt(1, Integer.parseInt(employeeId));
+            preparedStatement.setString(2, payDate);
+            preparedStatement.setString(3, month);
+            preparedStatement.setString(4, hoursWorked);
+            preparedStatement.setString(5, pension);
+            preparedStatement.setString(6, overtimeHours);
+            preparedStatement.setString(7, overtimePay);
+            preparedStatement.setString(8, grossPay);
+            preparedStatement.setString(9, taxes);
+            preparedStatement.setString(10, netPay);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Payroll info added successfully.");
+            } else {
+                System.out.println("Failed to add payroll info.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to add emergency contact info
+    public static void addEmergencyDetails(String  fName, String lName, String mobile, String relationship) {
+        // Add employee record
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO NPS_EMERGENCY_CONTACT (EMPLOYEE_ID, FIRST_NAME, LAST_NAME, PHONE, RELATIONSHIP) VALUES (?, ?, ?, ?, ?)")) {
+            preparedStatement.setString(1, currentLoggedInEmployeeId);
+            preparedStatement.setString(2, fName);
+            preparedStatement.setString(3, lName);
+            preparedStatement.setString(4, mobile);
+            preparedStatement.setString(5, relationship);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Emergency contact info added successfully.");
+            } else {
+                System.out.println("Failed to add emergency contact info.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -497,6 +757,51 @@ public class DatabaseController {
                     System.out.println("Login record deleted successfully.");
                 } else {
                     System.out.println("No login found with the given ID.");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            // Delete the bank details
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    "DELETE FROM NPS_BANK_DETAILS WHERE EMPLOYEE_ID = ?")) {
+                preparedStatement.setString(1, employeeId);
+
+                int rowsAffected = preparedStatement.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Bank details deleted successfully.");
+                } else {
+                    System.out.println("No bank details found with the given ID.");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            // Delete the emergency contact details
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    "DELETE FROM NPS_EMERGENCY_CONTACT WHERE EMPLOYEE_ID = ?")) {
+                preparedStatement.setString(1, employeeId);
+
+                int rowsAffected = preparedStatement.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Emergency contact details deleted successfully.");
+                } else {
+                    System.out.println("No emergency contact details found with the given ID.");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            // Delete the address details
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    "DELETE FROM NPS_ADDRESSES WHERE EMPLOYEE_ID = ?")) {
+                preparedStatement.setString(1, employeeId);
+
+                int rowsAffected = preparedStatement.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Address details deleted successfully.");
+                } else {
+                    System.out.println("No address details found with the given ID.");
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -591,7 +896,7 @@ public class DatabaseController {
         return loginExists;
     }
 
-    // Method to get all employees from the database and return an ObservableList
+    // Method to get all employees from the database and return an ObservableList for Employees table
     public static ObservableList<Person> getAllEmployees() {
         ObservableList<Person> data = FXCollections.observableArrayList();
 
@@ -605,12 +910,18 @@ public class DatabaseController {
                 String lastName = resultSet.getString("LAST_NAME");
                 String email = resultSet.getString("EMAIL");
                 String phone = resultSet.getString("PHONE");
+                String salary = resultSet.getString("SALARY");
                 String niNumber = resultSet.getString("NI_NUMBER");
+                String location = resultSet.getString("LOCATION");
+                String contractType = resultSet.getString("CONTRACT_TYPE");
+                String department = resultSet.getString("DEPARTMENT");
+                String jobTitle = resultSet.getString("JOB_TITLE");
 
                 // Get access level
                 String accessLevel = getAccessLevel(email);
 
-                Person person = new Person(id, firstName, lastName, email, phone, accessLevel, niNumber);
+                Person person = new Person(id, firstName, lastName, email, phone, salary, accessLevel, niNumber,
+                        location, contractType, department, jobTitle);
 
                 data.add(person);
             }
@@ -622,37 +933,90 @@ public class DatabaseController {
         return data;
     }
 
-    // Method to get an employees details by ID
-    public static Person getEmployeeInfo() {
-        Person person = null;
+    // Retrieve payroll overview data for a specific month
+    public static ObservableList<PayrollOverview> getPayrollOverviewForMonth() {
+        ObservableList<PayrollOverview> data = FXCollections.observableArrayList();
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT * FROM NPS_EMPLOYEE WHERE ID = ?")) {
-            preparedStatement.setString(1, currentLoggedInEmployeeId);
+                "SELECT MONTH, TO_CHAR(PAY_DATE, 'DD-MM-YYYY') AS PAY_DATE, SUM(GROSS_PAY) AS TOTAL_AMOUNT, COUNT(EMPLOYEE_ID) AS EMPLOYEE_COUNT FROM NPS_PAYROLL GROUP BY MONTH, TO_CHAR(PAY_DATE, 'DD-MM-YYYY')")) {
+
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            if (resultSet.next()) {
-                String id = currentLoggedInEmployeeId;
-                String firstName = resultSet.getString("FIRST_NAME");
-                String lastName = resultSet.getString("LAST_NAME");
-                String email = resultSet.getString("EMAIL");
-                String phone = resultSet.getString("PHONE");
-                String niNumber = resultSet.getString("NI_NUMBER");
+            while (resultSet.next()) {
+                String payDate = resultSet.getString("PAY_DATE");
+                String month = resultSet.getString("MONTH");
+                String totalAmount = resultSet.getString("TOTAL_AMOUNT");
+                String employeeCount = resultSet.getString("EMPLOYEE_COUNT");
 
-                // Get access level
-                String accessLevel = getAccessLevel(email);
+                PayrollOverview payrollOverview = new PayrollOverview(payDate, month, totalAmount, employeeCount);
 
-                person = new Person(id, firstName, lastName, email, phone, accessLevel, niNumber);
+                data.add(payrollOverview);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return person;
+        return data;
+    }
+
+    public static ObservableList<DetailedPayroll> getEmployeeDetailsForMonth(String selectedMonth) {
+        ObservableList<DetailedPayroll> data = FXCollections.observableArrayList();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT EMPLOYEE_ID, HOURS_WORKED, OVERTIME_HOURS, OVERTIME_PAY, TAXES FROM NPS_PAYROLL WHERE MONTH = ?")) {
+
+            preparedStatement.setString(1, selectedMonth);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String employeeId = resultSet.getString("EMPLOYEE_ID");
+                Double hoursWorked = resultSet.getDouble("HOURS_WORKED");
+                Double overtimeWorked = resultSet.getDouble("OVERTIME_HOURS");
+                Double overtimePay = resultSet.getDouble("OVERTIME_PAY");
+                Double taxes = resultSet.getDouble("TAXES");
+
+                // Get employee first and last name
+                String firstName = "";
+                String lastName = "";
+                int salary = 0;
+                try (PreparedStatement preparedStatement2 = connection.prepareStatement(
+                        "SELECT FIRST_NAME, LAST_NAME, SALARY FROM NPS_EMPLOYEE WHERE ID = ?")) {
+                    preparedStatement2.setString(1, employeeId);
+
+                    ResultSet resultSet2 = preparedStatement2.executeQuery();
+                    if (resultSet2.next()) {
+                        firstName = resultSet2.getString("FIRST_NAME");
+                        lastName = resultSet2.getString("LAST_NAME");
+                        salary = resultSet2.getInt("SALARY");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                DetailedPayroll employeeDetails = new DetailedPayroll(employeeId, firstName, lastName, hoursWorked,
+                        (salary * hoursWorked), overtimeWorked, overtimePay, taxes);
+
+                data.add(employeeDetails);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return data;
+    }
+
+    // Method to get an employees details by ID
+    public static Person getEmployeeInfo() {
+        return getEmployeeInfoMethod(currentLoggedInEmployeeId);
     }
 
     // Method to get employee details by ID
     public static Person getEmployeeInfoByID(String ID) {
+        return getEmployeeInfoMethod(ID);
+    }
+
+    private static Person getEmployeeInfoMethod(String ID) {
         Person person = null;
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -666,12 +1030,104 @@ public class DatabaseController {
                 String lastName = resultSet.getString("LAST_NAME");
                 String email = resultSet.getString("EMAIL");
                 String phone = resultSet.getString("PHONE");
+                String salary = resultSet.getString("SALARY");
                 String niNumber = resultSet.getString("NI_NUMBER");
+                String location = resultSet.getString("LOCATION");
+                String contractType = resultSet.getString("CONTRACT_TYPE");
+                String department = resultSet.getString("DEPARTMENT");
+                String jobTitle = resultSet.getString("JOB_TITLE");
 
                 // Get access level
                 String accessLevel = getAccessLevel(email);
 
-                person = new Person(id, firstName, lastName, email, phone, accessLevel, niNumber);
+                person = new Person(id, firstName, lastName, email, phone, salary, accessLevel, niNumber,
+                        location, contractType, department, jobTitle);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Get data from BANK_DETAILS Table
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_BANK_DETAILS WHERE EMPLOYEE_ID = ?")) {
+            preparedStatement.setString(1, ID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String bankName = resultSet.getString("BANK_NAME");
+                String accountNumber = resultSet.getString("ACCOUNT_NUMBER");
+                String sortCode = resultSet.getString("SORT_CODE");
+
+                person.setBankName(bankName);
+                person.setAccountNumber(accountNumber);
+                person.setSortCode(sortCode);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Get data from PAYROLL Table
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_PAYROLL WHERE EMPLOYEE_ID = ?")) {
+            preparedStatement.setString(1, ID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String hoursWorked = resultSet.getString("HOURS_WORKED");
+                String overtimeHours = resultSet.getString("OVERTIME_HOURS");
+                String overtimePay = resultSet.getString("OVERTIME_PAY");
+                String pension = resultSet.getString("PENSION");
+                String grossPay = resultSet.getString("GROSS_PAY");
+                String taxes = resultSet.getString("TAXES");
+                String netPay = resultSet.getString("NET_PAY");
+
+                person.setHoursWorked(hoursWorked);
+                person.setOvertimeHours(overtimeHours);
+                person.setOvertimePay(overtimePay);
+                person.setGrossPay(grossPay);
+                person.setTaxes(taxes);
+                person.setNetPay(netPay);
+                person.setPension(pension);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Get data from EMERGENCY_CONTACT Table
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_EMERGENCY_CONTACT WHERE EMPLOYEE_ID = ?")) {
+            preparedStatement.setString(1, ID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String emergencyContactFName = resultSet.getString("FIRST_NAME");
+                String emergencyContactLName = resultSet.getString("LAST_NAME");
+                String emergencyContactMobile = resultSet.getString("PHONE");
+                String emergencyContactRelationship = resultSet.getString("RELATIONSHIP");
+
+                person.setEFirstName(emergencyContactFName);
+                person.setELastName(emergencyContactLName);
+                person.setEMobile(emergencyContactMobile);
+                person.setERelationship(emergencyContactRelationship);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Get data from ADDRESSES Table
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_ADDRESSES WHERE EMPLOYEE_ID = ?")) {
+            preparedStatement.setString(1, ID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String addressLine1 = resultSet.getString("ADDRESS_LINE_1");
+                String addressLine2 = resultSet.getString("ADDRESS_LINE_2");
+                String postcode = resultSet.getString("POSTCODE");
+
+                person.setAddressLine1(addressLine1);
+                person.setAddressLine2(addressLine2);
+                person.setPostcode(postcode);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -696,7 +1152,7 @@ public class DatabaseController {
     }
 
     // Method to retrieve the email by employee ID
-    private static String getEmailById(String employeeId) throws SQLException {
+    private static String getEmailById(String employeeId) {
         String email = null;
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "SELECT EMAIL FROM NPS_EMPLOYEE WHERE ID = ?")) {
@@ -706,6 +1162,8 @@ public class DatabaseController {
             if (resultSet.next()) {
                 email = resultSet.getString("EMAIL");
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return email;
     }

@@ -82,11 +82,6 @@
                                  <children>
                                     <VBox alignment="CENTER_RIGHT" maxWidth="100.0" prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">
                                        <children>
-                                          <Label text="Label" textAlignment="CENTER" VBox.vgrow="ALWAYS">
-                                             <font>
-                                                <Font size="16.0" />
-                                             </font>
-                                          </Label>
                                           <Label text="First name:" textAlignment="CENTER" VBox.vgrow="ALWAYS">
                                              <font>
                                                 <Font size="16.0" />
@@ -116,7 +111,6 @@
                                     </VBox>
                                     <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">
                                        <children>
-                                          <TextField editable="false" />
                                           <TextField fx:id="txtfName" editable="false" />
                                           <TextField fx:id="txtlName" editable="false" />
                                           <TextField fx:id="txtEmail" editable="false" />
@@ -126,27 +120,17 @@
                                     </VBox>
                                     <VBox alignment="CENTER_RIGHT" maxWidth="100.0" prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">
                                        <children>
-                                          <Label text="Job title:">
+                                          <Label text="Address 1:">
                                              <font>
                                                 <Font size="16.0" />
                                              </font>
                                           </Label>
-                                          <Label text="Department:">
+                                          <Label text="Address 2:">
                                              <font>
                                                 <Font size="16.0" />
                                              </font>
                                           </Label>
-                                          <Label text="Contract type:">
-                                             <font>
-                                                <Font size="16.0" />
-                                             </font>
-                                          </Label>
-                                          <Label text="Start date:">
-                                             <font>
-                                                <Font size="16.0" />
-                                             </font>
-                                          </Label>
-                                          <Label text="Address:">
+                                          <Label text="City:">
                                              <font>
                                                 <Font size="16.0" />
                                              </font>
@@ -160,12 +144,10 @@
                                     </VBox>
                                     <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">
                                        <children>
-                                          <TextField editable="false" />
-                                          <TextField />
-                                          <TextField />
-                                          <TextField />
-                                          <TextField />
-                                          <TextField />
+                                          <TextField fx:id="txtAddress1" editable="false" />
+                                          <TextField fx:id="txtAddress2" editable="false" />
+                                          <TextField fx:id="txtCity" editable="false" />
+                                          <TextField fx:id="txtPostcode" editable="false" />
                                        </children>
                                     </VBox>
                                  </children>
@@ -187,6 +169,11 @@
                                                 <Font size="16.0" />
                                              </font>
                                           </Label>
+                                          <Label text="Pension Pay" VBox.vgrow="ALWAYS">
+                                             <font>
+                                                <Font size="16.0" />
+                                             </font>
+                                          </Label>
                                           <Label text="Bank name:" VBox.vgrow="ALWAYS">
                                              <font>
                                                 <Font size="16.0" />
@@ -202,7 +189,36 @@
                                                 <Font size="16.0" />
                                              </font>
                                           </Label>
-                                          <Label text="Label" VBox.vgrow="ALWAYS">
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <TextField fx:id="txtSalaryHourly" editable="false" />
+                                          <TextField editable="false" />
+                                          <TextField fx:id="txtPension" editable="false" />
+                                          <TextField fx:id="txtBankName" editable="false" />
+                                          <TextField fx:id="txtAccountNumber" editable="false" />
+                                          <TextField fx:id="txtSortCode" editable="false" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER_RIGHT" maxWidth="100.0" prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label text="Job title:">
+                                             <font>
+                                                <Font size="16.0" />
+                                             </font>
+                                          </Label>
+                                          <Label text="Department:">
+                                             <font>
+                                                <Font size="16.0" />
+                                             </font>
+                                          </Label>
+                                          <Label text="Contract type:">
+                                             <font>
+                                                <Font size="16.0" />
+                                             </font>
+                                          </Label>
+                                          <Label text="Location:">
                                              <font>
                                                 <Font size="16.0" />
                                              </font>
@@ -211,56 +227,10 @@
                                     </VBox>
                                     <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">
                                        <children>
-                                          <TextField />
-                                          <TextField />
-                                          <TextField />
-                                          <TextField />
-                                          <TextField />
-                                          <TextField />
-                                       </children>
-                                    </VBox>
-                                    <VBox alignment="CENTER" disable="true" maxWidth="100.0" prefHeight="200.0" prefWidth="100.0" spacing="5.0" visible="false" HBox.hgrow="ALWAYS">
-                                       <children>
-                                          <Label text="Label">
-                                             <font>
-                                                <Font size="16.0" />
-                                             </font>
-                                          </Label>
-                                          <Label text="Label">
-                                             <font>
-                                                <Font size="16.0" />
-                                             </font>
-                                          </Label>
-                                          <Label text="Label">
-                                             <font>
-                                                <Font size="16.0" />
-                                             </font>
-                                          </Label>
-                                          <Label text="Label">
-                                             <font>
-                                                <Font size="16.0" />
-                                             </font>
-                                          </Label>
-                                          <Label text="Label">
-                                             <font>
-                                                <Font size="16.0" />
-                                             </font>
-                                          </Label>
-                                          <Label text="Label">
-                                             <font>
-                                                <Font size="16.0" />
-                                             </font>
-                                          </Label>
-                                       </children>
-                                    </VBox>
-                                    <VBox alignment="CENTER" disable="true" prefHeight="200.0" prefWidth="100.0" spacing="5.0" visible="false" HBox.hgrow="ALWAYS">
-                                       <children>
-                                          <TextField />
-                                          <TextField />
-                                          <TextField />
-                                          <TextField />
-                                          <TextField />
-                                          <TextField />
+                                          <TextField fx:id="txtJobTitle" editable="false" />
+                                          <TextField fx:id="txtDepartment" editable="false" />
+                                          <TextField fx:id="txtContractType" editable="false" />
+                                          <TextField fx:id="txtLocation" editable="false" />
                                        </children>
                                     </VBox>
                                  </children>
@@ -319,10 +289,10 @@
                                     </VBox>
                                     <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">
                                        <children>
-                                          <TextField />
-                                          <TextField />
-                                          <TextField />
-                                          <TextField />
+                                          <TextField fx:id="txtEFirstName" editable="false" />
+                                          <TextField fx:id="txtELastName" editable="false" />
+                                          <TextField fx:id="txtERelationship" editable="false" />
+                                          <TextField fx:id="txtEMobile" editable="false" />
                                        </children>
                                     </VBox>
                                     <VBox alignment="CENTER" maxWidth="100.0" prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">

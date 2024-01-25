@@ -86,7 +86,6 @@ public class SceneController {
 
         // Manually set the initial stylesheet
         scn.getStylesheets().add(Objects.requireNonNull(application.Main.class.getResource("css/" + ThemeManager.getCurrentMode() + ".css")).toExternalForm());
-        //scn.getStylesheets().add(Objects.requireNonNull(application.Main.class.getResource("css/" + ThemeManager.getCurrentMode() + ".css")).toExternalForm());
 
         stg.setTitle("Payroll - " + name);
         stg.setScene(scn);

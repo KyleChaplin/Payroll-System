@@ -20,7 +20,7 @@ public class Main extends Application {
         DatabaseController.databaseChecks();
 
         // Testing directory creation for PDFs
-        PDFBox.createPDF("1");
+        //PDFBox.createPDF("1");
 
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("views/login-view.fxml")));
         Scene scene = new Scene(root);

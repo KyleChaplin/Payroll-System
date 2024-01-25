@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import static application.DatabaseController.*;
@@ -39,10 +40,25 @@ public class EmployeeController implements Initializable {
     private TableColumn<Person, String> Phone;
 
     @FXML
+    private TableColumn<Person, String> HourlySalary;
+
+    @FXML
     private TableColumn<Person, String> AccessLevel;
 
     @FXML
     private TableColumn<Person, String> NiNumber;
+
+    @FXML
+    private TableColumn<Person, String> Location;
+
+    @FXML
+    private TableColumn<Person, String> ContractType;
+
+    @FXML
+    private TableColumn<Person, String> Department;
+
+    @FXML
+    private TableColumn<Person, String> JobTitle;
 
     @FXML
     private TextField txtID;
@@ -61,6 +77,21 @@ public class EmployeeController implements Initializable {
 
     @FXML
     private TextField txtNiNumber;
+
+    @FXML
+    private TextField txtHourlySalary;
+
+    @FXML
+    private TextField txtLocation;
+
+    @FXML
+    private TextField txtContractType;
+
+    @FXML
+    private TextField txtDepartment;
+
+    @FXML
+    private TextField txtJobTitle;
 
     @FXML
     private ComboBox cboAccessLevel;
@@ -88,8 +119,13 @@ public class EmployeeController implements Initializable {
         LastName.setCellValueFactory(new PropertyValueFactory<Person, String>("LastName"));
         Email.setCellValueFactory(new PropertyValueFactory<Person, String>("Email"));
         Phone.setCellValueFactory(new PropertyValueFactory<Person, String>("Phone"));
+        HourlySalary.setCellValueFactory(new PropertyValueFactory<Person, String>("HourlySalary"));
         AccessLevel.setCellValueFactory(new PropertyValueFactory<Person, String>("AccessLevel"));
         NiNumber.setCellValueFactory(new PropertyValueFactory<Person, String>("NiNumber"));
+        Location.setCellValueFactory(new PropertyValueFactory<Person, String>("Location"));
+        ContractType.setCellValueFactory(new PropertyValueFactory<Person, String>("ContractType"));
+        Department.setCellValueFactory(new PropertyValueFactory<Person, String>("Department"));
+        JobTitle.setCellValueFactory(new PropertyValueFactory<Person, String>("JobTitle"));
 
         EmployeeTable.setItems(getAllEmployees());
     }
@@ -103,12 +139,17 @@ public class EmployeeController implements Initializable {
     public void btnAdd(ActionEvent event) throws IOException {
         // Check if the text fields are empty
         // Only add the employee if all the text fields are filled in
-        if (txtFirstName.getText().isEmpty() || txtLastName.getText().isEmpty() || txtEmail.getText().isEmpty() || txtPhone.getText().isEmpty() || txtNiNumber.getText().isEmpty() || cboAccessLevel.getSelectionModel().isEmpty()) {
+        if (txtFirstName.getText().isEmpty() || txtLastName.getText().isEmpty() || txtEmail.getText().isEmpty() ||
+                txtPhone.getText().isEmpty() || txtNiNumber.getText().isEmpty() ||
+                cboAccessLevel.getSelectionModel().isEmpty()) {
             // Show an error message
             txtEmptyError.setText("Fields should not be empty!");
         } else {
             // Add the employee
-            addEmployee(txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(), txtPhone.getText(), txtNiNumber.getText(), Integer.parseInt((String)cboAccessLevel.getValue()), false);
+            addEmployee(txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(), txtPhone.getText(),
+                    txtHourlySalary.getText(), txtNiNumber.getText(),
+                    Integer.parseInt((String)cboAccessLevel.getValue()), txtLocation.getText(), txtContractType.getText(),
+                    txtDepartment.getText(), txtJobTitle.getText(),false);
 
             btnClear(event);
             btnRefresh(event);
@@ -118,12 +159,19 @@ public class EmployeeController implements Initializable {
     public void btnUpdate(ActionEvent event) throws IOException {
         // Check if the text fields are empty
         // Only update the employee if all the text fields are filled in
-        if (txtID.getText().isEmpty() || txtFirstName.getText().isEmpty() || txtLastName.getText().isEmpty() || txtEmail.getText().isEmpty() || txtPhone.getText().isEmpty() || txtNiNumber.getText().isEmpty() || cboAccessLevel.getSelectionModel().isEmpty()) {
+        if (txtID.getText().isEmpty() || txtFirstName.getText().isEmpty() || txtLastName.getText().isEmpty() ||
+                txtEmail.getText().isEmpty() || txtPhone.getText().isEmpty() || txtNiNumber.getText().isEmpty() ||
+                cboAccessLevel.getSelectionModel().isEmpty() || txtHourlySalary.getText().isEmpty() ||
+                txtLocation.getText().isEmpty() || txtContractType.getText().isEmpty() ||
+                txtDepartment.getText().isEmpty() || txtJobTitle.getText().isEmpty()) {
             // Show an error message
             txtEmptyError.setText("Fields should not be empty!");
         } else {
             // Update the employee
-            updateEmployee(txtID.getText(), txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(), txtPhone.getText(), txtNiNumber.getText(), Integer.parseInt((String)cboAccessLevel.getValue()));
+            updateEmployee(txtID.getText(), txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(),
+                    txtPhone.getText(), txtHourlySalary.getText(), txtNiNumber.getText(),
+                    Integer.parseInt((String)cboAccessLevel.getValue()), txtLocation.getText(),
+                    txtContractType.getText(), txtDepartment.getText(), txtJobTitle.getText());
 
             btnClear(event);
             btnRefresh(event);
@@ -144,7 +192,6 @@ public class EmployeeController implements Initializable {
             btnRefresh(event);
         }
 
-
         deleteEmployee(txtID.getText());
     }
 
@@ -155,8 +202,13 @@ public class EmployeeController implements Initializable {
         txtLastName.clear();
         txtEmail.clear();
         txtPhone.clear();
+        txtHourlySalary.clear();
         txtNiNumber.clear();
         cboAccessLevel.setValue(null);
+        txtLocation.clear();
+        txtContractType.clear();
+        txtDepartment.clear();
+        txtJobTitle.clear();
     }
 
     @FXML
@@ -170,8 +222,13 @@ public class EmployeeController implements Initializable {
             txtLastName.setText(person.getLastName());
             txtEmail.setText(person.getEmail());
             txtPhone.setText(person.getPhone());
+            txtHourlySalary.setText(person.getHourlySalary());
             cboAccessLevel.setValue(person.getAccessLevel());
             txtNiNumber.setText(person.getNiNumber());
+            txtLocation.setText(person.getLocation());
+            txtContractType.setText(person.getContractType());
+            txtDepartment.setText(person.getDepartment());
+            txtJobTitle.setText(person.getJobTitle());
         }
     }
 
