@@ -7,7 +7,7 @@ module org.example.project {
     requires java.sql;
     requires org.apache.pdfbox;
     requires java.datatransfer;
-
+    requires com.dustinredmond.fxtrayicon;
 
     exports application;
     opens application to javafx.fxml;

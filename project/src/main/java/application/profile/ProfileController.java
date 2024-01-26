@@ -216,6 +216,13 @@ public class ProfileController implements Initializable {
         System.exit(0);
     }
 
+    public void minimiseApplication(ActionEvent event) throws IOException {
+        // Minimise the application
+        stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+
+
+    }
+
     public void openDashboard(ActionEvent event) throws IOException {
         SceneController.openScene(event, "home", stage, scene);
     }
