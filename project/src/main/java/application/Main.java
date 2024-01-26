@@ -1,5 +1,6 @@
 package application;
 
+import application.email.Email;
 import com.dustinredmond.fxtrayicon.FXTrayIcon;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -24,6 +25,7 @@ public class Main extends Application {
 
         // Testing directory creation for PDFs
         //PDFBox.createPDF("1");
+        Email.sendEmailTask();
 
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("views/login-view.fxml")));
         Scene scene = new Scene(root);

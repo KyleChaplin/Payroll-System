@@ -14,13 +14,16 @@ import application.DatabaseController;
 import application.employees.Person;
 import javafx.scene.chart.PieChart;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
+import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 public class PDFBox {
-    public static void createPDF(String employeeNumber) throws IOException {
+    public static String createPDF(String employeeNumber, String niNo) throws IOException {
 
         String savePath = "src/main/resources/PDF/";
 
@@ -56,7 +59,7 @@ public class PDFBox {
         PDFont italicFont = PDType1Font.HELVETICA_OBLIQUE;
 
         // ****************Employee details***************
-        Person employee = DatabaseController.getEmployeeInfoByID("1"); // Gets the employee info from the database using the employee ID
+        Person employee = DatabaseController.getEmployeeInfoByID(employeeNumber); // Gets the employee info from the database using the employee ID
         String employeeID = employee.getEmployeeID();
         String name = employee.getFirstName() + " " + employee.getLastName();
         String hoursWorked = ""; // TODO: Get hours worked from database
@@ -116,9 +119,17 @@ public class PDFBox {
 
         // Close the content stream
         contentStream.close();
-        doc.save(employeeMonthDirectory + ".pdf");
-        System.out.println("PDF created");
+        String pdfFilePath = employeeMonthDirectory + ".pdf";
+        //doc.save(pdfFilePath);
+
+        // Encrypt the PDF
+        String lastFourDigits = niNo.substring(niNo.length() - 4);
+        encryptPDF(doc, pdfFilePath, lastFourDigits);
+
+        System.out.println("PDF created: " + pdfFilePath);
         doc.close();
+
+        return pdfFilePath;
     }
 
     private static class textClass {
@@ -240,7 +251,26 @@ public class PDFBox {
         }
     }
 
+    // Method to encrypt the PDF with a password
+    private static void encryptPDF(PDDocument doc, String filePath, String password) throws IOException {
+        // Set up encryption options
+        AccessPermission ap = new AccessPermission();
+        ap.setCanPrint(true);
 
+        StandardProtectionPolicy spp = new StandardProtectionPolicy(password, password, ap);
+        spp.setEncryptionKeyLength(128);
+
+        // Apply encryption to the document
+        doc.protect(spp);
+
+        // Set additional document information
+        PDDocumentInformation info = doc.getDocumentInformation();
+        info.setAuthor("Payroll System");
+        info.setTitle("Payslip");
+
+        // Save the encrypted document
+        doc.save(filePath);
+    }
 
     // Method to check if the directories exist to save the PDF
     // directories are unique to each employee by using their email
@@ -281,5 +311,4 @@ public class PDFBox {
 
         return monthAndYear;
     }
-
 }

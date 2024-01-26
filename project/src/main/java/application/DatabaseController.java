@@ -1192,6 +1192,15 @@ public class DatabaseController {
         return data;
     }
 
+    // Method to get all emails from the database and return an array
+    public static String[] getAllEmployeeEmails() {
+        String[] emails = null;
+
+
+
+        return emails;
+    }
+
     // ********************************************
     // ************** OTHER METHODS ***************
     // ********************************************

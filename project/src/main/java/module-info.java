@@ -8,6 +8,7 @@ module org.example.project {
     requires org.apache.pdfbox;
     requires java.datatransfer;
     requires com.dustinredmond.fxtrayicon;
+    requires java.mail;
 
     exports application;
     opens application to javafx.fxml;
