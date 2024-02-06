@@ -53,8 +53,7 @@ public class HelpController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // TODO: This will populate the scroll pane with the help information
-        //  by dynamically creating the labels and text
+        // TODO: This currently only works with dark mode - Setup support for light mode
 
         ObservableList<HelpInfo> helpInfo = (ObservableList<HelpInfo>) DatabaseController.getHelpInfo();
 

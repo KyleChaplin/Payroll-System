@@ -128,7 +128,7 @@
 
 .text-field {
     -fx-background-color: #434443;
-    -fx-text-fill: #FFFFFF;
+    -fx-text-fill: #ffffff;
     -fx-background-radius: 15;
     -fx-border-width: 2;
     -fx-border-radius: 15;
@@ -140,6 +140,34 @@
 }
 
 .text-field:focused {
+    -fx-border-color: #3d3d3d;
+    -fx-border-width: 2;
+}
+
+/* text area */
+
+.text-area {
+    -fx-background-color: #434443;
+    -fx-text-fill: #ffffff;
+    -fx-background-radius: 15;
+    -fx-border-width: 0;
+    -fx-border-radius: 15;
+    -fx-border-color: transparent;
+}
+
+.text-area .content{
+    -fx-background-color: #434443;
+    -fx-text-fill: #ffffff;
+    -fx-border-width: 0;
+    -fx-border-color: transparent;
+}
+
+.text-area:hover {
+    -fx-border-color: #3d3d3d;
+    -fx-border-width: 2;
+}
+
+.text-area:focused {
     -fx-border-color: #3d3d3d;
     -fx-border-width: 2;
 }

@@ -822,6 +822,8 @@ public class DatabaseController {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        } else {
+            System.out.println("You cannot delete the currently logged-in user.");
         }
     }
 
