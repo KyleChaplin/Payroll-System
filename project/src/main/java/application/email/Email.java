@@ -11,7 +11,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,7 +28,7 @@ public class Email {
     private static Date getNextExecutionTime() {
         // Set the desired time of the month for sending the email
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        String scheduledDateStr = "26-01-2024 15:11:00"; // TODO: get the pay date from the database
+        String scheduledDateStr = DatabaseController.getEmailDateInfo();// "26-01-2024 15:11:00"; // TODO: get the pay date from the database
         try {
             Date scheduledDate = sdf.parse(scheduledDateStr);
             Date currentDate = new Date();
@@ -65,8 +64,8 @@ public class Email {
         }
 
         private void sendEmail() throws MessagingException {
-            String fromUser = "";   // TODO: get the from user from the database
-            String fromUserPassword = "";   // TODO: get the from user password from the database
+            String fromUser = DatabaseController.getEmailInfo();   // TODO: get the from user from the database
+            String fromUserPassword = DatabaseController.getPasswordInfo();   // TODO: get the from user password from the database
             String emailHost = "smtp.gmail.com";
             Transport transport = newSession.getTransport("smtp");
             transport.connect(emailHost, fromUser, fromUserPassword);
@@ -83,8 +82,8 @@ public class Email {
         }
 
         private MimeMessage[] draftEmail() throws MessagingException, IOException {
-            String emailSubject;    // TODO: Allow setting and get the email subject from the database
-            String emailBody; // TODO: Allow setting and get the email body from the database
+            String emailSubject;    // TODO: Allow setting and get the email subject from the database - Maybe
+            String emailBody; // TODO: Allow setting and get the email body from the database - Maybe
 
             Person[] person = new Person[]{DatabaseController.getEmployeeInfo()};
             for (int i = 0; i < person.length; i++) {

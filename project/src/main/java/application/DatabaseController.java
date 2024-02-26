@@ -72,7 +72,8 @@ public class DatabaseController {
                 "NPS_LOGIN",
                 "NPS_EMERGENCY_CONTACT",
                 "NPS_ADDRESSES",
-                "NPS_HELP_INFO"
+                "NPS_HELP_INFO",
+                "NPS_EMAIL_INFO"
                 //"NPS_SCHEDULE",
         };
 
@@ -96,8 +97,18 @@ public class DatabaseController {
             System.out.println("Admin account exists.\n");
         } else {
             System.out.println("Admin account does not exist.\n");
+            // Set currently logged in employee ID to 1 (admin) for the first login
+            currentLoggedInEmployeeId = "1";
+
             addEmployee("admin", "admin", "admin", "-", "0.0", "-",
                     0, "admin", "delete me", "IT", "admin", true);
+            // Create base email info
+            // Get current date and time
+            java.util.Date date = new java.util.Date();
+            Timestamp timestamp = new Timestamp(date.getTime());
+            String formattedDate = new java.text.SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(timestamp);
+
+            addEmailInfo("your_email", "your_password", formattedDate);
         }
 
         // Close connection to Oracle Database
@@ -199,7 +210,8 @@ public class DatabaseController {
                             "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
                             "EMPLOYEE_ID NUMBER NOT NULL, " +
                             "PAY_DATE DATE NOT NULL, " +
-                            "MONTH VARCHAR(3) NOT NULL, " +
+                            "MONTH VARCHAR(8) NOT NULL, " +
+                            "YEAR NUMBER NOT NULL, " +
                             "HOURS_WORKED DECIMAL(10, 2) NOT NULL, " +
                             "PENSION DECIMAL(10, 2) NOT NULL, " +
                             "OVERTIME_HOURS DECIMAL(10, 2) NOT NULL, " +
@@ -264,6 +276,19 @@ public class DatabaseController {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+                break;
+            case "NPS_EMAIL_INFO":
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate("CREATE TABLE NPS_EMAIL_INFO (" +
+                            "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
+                            "FROM_USER_EMAIL VARCHAR2(100) NOT NULL, " +
+                            "FROM_USER_PASSWORD VARCHAR2(100) NOT NULL, " +
+                            "EMAIL_DATE VARCHAR2(30) NOT NULL " +
+                            ")");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
             // Add cases for other tables...
         }
     }
@@ -272,7 +297,7 @@ public class DatabaseController {
     // *********** TABLE UPDATE METHODS ***********
     // ********************************************
 
-    // Method to update tables to include foreign keys and other constraintss
+    // Method to update tables to include foreign keys and other constraints
     private static void updateTables(Connection connection, String tableName) {
         System.out.println("Updating table " + tableName + "...");
 
@@ -563,8 +588,25 @@ public class DatabaseController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
 
+    // Method to update the email info
+    public static void updateEmailInfo(String fromUserEmail, String fromUserPassword, String emailDate) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "UPDATE NPS_EMAIL_INFO SET FROM_USER_EMAIL = ?, FROM_USER_PASSWORD = ?, EMAIL_DATE = ?")) {
+            preparedStatement.setString(1, fromUserEmail);
+            preparedStatement.setString(2, fromUserPassword);
+            preparedStatement.setString(3, emailDate);
 
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Email info updated successfully.");
+            } else {
+                System.out.println("Failed to update email info.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     // ********************************************
@@ -602,10 +644,13 @@ public class DatabaseController {
                 createLogin(employeeId, email, firstName, niNumber, accessLevel, firstLogin);
 
                 // Add bank details for the employee
-                addBankDetails(String.valueOf(employeeId), "Bank Name", "Account Number", "Sort Code");
+                addBankDetails(String.valueOf(employeeId), "Bank Name", "Account Number",
+                        "Sort Code");
 
                 // Add payroll info for the employee
-                addPayrollInfo(String.valueOf(employeeId), "Pay Date", "Month", "Hours Worked", "Pension", "Overtime Hours", "Overtime Pay", "Gross Pay", "Taxes", "Net Pay");
+                addPayrollInfo(String.valueOf(employeeId), "Date", "Month", "",
+                        "Hours Worked", "Pension", "Overtime Hours",
+                        "Overtime Pay", "Gross Pay", "Taxes", "Net Pay");
 
                 // Add emergency contact info for the employee
                 addEmergencyDetails("First Name", "Last Name", "Mobile", "Relationship");
@@ -650,7 +695,7 @@ public class DatabaseController {
 
     // Method to add bank details
     public static void addBankDetails(String employeeId, String bankName, String accountNumber, String sortCode) {
-        // Add employee record
+        // Add record
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO NPS_BANK_DETAILS (EMPLOYEE_ID, BANK_NAME, ACCOUNT_NUMBER, SORT_CODE) VALUES (?, ?, ?, ?)")) {
             preparedStatement.setInt(1, Integer.parseInt(employeeId));
@@ -670,8 +715,8 @@ public class DatabaseController {
     }
 
     // Method to add payroll info
-    public static void addPayrollInfo(String employeeId, String payDate, String month, String hoursWorked, String pension, String overtimeHours, String overtimePay, String grossPay, String taxes, String netPay) {
-        // Add employee record
+    public static void addPayrollInfo(String employeeId, String payDate, String month, String hoursWorked, String pension, String overtimeHours, String overtimePay, String grossPay, String taxes, String netPay, String net_pay) {
+        // Add record
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO NPS_PAYROLL (EMPLOYEE_ID, PAY_DATE, MONTH, HOURS_WORKED, PENSION, OVERTIME_HOURS, OVERTIME_PAY, GROSS_PAY, TAXES, NET_PAY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
             preparedStatement.setInt(1, Integer.parseInt(employeeId));
@@ -697,8 +742,8 @@ public class DatabaseController {
     }
 
     // Method to add emergency contact info
-    public static void addEmergencyDetails(String  fName, String lName, String mobile, String relationship) {
-        // Add employee record
+    public static void addEmergencyDetails(String fName, String lName, String mobile, String relationship) {
+        // Add record
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO NPS_EMERGENCY_CONTACT (EMPLOYEE_ID, FIRST_NAME, LAST_NAME, PHONE, RELATIONSHIP) VALUES (?, ?, ?, ?, ?)")) {
             preparedStatement.setString(1, currentLoggedInEmployeeId);
@@ -720,7 +765,7 @@ public class DatabaseController {
 
     // Method to add help info
     public static void addHelp(String errorCode, String Title, String Description) {
-        // Add employee record
+        // Add record
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO NPS_HELP_INFO (ERROR_CODE, TITLE, DESCRIPTION) VALUES (?, ?, ?)")) {
             preparedStatement.setString(1, errorCode);
@@ -738,6 +783,25 @@ public class DatabaseController {
         }
     }
 
+    // Method to add email info
+    public static void addEmailInfo(String fromUserEmail, String fromUserPassword, String emailDate) {
+        // Add record
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO NPS_EMAIL_INFO (FROM_USER_EMAIL, FROM_USER_PASSWORD, EMAIL_DATE) VALUES (?, ?, ?)")) {
+            preparedStatement.setString(1, fromUserEmail);
+            preparedStatement.setString(2, fromUserPassword);
+            preparedStatement.setString(3, emailDate);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Email info added successfully.");
+            } else {
+                System.out.println("Failed to add email info.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     // ********************************************
     // *********** TABLE DELETE METHODS ***********
@@ -1199,9 +1263,54 @@ public class DatabaseController {
         String[] emails = null;
 
 
-
         return emails;
     }
+
+    // Method to get email from email info table
+    public static String getEmailInfo() {
+        String email = null;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT FROM_USER_EMAIL FROM NPS_EMAIL_INFO")) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                email = resultSet.getString("FROM_USER_EMAIL");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return email;
+    }
+
+    // Method to get password from email info table
+    public static String getPasswordInfo() {
+        String password = null;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT FROM_USER_PASSWORD FROM NPS_EMAIL_INFO")) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                password = resultSet.getString("FROM_USER_PASSWORD");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return password;
+    }
+
+    // Method to get email date from email info table
+    public static String getEmailDateInfo() {
+        String emailDate = null;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT EMAIL_DATE FROM NPS_EMAIL_INFO")) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                emailDate = resultSet.getString("EMAIL_DATE");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return emailDate;
+    }
+
 
     // ********************************************
     // ************** OTHER METHODS ***************
