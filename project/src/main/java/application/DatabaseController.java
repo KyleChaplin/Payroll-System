@@ -4,6 +4,7 @@ import application.employees.Person;
 import application.help.HelpInfo;
 import application.payroll.DetailedPayroll;
 import application.payroll.PayrollOverview;
+import application.schedule.Schedule;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -73,8 +74,8 @@ public class DatabaseController {
                 "NPS_EMERGENCY_CONTACT",
                 "NPS_ADDRESSES",
                 "NPS_HELP_INFO",
-                "NPS_EMAIL_INFO"
-                //"NPS_SCHEDULE",
+                "NPS_EMAIL_INFO",
+                "NPS_SCHEDULE"
         };
 
         // Loop to check all tables
@@ -289,6 +290,20 @@ public class DatabaseController {
                     e.printStackTrace();
                 }
                 break;
+            case "NPS_SCHEDULE":
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate("CREATE TABLE NPS_SCHEDULE (" +
+                            "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
+                            "EMPLOYEE_ID NUMBER NOT NULL, " +
+                            "WEEK_ID NUMBER NOT NULL, " +
+                            "DAY VARCHAR(10) NOT NULL, " +
+                            "START_TIME VARCHAR(5), " +
+                            "END_TIME VARCHAR(5)" +
+                            ")");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
             // Add cases for other tables...
         }
     }
@@ -338,6 +353,14 @@ public class DatabaseController {
             case "NPS_ADDRESSES":
                 try (Statement statement = connection.createStatement()) {
                     statement.executeUpdate("ALTER TABLE NPS_ADDRESSES ADD CONSTRAINT fk_employee " +
+                            "FOREIGN KEY (EMPLOYEE_ID) REFERENCES NPS_EMPLOYEE(ID)");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "NPS_SCHEDULE":
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate("ALTER TABLE NPS_SCHEDULE ADD CONSTRAINT fk_schedule_employee " +
                             "FOREIGN KEY (EMPLOYEE_ID) REFERENCES NPS_EMPLOYEE(ID)");
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -609,6 +632,106 @@ public class DatabaseController {
         }
     }
 
+    // Check if schedule entry exists, if not, add it and update it if it does
+    public static void updateSchedule(Schedule schedule) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_SCHEDULE WHERE EMPLOYEE_ID = ? AND WEEK_ID = ?")) {
+            preparedStatement.setInt(1, Integer.parseInt(schedule.getEmployeeID()));
+            preparedStatement.setInt(2, Integer.parseInt(schedule.getWeekId()));
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                // Update the schedule entry for each day of the week
+                for (String day : schedule.getDays()) {
+                    try (PreparedStatement preparedStatement2 = connection.prepareStatement(
+                            "UPDATE NPS_SCHEDULE SET START_TIME = ?, END_TIME = ? WHERE EMPLOYEE_ID = ? " +
+                                    "AND WEEK_ID = ? AND DAY = ?")) {
+                        preparedStatement2.setString(1, schedule.getStartTime(day));
+                        preparedStatement2.setString(2, schedule.getEndTime(day));
+                        preparedStatement2.setInt(3, Integer.parseInt(schedule.getEmployeeID()));
+                        preparedStatement2.setInt(4, Integer.parseInt(schedule.getWeekId()));
+                        preparedStatement2.setString(5, day);
+
+                        int rowsAffected = preparedStatement2.executeUpdate();
+                        if (rowsAffected > 0) {
+                            System.out.println("Schedule updated successfully.");
+                        } else {
+                            System.out.println("Failed to update schedule.");
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                // Add a new schedule entry for each day of the week
+                for (String day : schedule.getDays()) {
+                    try (PreparedStatement preparedStatement2 = connection.prepareStatement(
+                            "INSERT INTO NPS_SCHEDULE (EMPLOYEE_ID, WEEK_ID, DAY, START_TIME, END_TIME) " +
+                                    "VALUES (?, ?, ?, ?, ?)")) {
+                        preparedStatement2.setInt(1, Integer.parseInt(schedule.getEmployeeID()));
+                        preparedStatement2.setInt(2, Integer.parseInt(schedule.getWeekId()));
+                        preparedStatement2.setString(3, day);
+                        preparedStatement2.setString(4, schedule.getStartTime(day));
+                        preparedStatement2.setString(5, schedule.getEndTime(day));
+
+                        int rowsAffected = preparedStatement2.executeUpdate();
+                        if (rowsAffected > 0) {
+                            System.out.println("Schedule added successfully.");
+                        } else {
+                            System.out.println("Failed to add schedule.");
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Ensure that every employee has a schedule entry for every day of the week for every week
+    public static void initializeScheduleForAllEmployees() {
+        // Get all employee IDs
+        ObservableList<Person> employees = getAllEmployees();
+
+        // Array of days
+        String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+
+        for (Person employee : employees) {
+            String employeeId = employee.getEmployeeID();
+
+            for (int weekId = 0; weekId <= 3; weekId++) {
+                for (String day : days) {
+                    // Check if a record already exists for the employee, week, and day
+                    if (!scheduleRecordExists(employeeId, String.valueOf(weekId), day)) {
+                        // If no record exists, add a default record (empty start and end time)
+                        Schedule defaultSchedule = new Schedule(employee.getFirstName() + " " + employee.getLastName(),
+                                employeeId);
+                        defaultSchedule.setWeekID(String.valueOf(weekId));
+                        updateSchedule(defaultSchedule);
+                    }
+                }
+            }
+        }
+    }
+
+    // Method to check if a schedule record exists
+    private static boolean scheduleRecordExists(String employeeId, String weekId, String day) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_SCHEDULE WHERE EMPLOYEE_ID = ? AND WEEK_ID = ? AND DAY = ?")) {
+            preparedStatement.setInt(1, Integer.parseInt(employeeId));
+            preparedStatement.setInt(2, Integer.parseInt(weekId));
+            preparedStatement.setString(3, day);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSet.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     // ********************************************
     // *********** TABLE INSERT METHODS ***********
     // ********************************************
@@ -654,6 +777,9 @@ public class DatabaseController {
 
                 // Add emergency contact info for the employee
                 addEmergencyDetails("First Name", "Last Name", "Mobile", "Relationship");
+
+                // Add schedule info for the employee
+                initializeScheduleForAllEmployees();
 
             } else {
                 System.out.println("Failed to add employee.");
@@ -886,8 +1012,45 @@ public class DatabaseController {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+
+            // Delete the schedule entries
+            deleteSchedule(employeeId);
         } else {
             System.out.println("You cannot delete the currently logged-in user.");
+        }
+    }
+
+    // Method to delete a help record
+    public static void deleteHelp(String errorCode) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "DELETE FROM NPS_HELP_INFO WHERE ERROR_CODE = ?")) {
+            preparedStatement.setString(1, errorCode);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Help record deleted successfully.");
+            } else {
+                System.out.println("No help record found with the given error code.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to delete every schedule entry for an employee
+    public static void deleteSchedule(String employeeId) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "DELETE FROM NPS_SCHEDULE WHERE EMPLOYEE_ID = ?")) {
+            preparedStatement.setString(1, employeeId);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Schedule entries deleted successfully.");
+            } else {
+                System.out.println("No schedule entries found for the given employee ID.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -1311,6 +1474,76 @@ public class DatabaseController {
         return emailDate;
     }
 
+    // Method to get all schedule entries for a specific week id
+    public static ObservableList<Schedule> getScheduleData(String weekId) {
+        ObservableList<Schedule> data = FXCollections.observableArrayList();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_SCHEDULE WHERE WEEK_ID = ?")) {
+            preparedStatement.setString(1, weekId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            Map<String, Schedule> scheduleMap = new HashMap<>();
+
+            while (resultSet.next()) {
+                String employeeId = resultSet.getString("EMPLOYEE_ID");
+                String day = resultSet.getString("DAY");
+                String startTime = resultSet.getString("START_TIME");
+                String endTime = resultSet.getString("END_TIME");
+
+                // Get employee first and last name
+                String firstName = "";
+                String lastName = "";
+                try (PreparedStatement preparedStatement2 = connection.prepareStatement(
+                        "SELECT FIRST_NAME, LAST_NAME FROM NPS_EMPLOYEE WHERE ID = ?")) {
+                    preparedStatement2.setString(1, employeeId);
+
+                    ResultSet resultSet2 = preparedStatement2.executeQuery();
+                    if (resultSet2.next()) {
+                        firstName = resultSet2.getString("FIRST_NAME");
+                        lastName = resultSet2.getString("LAST_NAME");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                String key = employeeId + "-" + weekId; // Unique key for each employee and week
+                Schedule schedule = scheduleMap.getOrDefault(key, new Schedule(firstName + " " + lastName, employeeId));
+
+                // Set start and end times based on the day
+                switch (day) {
+                    case "Monday":
+                        schedule.setMonday(startTime, endTime);
+                        break;
+                    case "Tuesday":
+                        schedule.setTuesday(startTime, endTime);
+                        break;
+                    case "Wednesday":
+                        schedule.setWednesday(startTime, endTime);
+                        break;
+                    case "Thursday":
+                        schedule.setThursday(startTime, endTime);
+                        break;
+                    case "Friday":
+                        schedule.setFriday(startTime, endTime);
+                        break;
+                    case "Saturday":
+                        schedule.setSaturday(startTime, endTime);
+                        break;
+                    case "Sunday":
+                        schedule.setSunday(startTime, endTime);
+                        break;
+                }
+
+                scheduleMap.put(key, schedule);
+            }
+
+            data.addAll(scheduleMap.values());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
 
     // ********************************************
     // ************** OTHER METHODS ***************
