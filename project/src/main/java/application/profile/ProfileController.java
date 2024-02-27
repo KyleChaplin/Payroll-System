@@ -145,15 +145,6 @@ public class ProfileController implements Initializable {
         txtELastName.setText(person.getELastName());
         txtEMobile.setText(person.getEMobile());
         txtERelationship.setText(person.getERelationship());
-
-        // Check if the text fields are editable
-        if (txtfName.isEditable()) {
-            // If they are editable, change the button text to "Update"
-            btnGreen.setText("Save");
-        } else {
-            // If they are not editable, change the button text to "Cancel"
-            btnGreen.setText("Edit");
-        }
     }
 
     public void btnToggleUpdate() {
