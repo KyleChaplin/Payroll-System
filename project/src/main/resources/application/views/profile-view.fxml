@@ -21,11 +21,11 @@
          <children>
             <VBox alignment="CENTER" layoutY="42.0" prefHeight="788.0" prefWidth="1071.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="42.0">
                <children>
-                  <HBox alignment="BOTTOM_LEFT" minHeight="0.0" prefHeight="0.0" prefWidth="1071.0" spacing="40.0" VBox.vgrow="ALWAYS">
+                  <HBox alignment="BOTTOM_LEFT" minHeight="0.0" prefHeight="0.0" prefWidth="1061.0" spacing="40.0" VBox.vgrow="ALWAYS">
                      <children>
-                        <VBox HBox.hgrow="ALWAYS">
+                        <VBox prefHeight="39.0" prefWidth="1061.0">
                            <children>
-                              <HBox alignment="BOTTOM_LEFT" fillHeight="false" spacing="40.0">
+                              <HBox alignment="BOTTOM_LEFT" fillHeight="false" prefHeight="147.0" prefWidth="1061.0" spacing="40.0">
                                  <children>
                                     <Label fx:id="lblName" text="Employee:" HBox.hgrow="ALWAYS">
                                        <font>
@@ -45,7 +45,7 @@
                                     <Insets />
                                  </opaqueInsets>
                               </HBox>
-                              <Line endX="930.0" startX="-100.0" stroke="LIGHTBLUE" VBox.vgrow="ALWAYS">
+                              <Line endX="930.0" startX="-100.0" stroke="LIGHTBLUE">
                                  <VBox.margin>
                                     <Insets left="15.0" />
                                  </VBox.margin>
@@ -54,27 +54,19 @@
                         </VBox>
                      </children>
                   </HBox>
+                  <HBox alignment="CENTER_RIGHT" prefHeight="53.0" prefWidth="930.0">
+                     <children>
+                        <Button fx:id="btnGreen" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#btnToggleUpdate" prefHeight="43.0" prefWidth="68.0" style="-fx-background-radius: 8; -fx-background-color: DARKSEAGREEN;" text="Update" textAlignment="CENTER" textFill="WHITE">
+                           <HBox.margin>
+                              <Insets right="30.0" />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
                   <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                      <children>
                         <VBox alignment="CENTER" spacing="5.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <HBox alignment="BOTTOM_LEFT" prefHeight="28.0" prefWidth="1036.0">
-                                 <children>
-                                    <Label alignment="CENTER" text="Details:">
-                                       <font>
-                                          <Font size="21.0" />
-                                       </font>
-                                       <padding>
-                                          <Insets left="20.0" />
-                                       </padding>
-                                    </Label>
-                                    <Button fx:id="btnGreen" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#btnToggleUpdate" prefHeight="43.0" prefWidth="68.0" style="-fx-background-radius: 8; -fx-background-color: DARKSEAGREEN;" text="Update" textFill="WHITE">
-                                       <HBox.margin>
-                                          <Insets left="850.0" />
-                                       </HBox.margin>
-                                    </Button>
-                                 </children>
-                              </HBox>
                               <HBox prefHeight="100.0" prefWidth="200.0" spacing="20.0" VBox.vgrow="ALWAYS">
                                  <padding>
                                     <Insets left="5.0" right="5.0" />
@@ -377,6 +369,11 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
             </VBox>
+            <Label fx:id="txtEmptyError" layoutX="650.0" layoutY="160.0" textFill="RED">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
          </children></AnchorPane>
    </center>
    <left>

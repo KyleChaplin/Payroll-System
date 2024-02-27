@@ -19,6 +19,7 @@ public class Person {
     private String contractType;
     private String address1;
     private String address2;
+    private String city;
     private String postcode;
     private String emergencyContactFName;
     private String emergencyContactLName;
@@ -61,6 +62,7 @@ public class Person {
 
         address1 = "Address Line 1";
         address2 = "Address Line 2";
+        city = "City";
         postcode = "Postcode";
 
         emergencyContactFName = "Emergency Contact First Name";
@@ -141,6 +143,7 @@ public class Person {
     public String getAddress2() {
         return address2;
     }
+    public String getCity() { return city; }
 
     public String getPostcode() {
         return postcode;
@@ -210,7 +213,7 @@ public class Person {
     public void setAddressLine2(String address) {
         this.address2 = address;
     }
-
+    public void setCity(String city) { this.city = city; }
     public void setPostcode(String postcode) {
         this.postcode = postcode;
     }

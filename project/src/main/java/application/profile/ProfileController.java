@@ -98,6 +98,9 @@ public class ProfileController implements Initializable {
     private TextField txtEMobile;
 
     @FXML
+    private Label txtEmptyError;
+
+    @FXML
     private Button btnGreen; // This button will either be "Edit" or "Update"
 
     private String id;
@@ -134,6 +137,7 @@ public class ProfileController implements Initializable {
         // Populate the text fields with the address information
         txtAddress1.setText(person.getAddress1());
         txtAddress2.setText(person.getAddress2());
+        txtCity.setText(person.getCity());
         txtPostcode.setText(person.getPostcode());
 
         // Populate the text fields with the emergency contact information
@@ -145,7 +149,7 @@ public class ProfileController implements Initializable {
         // Check if the text fields are editable
         if (txtfName.isEditable()) {
             // If they are editable, change the button text to "Update"
-            btnGreen.setText("Update");
+            btnGreen.setText("Save");
         } else {
             // If they are not editable, change the button text to "Cancel"
             btnGreen.setText("Edit");
@@ -153,32 +157,96 @@ public class ProfileController implements Initializable {
     }
 
     public void btnToggleUpdate() {
-
         // Check if the text fields are editable
-        if (Objects.equals(btnGreen.getText(), "Update")) {
+        if (Objects.equals(btnGreen.getText(), "Save")) {
             // Update the user's information
+            if (txtEFirstName.getText().isEmpty() || txtELastName.getText().isEmpty() ||
+                    txtEmail.getText().isEmpty() || txtPhone.getText().isEmpty() ||
+                    txtNiNumber.getText().isEmpty() || txtAddress1.getText().isEmpty() ||
+                    txtAddress2.getText().isEmpty() || txtCity.getText().isEmpty() ||
+                    txtPostcode.getText().isEmpty() || txtBankName.getText().isEmpty() ||
+                    txtAccountNumber.getText().isEmpty() || txtSortCode.getText().isEmpty() ||
+                    txtEMobile.getText().isEmpty() || txtERelationship.getText().isEmpty()) {
 
-            // Toggle the text fields to be editable or not
-            txtfName.setEditable(!txtfName.isEditable());
-            txtlName.setEditable(!txtlName.isEditable());
-            txtEmail.setEditable(!txtEmail.isEditable());
-            txtPhone.setEditable(!txtPhone.isEditable());
-            txtNiNumber.setEditable(!txtNiNumber.isEditable());
-            txtAddress1.setEditable(!txtAddress1.isEditable());
-            txtAddress2.setEditable(!txtAddress2.isEditable());
-            txtCity.setEditable(!txtCity.isEditable());
-            txtPostcode.setEditable(!txtPostcode.isEditable());
-            txtEFirstName.setEditable(!txtEFirstName.isEditable());
-            txtELastName.setEditable(!txtELastName.isEditable());
-            txtEMobile.setEditable(!txtEMobile.isEditable());
-            txtERelationship.setEditable(!txtERelationship.isEditable());
-            txtPension.setEditable(!txtPension.isEditable());
-            txtBankName.setEditable(!txtBankName.isEditable());
-            txtAccountNumber.setEditable(!txtAccountNumber.isEditable());
-            txtSortCode.setEditable(!txtSortCode.isEditable());
+                // Show an error message
+                txtEmptyError.setText("Fields should not be empty!");
+                return;
+            } else {
+                // Perform additional input validation
+                String email = txtEmail.getText();
+                String phone = txtPhone.getText();
+                String niNumber = txtNiNumber.getText();
+                String accountNumber = txtAccountNumber.getText();
+                String sortCode = txtSortCode.getText();
+                String mobile = txtEMobile.getText();
+                String postcode = txtPostcode.getText();
 
-            btnGreen.setText("Edit");
+                if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+                    txtEmptyError.setText("Invalid email address!");
+                    return;
+                }
 
+                if (!phone.matches("^[0-9]{11}$")) {
+                    txtEmptyError.setText("Invalid mobile number!");
+                    return;
+                }
+
+                if (!niNumber.matches("^[A-CEGHJ-PR-TW-Z]{1}[A-CEGHJ-NPR-TW-Z]{1}[0-9]{6}[A-D\\s]{1}$")) {
+                    txtEmptyError.setText("Invalid NI number!");
+                    return;
+                }
+
+                if (!accountNumber.matches("^[0-9]{8}$")) {
+                    txtEmptyError.setText("Invalid account number!");
+                    return;
+                }
+
+                if (!sortCode.matches("^[0-9]{6}$")) {
+                    txtEmptyError.setText("Invalid sort code!");
+                    return;
+                }
+
+                if (!mobile.matches("^[0-9]{11}$")) {
+                    txtEmptyError.setText("Invalid emergency contact mobile number!");
+                    return;
+                }
+
+                if (!postcode.matches("^[A-Z]{1,2}[0-9]{1,2}[A-Z]?\\s[0-9][A-Z]{2}$")) {
+                    txtEmptyError.setText("Invalid postcode!");
+                    return;
+                }
+
+                // Once validation is passed, update the employee profile
+                DatabaseController.updateEmployeeProfile(id, txtlName.getText(), txtlName.getText(),
+                        txtEmail.getText(), txtPhone.getText(), txtNiNumber.getText(), txtAddress1.getText(),
+                        txtAddress2.getText(), txtPostcode.getText(), txtCity.getText(), txtBankName.getText(),
+                        txtAccountNumber.getText(), txtSortCode.getText(), txtEFirstName.getText(),
+                        txtELastName.getText(), txtEMobile.getText(), txtERelationship.getText());
+
+                // Clear the error message
+                txtEmptyError.setText("");
+
+                // Toggle the text fields to be editable or not
+                txtfName.setEditable(!txtfName.isEditable());
+                txtlName.setEditable(!txtlName.isEditable());
+                txtEmail.setEditable(!txtEmail.isEditable());
+                txtPhone.setEditable(!txtPhone.isEditable());
+                txtNiNumber.setEditable(!txtNiNumber.isEditable());
+                txtAddress1.setEditable(!txtAddress1.isEditable());
+                txtAddress2.setEditable(!txtAddress2.isEditable());
+                txtCity.setEditable(!txtCity.isEditable());
+                txtPostcode.setEditable(!txtPostcode.isEditable());
+                txtEFirstName.setEditable(!txtEFirstName.isEditable());
+                txtELastName.setEditable(!txtELastName.isEditable());
+                txtEMobile.setEditable(!txtEMobile.isEditable());
+                txtERelationship.setEditable(!txtERelationship.isEditable());
+                txtPension.setEditable(!txtPension.isEditable());
+                txtBankName.setEditable(!txtBankName.isEditable());
+                txtAccountNumber.setEditable(!txtAccountNumber.isEditable());
+                txtSortCode.setEditable(!txtSortCode.isEditable());
+
+                btnGreen.setText("Edit");
+            }
         } else {
             // Toggle the text fields to be editable or not
             txtfName.setEditable(!txtfName.isEditable());
@@ -199,28 +267,8 @@ public class ProfileController implements Initializable {
             txtAccountNumber.setEditable(!txtAccountNumber.isEditable());
             txtSortCode.setEditable(!txtSortCode.isEditable());
 
-            btnGreen.setText("Update");
+            btnGreen.setText("Save");
         }
-
-        if (!txtEFirstName.isEditable()) {
-            DatabaseController.updateEmployeeProfile(id, txtlName.getText(), txtlName.getText(),
-                    txtEmail.getText(), txtPhone.getText(), txtNiNumber.getText(), txtAddress1.getText(),
-                    txtAddress2.getText(), txtCity.getText(), txtPostcode.getText(), txtBankName.getText(),
-                    txtAccountNumber.getText(), txtSortCode.getText(), txtEFirstName.getText(),
-                    txtELastName.getText(), txtEMobile.getText(), txtERelationship.getText());
-        }
-    }
-
-    public void CloseApplication(ActionEvent event) throws IOException {
-        // Close the application
-        System.exit(0);
-    }
-
-    public void minimiseApplication(ActionEvent event) throws IOException {
-        // Minimise the application
-        stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-
-
     }
 
     public void openDashboard(ActionEvent event) throws IOException {
@@ -254,5 +302,4 @@ public class ProfileController implements Initializable {
     public void toggleTheme(ActionEvent event) throws IOException {
         ThemeManager.toggleMode();
     }
-
 }

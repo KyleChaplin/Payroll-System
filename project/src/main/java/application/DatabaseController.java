@@ -1352,10 +1352,12 @@ public class DatabaseController {
             if (resultSet.next()) {
                 String addressLine1 = resultSet.getString("ADDRESS_LINE_1");
                 String addressLine2 = resultSet.getString("ADDRESS_LINE_2");
+                String city = resultSet.getString("CITY");
                 String postcode = resultSet.getString("POSTCODE");
 
                 person.setAddressLine1(addressLine1);
                 person.setAddressLine2(addressLine2);
+                person.setCity(city);
                 person.setPostcode(postcode);
             }
         } catch (SQLException e) {
