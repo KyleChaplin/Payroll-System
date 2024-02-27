@@ -131,54 +131,149 @@ public class EmployeeController implements Initializable {
     }
 
     @FXML
-    private void btnRefresh(ActionEvent event) throws IOException {
+    private void btnRefresh() {
         // Refresh the table
         EmployeeTable.setItems(getAllEmployees());
     }
 
-    public void btnAdd(ActionEvent event) throws IOException {
+    public void btnAdd() {
+        try {
+            // Check if the employee already exists
+            if (employeeExists(txtEmail.getText())) {
+                // Show an error message
+                txtEmptyError.setText("Employee already exists!");
+            } else {
+
+                // Check if the text fields are empty
+                // Only add the employee if all the text fields are filled in
+                if (txtFirstName.getText().isEmpty() || txtLastName.getText().isEmpty() || txtEmail.getText().isEmpty() ||
+                        txtPhone.getText().isEmpty() || txtNiNumber.getText().isEmpty() ||
+                        cboAccessLevel.getSelectionModel().isEmpty() || txtHourlySalary.getText().isEmpty() ||
+                        txtLocation.getText().isEmpty() || txtContractType.getText().isEmpty() ||
+                        txtDepartment.getText().isEmpty() || txtJobTitle.getText().isEmpty()) {
+                    // Show an error message
+                    txtEmptyError.setText("Fields should not be empty!");
+                } else {
+                    // Perform additional input validation
+                    String email = txtEmail.getText();
+                    String phone = txtPhone.getText();
+                    String niNumber = txtNiNumber.getText();
+                    String hourlySalary = txtHourlySalary.getText();
+
+                    if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+                        txtEmptyError.setText("Invalid email address!");
+                        return;
+                    }
+
+                    if (!phone.matches("^[0-9]{11}$")) {
+                        txtEmptyError.setText("Invalid phone number!");
+                        return;
+                    }
+
+                    if (!niNumber.matches("^[A-CEGHJ-PR-TW-Z]{1}[A-CEGHJ-NPR-TW-Z]{1}[0-9]{6}[A-D]{1}$")) {
+                        txtEmptyError.setText("Invalid NI number!");
+                        return;
+                    }
+
+                    // Ensure hour salary is not negative and has at most 2 decimal places
+                    try {
+                        double salary = Double.parseDouble(hourlySalary);
+                        if (salary < 0) {
+                            txtEmptyError.setText("Hourly salary cannot be negative!");
+                            return;
+                        }
+                    } catch (NumberFormatException e) {
+                        txtEmptyError.setText("Invalid hourly salary!");
+                        return;
+                    }
+
+                    if (!hourlySalary.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+                        txtEmptyError.setText("Invalid hourly salary!");
+                        return;
+                    }
+                }
+
+                // Once input validation is passed, add the employee
+                addEmployee(txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(), txtPhone.getText(),
+                        txtHourlySalary.getText(), txtNiNumber.getText(),
+                        Integer.parseInt((String)cboAccessLevel.getValue()), txtLocation.getText(), txtContractType.getText(),
+                        txtDepartment.getText(), txtJobTitle.getText(),false);
+
+                // Clear the text fields and refresh the table
+                btnClear();
+                btnRefresh();
+                // Clear the error message
+                txtEmptyError.setText("");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void btnUpdate() {
         // Check if the text fields are empty
         // Only add the employee if all the text fields are filled in
         if (txtFirstName.getText().isEmpty() || txtLastName.getText().isEmpty() || txtEmail.getText().isEmpty() ||
                 txtPhone.getText().isEmpty() || txtNiNumber.getText().isEmpty() ||
-                cboAccessLevel.getSelectionModel().isEmpty()) {
-            // Show an error message
-            txtEmptyError.setText("Fields should not be empty!");
-        } else {
-            // Add the employee
-            addEmployee(txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(), txtPhone.getText(),
-                    txtHourlySalary.getText(), txtNiNumber.getText(),
-                    Integer.parseInt((String)cboAccessLevel.getValue()), txtLocation.getText(), txtContractType.getText(),
-                    txtDepartment.getText(), txtJobTitle.getText(),false);
-
-            btnClear(event);
-            btnRefresh(event);
-        }
-    }
-
-    public void btnUpdate(ActionEvent event) throws IOException {
-        // Check if the text fields are empty
-        // Only update the employee if all the text fields are filled in
-        if (txtID.getText().isEmpty() || txtFirstName.getText().isEmpty() || txtLastName.getText().isEmpty() ||
-                txtEmail.getText().isEmpty() || txtPhone.getText().isEmpty() || txtNiNumber.getText().isEmpty() ||
                 cboAccessLevel.getSelectionModel().isEmpty() || txtHourlySalary.getText().isEmpty() ||
                 txtLocation.getText().isEmpty() || txtContractType.getText().isEmpty() ||
                 txtDepartment.getText().isEmpty() || txtJobTitle.getText().isEmpty()) {
             // Show an error message
             txtEmptyError.setText("Fields should not be empty!");
         } else {
+            // Perform additional input validation
+            String email = txtEmail.getText();
+            String phone = txtPhone.getText();
+            String niNumber = txtNiNumber.getText();
+            String hourlySalary = txtHourlySalary.getText();
+
+            if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+                txtEmptyError.setText("Invalid email address!");
+                return;
+            }
+
+            if (!phone.matches("^[0-9]{11}$")) {
+                txtEmptyError.setText("Invalid phone number!");
+                return;
+            }
+
+            if (!niNumber.matches("^[A-CEGHJ-PR-TW-Z]{1}[A-CEGHJ-NPR-TW-Z]{1}[0-9]{6}[A-D]{1}$")) {
+                txtEmptyError.setText("Invalid NI number!");
+                return;
+            }
+
+            // Ensure hour salary is not negative and has at most 2 decimal places
+            try {
+                double salary = Double.parseDouble(hourlySalary);
+                if (salary < 0) {
+                    txtEmptyError.setText("Hourly salary cannot be negative!");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                txtEmptyError.setText("Invalid hourly salary!");
+                return;
+            }
+
+            if (!hourlySalary.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+                txtEmptyError.setText("Invalid hourly salary!");
+                return;
+            }
+
+            // Once input validation is passed, update the employee
             // Update the employee
             updateEmployee(txtID.getText(), txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(),
                     txtPhone.getText(), txtHourlySalary.getText(), txtNiNumber.getText(),
                     Integer.parseInt((String)cboAccessLevel.getValue()), txtLocation.getText(),
                     txtContractType.getText(), txtDepartment.getText(), txtJobTitle.getText());
 
-            btnClear(event);
-            btnRefresh(event);
+            btnClear();
+            btnRefresh();
+            // Clear the error message
+            txtEmptyError.setText("");
         }
     }
 
-    public void btnDelete(ActionEvent event) throws IOException {
+    public void btnDelete() {
         // Select the employee from the tableview and delete them
         TableView.TableViewSelectionModel<Person> selectionModel = EmployeeTable.getSelectionModel();
         if (selectionModel.isEmpty()) {
@@ -188,14 +283,14 @@ public class EmployeeController implements Initializable {
             // Delete the employee
             deleteEmployee(selectionModel.getSelectedItem().getEmployeeID());
 
-            btnClear(event);
-            btnRefresh(event);
+            btnClear();
+            btnRefresh();
         }
 
         deleteEmployee(txtID.getText());
     }
 
-    public void btnClear(ActionEvent event) throws IOException {
+    public void btnClear() {
         // Clear the text fields
         txtID.clear();
         txtFirstName.clear();

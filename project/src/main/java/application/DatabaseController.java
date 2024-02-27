@@ -181,7 +181,7 @@ public class DatabaseController {
                             "LAST_NAME VARCHAR2(50) NOT NULL, " +
                             "EMAIL VARCHAR2(100) UNIQUE NOT NULL, " +
                             "PHONE VARCHAR2(20) NOT NULL," +
-                            "SALARY DECIMAL NOT NULL," +
+                            "SALARY DECIMAL (10, 2) NOT NULL," +
                             "NI_NUMBER VARCHAR2(20) NOT NULL," +
                             "LOCATION VARCHAR2(100) NOT NULL," +
                             "CONTRACT_TYPE VARCHAR2(50) NOT NULL," +
@@ -1365,6 +1365,20 @@ public class DatabaseController {
         return person;
     }
 
+    // Check if an employee exists
+    public static boolean employeeExists(String email) {
+        boolean employeeExists = false;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_EMPLOYEE WHERE EMAIL = ?")) {
+            preparedStatement.setString(1, email);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            employeeExists = resultSet.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return employeeExists;
+    }
+
     // Method to get employee access level by email
     private static String getAccessLevel(String email) throws SQLException {
         String accessLevel = "";
@@ -1419,14 +1433,6 @@ public class DatabaseController {
         }
 
         return data;
-    }
-
-    // Method to get all emails from the database and return an array
-    public static String[] getAllEmployeeEmails() {
-        String[] emails = null;
-
-
-        return emails;
     }
 
     // Method to get email from email info table
