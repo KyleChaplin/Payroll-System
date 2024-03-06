@@ -10,6 +10,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -143,16 +144,22 @@ public class ScheduleController implements Initializable {
     @FXML
     private TableColumn<Schedule, String> WedStart;
 
+    @FXML
+    private HBox adminBox;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        if (Integer.parseInt(DatabaseController.getAccessLevel(DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()))) == 0) {
+            adminBox.setVisible(true);
+            btnPurple.setVisible(true);
+            btnGreen.setVisible(true);
+        }
+
         DatabaseController.initializeScheduleForAllEmployees();
 
         //initializeColumns();
         loadTableData();
-
-        // Get week 1 table data
-        //ObservableList<Schedule> week0 = getScheduleData("0");
-        //Week1Table.setItems(week0);
     }
 
     private void initializeColumns() {

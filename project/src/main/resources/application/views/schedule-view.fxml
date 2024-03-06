@@ -151,7 +151,7 @@
                         </TabPane>
                      </children>
                   </HBox>
-                  <HBox alignment="CENTER" prefHeight="272.0" prefWidth="1073.0">
+                  <HBox fx:id="adminBox" alignment="CENTER" prefHeight="272.0" prefWidth="1073.0" visible="false">
                      <children>
                         <VBox prefHeight="262.0" prefWidth="272.0" spacing="5.0">
                            <padding>
@@ -416,12 +416,12 @@
                         <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                         <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="5.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <Button fx:id="btnPurple" mnemonicParsing="false" onAction="#btnClear" prefHeight="46.0" prefWidth="92.0" text="Clear" textAlignment="CENTER" textFill="WHITE">
+                              <Button fx:id="btnPurple" mnemonicParsing="false" onAction="#btnClear" prefHeight="46.0" prefWidth="92.0" text="Clear" textAlignment="CENTER" textFill="WHITE" visible="false">
                                  <font>
                                     <Font name="System Bold" size="16.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="btnGreen" mnemonicParsing="false" onAction="#btnUpdate" prefHeight="46.0" prefWidth="92.0" text="Update" textAlignment="CENTER" textFill="WHITE">
+                              <Button fx:id="btnGreen" mnemonicParsing="false" onAction="#btnUpdate" prefHeight="46.0" prefWidth="92.0" text="Update" textAlignment="CENTER" textFill="WHITE" visible="false">
                                  <font>
                                     <Font name="System Bold" size="16.0" />
                                  </font>

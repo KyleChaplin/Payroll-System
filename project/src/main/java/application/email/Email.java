@@ -28,7 +28,7 @@ public class Email {
     private static Date getNextExecutionTime() {
         // Set the desired time of the month for sending the email
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        String scheduledDateStr = DatabaseController.getEmailDateInfo();// "26-01-2024 15:11:00"; // TODO: get the pay date from the database
+        String scheduledDateStr = DatabaseController.getEmailDateInfo();// "26-01-2024 15:11:00";
         try {
             Date scheduledDate = sdf.parse(scheduledDateStr);
             Date currentDate = new Date();

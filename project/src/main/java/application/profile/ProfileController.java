@@ -218,48 +218,36 @@ public class ProfileController implements Initializable {
                 txtEmptyError.setText("");
 
                 // Toggle the text fields to be editable or not
-                txtfName.setEditable(!txtfName.isEditable());
-                txtlName.setEditable(!txtlName.isEditable());
-                txtEmail.setEditable(!txtEmail.isEditable());
-                txtPhone.setEditable(!txtPhone.isEditable());
-                txtNiNumber.setEditable(!txtNiNumber.isEditable());
-                txtAddress1.setEditable(!txtAddress1.isEditable());
-                txtAddress2.setEditable(!txtAddress2.isEditable());
-                txtCity.setEditable(!txtCity.isEditable());
-                txtPostcode.setEditable(!txtPostcode.isEditable());
-                txtEFirstName.setEditable(!txtEFirstName.isEditable());
-                txtELastName.setEditable(!txtELastName.isEditable());
-                txtEMobile.setEditable(!txtEMobile.isEditable());
-                txtERelationship.setEditable(!txtERelationship.isEditable());
-                txtPension.setEditable(!txtPension.isEditable());
-                txtBankName.setEditable(!txtBankName.isEditable());
-                txtAccountNumber.setEditable(!txtAccountNumber.isEditable());
-                txtSortCode.setEditable(!txtSortCode.isEditable());
+                setEditable();
 
                 btnGreen.setText("Edit");
             }
         } else {
-            // Toggle the text fields to be editable or not
-            txtfName.setEditable(!txtfName.isEditable());
-            txtlName.setEditable(!txtlName.isEditable());
-            txtEmail.setEditable(!txtEmail.isEditable());
-            txtPhone.setEditable(!txtPhone.isEditable());
-            txtNiNumber.setEditable(!txtNiNumber.isEditable());
-            txtAddress1.setEditable(!txtAddress1.isEditable());
-            txtAddress2.setEditable(!txtAddress2.isEditable());
-            txtCity.setEditable(!txtCity.isEditable());
-            txtPostcode.setEditable(!txtPostcode.isEditable());
-            txtEFirstName.setEditable(!txtEFirstName.isEditable());
-            txtELastName.setEditable(!txtELastName.isEditable());
-            txtEMobile.setEditable(!txtEMobile.isEditable());
-            txtERelationship.setEditable(!txtERelationship.isEditable());
-            txtPension.setEditable(!txtPension.isEditable());
-            txtBankName.setEditable(!txtBankName.isEditable());
-            txtAccountNumber.setEditable(!txtAccountNumber.isEditable());
-            txtSortCode.setEditable(!txtSortCode.isEditable());
+            setEditable();
 
             btnGreen.setText("Save");
         }
+    }
+
+    private void setEditable() {
+        // Toggle the text fields to be editable or not
+        txtfName.setEditable(!txtfName.isEditable());
+        txtlName.setEditable(!txtlName.isEditable());
+        txtEmail.setEditable(!txtEmail.isEditable());
+        txtPhone.setEditable(!txtPhone.isEditable());
+        txtNiNumber.setEditable(!txtNiNumber.isEditable());
+        txtAddress1.setEditable(!txtAddress1.isEditable());
+        txtAddress2.setEditable(!txtAddress2.isEditable());
+        txtCity.setEditable(!txtCity.isEditable());
+        txtPostcode.setEditable(!txtPostcode.isEditable());
+        txtEFirstName.setEditable(!txtEFirstName.isEditable());
+        txtELastName.setEditable(!txtELastName.isEditable());
+        txtEMobile.setEditable(!txtEMobile.isEditable());
+        txtERelationship.setEditable(!txtERelationship.isEditable());
+        txtPension.setEditable(!txtPension.isEditable());
+        txtBankName.setEditable(!txtBankName.isEditable());
+        txtAccountNumber.setEditable(!txtAccountNumber.isEditable());
+        txtSortCode.setEditable(!txtSortCode.isEditable());
     }
 
     public void openDashboard(ActionEvent event) throws IOException {
