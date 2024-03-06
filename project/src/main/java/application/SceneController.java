@@ -55,16 +55,13 @@ public class SceneController {
     }
 
     public int checkLoginDetails() {
-        // TODO: Check login details against database
         int loginStatus;
 
         if (usernameTextField.getText().isBlank() && passwordTextField.getText().isBlank()) {
             loginStatus = 0;
-        }
-        else if (DatabaseController.checkLogin(usernameTextField.getText(), passwordTextField.getText())) {
+        } else if (DatabaseController.checkLogin(usernameTextField.getText(), passwordTextField.getText())) {
             loginStatus = 1;
-        }
-        else {
+        } else {
             loginStatus = -1;
         }
 
@@ -91,6 +88,6 @@ public class SceneController {
         stg.setScene(scn);
         stg.show();
 
-        System.out.println("Opening " + name);
+        //System.out.println("Opening " + name);
     }
 }

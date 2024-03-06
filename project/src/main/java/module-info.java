@@ -9,6 +9,7 @@ module org.example.project {
     requires java.datatransfer;
     requires com.dustinredmond.fxtrayicon;
     requires java.mail;
+    requires org.apache.logging.log4j;
 
     exports application;
     opens application to javafx.fxml;

@@ -7,15 +7,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
 import java.io.*;
 import java.sql.SQLException;
 import java.util.Objects;
-
-import application.email.PDFBox;
 
 public class Main extends Application {
     @Override

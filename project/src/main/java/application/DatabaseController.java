@@ -7,7 +7,6 @@ import application.payroll.PayrollOverview;
 import application.schedule.Schedule;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import java.math.BigDecimal;
 import java.sql.*;
 import java.io.BufferedReader;
@@ -18,9 +17,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class DatabaseController {
-    private static Map<String, String> envVariables = new HashMap<>();
+    private static final Map<String, String> envVariables = new HashMap<>();
     private static Connection connection = null;
+    private static final Logger logger = LogManager.getLogger(DatabaseController.class);
     private static String currentLoggedInEmployeeId;
 
     // ********************************************
@@ -37,14 +40,14 @@ public class DatabaseController {
                 String password = DatabaseController.getEnvVariable("DB_PASSWORD");
 
                 connection = DriverManager.getConnection(url, username, password);
-                System.out.println("Connected to Oracle Database.\n");
+                logger.info("Connected to Oracle Database.\n");
 
             } catch (SQLException e) {
                 System.out.println("Connection to Oracle Database failed.");
-                e.printStackTrace();
+                logger.error("Connection to Oracle Database Failed.", e);
             }
         } else {
-            System.out.println("Connection to Oracle Database already exists.\n");
+            logger.info("Connection to Oracle Database already exists.\n");
         }
     }
 
@@ -54,7 +57,7 @@ public class DatabaseController {
             try {
                 connection.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("Closing connection to Oracle Database failed.", e);
             }
         }
     }
@@ -84,7 +87,7 @@ public class DatabaseController {
 
             // If table exists, print message
             if (tablesExists.next()) {
-                System.out.println("Table " + tableName + " exists.\n");
+                logger.info("Table " + tableName + " exists.\n");
             } else {
                 // Create table if it does not exist
                 createTables(connection, tableName);
@@ -95,9 +98,9 @@ public class DatabaseController {
 
         // Check if an admin account exists
         if (checkLoginWithAccessLevelZero()) {
-            System.out.println("Admin account exists.\n");
+            logger.info("Admin account exists.\n");
         } else {
-            System.out.println("Admin account does not exist.\n");
+            logger.info("Admin account does not exist... creating one.\n");
             // Set currently logged in employee ID to 1 (admin) for the first login
             currentLoggedInEmployeeId = "1";
 
@@ -125,7 +128,7 @@ public class DatabaseController {
 
         try {
             if (envFile.createNewFile()) {
-                System.out.println(".env file created.");
+                logger.info(".env files has been created.\n");
 
                 // Write default content to the file if needed
                 FileWriter writer = new FileWriter(envFile);
@@ -135,11 +138,10 @@ public class DatabaseController {
                 writer.close();
 
             } else {
-                System.out.println(".env file already exists.");
+                logger.info(".env file already exists.\n");
             }
         } catch (IOException e) {
-            System.out.println("An error occurred while creating the file.");
-            e.printStackTrace();
+            logger.error("Error creating the .env file", e);
         }
 
         try (BufferedReader br = new BufferedReader(new FileReader(envPath))) {
@@ -153,7 +155,7 @@ public class DatabaseController {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Loading environment data failed", e);
         }
     }
 
@@ -168,8 +170,7 @@ public class DatabaseController {
 
     // Method to create tables if they do not exist
     private static void createTables(Connection connection, String tableName) {
-        System.out.println("Table " + tableName + " does not exist.");
-        System.out.println("Creating table " + tableName + "...");
+        logger.info("Table " + tableName + " does not exist... Creating table...");
 
         // Create tables if they do not exist
         switch (tableName) {
@@ -189,7 +190,7 @@ public class DatabaseController {
                             "JOB_TITLE VARCHAR2(20) NOT NULL" +
                             ")");
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failed to create " + tableName + " ", e);
                 }
                 break;
             case "NPS_BANK_DETAILS":
@@ -202,7 +203,7 @@ public class DatabaseController {
                             "SORT_CODE VARCHAR2(20) NOT NULL" +
                             ")");
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failed to create " + tableName + " ", e);
                 }
                 break;
             case "NPS_PAYROLL":
@@ -222,7 +223,7 @@ public class DatabaseController {
                             "NET_PAY DECIMAL(10, 2) NOT NULL" +
                             ")");
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failed to create " + tableName + " ", e);
                 }
                 break;
             case "NPS_LOGIN":
@@ -235,7 +236,7 @@ public class DatabaseController {
                             "PASSWORD VARCHAR2(50) NOT NULL" +
                             ")");
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failed to create " + tableName + " ", e);
                 }
                 break;
             case "NPS_EMERGENCY_CONTACT":
@@ -249,7 +250,7 @@ public class DatabaseController {
                             "RELATIONSHIP VARCHAR2(50) NOT NULL" +
                             ")");
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failed to create " + tableName + " ", e);
                 }
                 break;
             case "NPS_ADDRESSES":
@@ -263,7 +264,7 @@ public class DatabaseController {
                             "POSTCODE VARCHAR2(10) NOT NULL" +
                             ")");
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failed to create " + tableName + " ", e);
                 }
                 break;
             case "NPS_HELP_INFO":
@@ -275,7 +276,7 @@ public class DatabaseController {
                             "ERROR_CODE VARCHAR2(25) NOT NULL" +
                             ")");
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failed to create " + tableName + " ", e);
                 }
                 break;
             case "NPS_EMAIL_INFO":
@@ -287,7 +288,7 @@ public class DatabaseController {
                             "EMAIL_DATE VARCHAR2(30) NOT NULL " +
                             ")");
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failed to create " + tableName + " ", e);
                 }
                 break;
             case "NPS_SCHEDULE":
@@ -301,7 +302,7 @@ public class DatabaseController {
                             "END_TIME VARCHAR(5)" +
                             ")");
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failed to create " + tableName + " ", e);
                 }
                 break;
             // Add cases for other tables...
@@ -314,7 +315,7 @@ public class DatabaseController {
 
     // Method to update tables to include foreign keys and other constraints
     private static void updateTables(Connection connection, String tableName) {
-        System.out.println("Updating table " + tableName + "...");
+        logger.info("Updating table " + tableName);
 
         // Update tables to include foreign keys and other constraints
         switch (tableName) {
@@ -323,7 +324,7 @@ public class DatabaseController {
                     statement.executeUpdate("ALTER TABLE NPS_BANK_DETAILS ADD CONSTRAINT fk_bank_employee " +
                             "FOREIGN KEY (EMPLOYEE_ID) REFERENCES NPS_EMPLOYEE(ID)");
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failed to update " + tableName + " ", e);
                 }
                 break;
             case "NPS_PAYROLL":
@@ -331,7 +332,7 @@ public class DatabaseController {
                     statement.executeUpdate("ALTER TABLE NPS_PAYROLL ADD CONSTRAINT fk_payroll_employee " +
                             "FOREIGN KEY (EMPLOYEE_ID) REFERENCES NPS_EMPLOYEE(ID)");
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failed to update " + tableName + " ", e);
                 }
                 break;
             case "NPS_LOGIN":
@@ -339,7 +340,7 @@ public class DatabaseController {
                     statement.executeUpdate("ALTER TABLE NPS_LOGIN ADD CONSTRAINT fk_login_employee " +
                             "FOREIGN KEY (EMPLOYEE_ID) REFERENCES NPS_EMPLOYEE(ID)");
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failed to update " + tableName + " ", e);
                 }
                 break;
             case "NPS_EMERGENCY_CONTACT":
@@ -347,7 +348,7 @@ public class DatabaseController {
                     statement.executeUpdate("ALTER TABLE NPS_EMERGENCY_CONTACT ADD CONSTRAINT fk_emergency_employee " +
                             "FOREIGN KEY (EMPLOYEE_ID) REFERENCES NPS_EMPLOYEE(ID)");
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failed to update " + tableName + " ", e);
                 }
                 break;
             case "NPS_ADDRESSES":
@@ -355,7 +356,7 @@ public class DatabaseController {
                     statement.executeUpdate("ALTER TABLE NPS_ADDRESSES ADD CONSTRAINT fk_employee " +
                             "FOREIGN KEY (EMPLOYEE_ID) REFERENCES NPS_EMPLOYEE(ID)");
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failed to update " + tableName + " ", e);
                 }
                 break;
             case "NPS_SCHEDULE":
@@ -363,7 +364,7 @@ public class DatabaseController {
                     statement.executeUpdate("ALTER TABLE NPS_SCHEDULE ADD CONSTRAINT fk_schedule_employee " +
                             "FOREIGN KEY (EMPLOYEE_ID) REFERENCES NPS_EMPLOYEE(ID)");
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failed to update " + tableName + " ", e);
                 }
                 break;
             // Add cases for other tables...
@@ -389,13 +390,14 @@ public class DatabaseController {
                 preparedStatement.setString(2, employeeId);
 
                 int rowsAffected = preparedStatement.executeUpdate();
+
                 if (rowsAffected > 0) {
-                    System.out.println("Login username updated successfully.");
+                    logger.info("Username successfully updated");
                 } else {
-                    System.out.println("Failed to update login username.");
+                    logger.error("Failed to update username");
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("Failure during SQL query - updating login info", e);
             }
         }
 
@@ -416,7 +418,7 @@ public class DatabaseController {
                 System.out.println("No employee found with the given ID.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - updating employee personal data", e);
         }
 
         // Update the employee address
@@ -449,11 +451,11 @@ public class DatabaseController {
                         System.out.println("Failed to add employee address.");
                     }
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failure during SQL query - adding address data", e);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - updating address data", e);
         }
 
         // Update the employee bank details
@@ -484,11 +486,11 @@ public class DatabaseController {
                         System.out.println("Failed to add employee bank details.");
                     }
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failure during SQL query - updating bank details", e);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - updating employee profile", e);
         }
 
         // Update the employee emergency contact details
@@ -521,11 +523,11 @@ public class DatabaseController {
                         System.out.println("Failed to add employee emergency contact details.");
                     }
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failure during SQL query - adding emergency contact", e);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - updating emergency contact", e);
         }
     }
 
@@ -553,7 +555,7 @@ public class DatabaseController {
                         System.out.println("Failed to update login access level.");
                     }
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failure during SQL query - updating employee access level", e);
                 }
             }
 
@@ -576,7 +578,7 @@ public class DatabaseController {
                         System.out.println("Failed to update login username.");
                     }
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failure during SQL query - updating employee email", e);
                 }
             }
 
@@ -606,10 +608,10 @@ public class DatabaseController {
                 }
 
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("Failure during SQL query - updating employee personal data", e);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - updating employee", e);
         }
     }
 
@@ -628,7 +630,7 @@ public class DatabaseController {
                 System.out.println("Failed to update email info.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - updating email data", e);
         }
     }
 
@@ -659,7 +661,7 @@ public class DatabaseController {
                             System.out.println("Failed to update schedule.");
                         }
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        logger.error("Failure during SQL query - adding start and end time", e);
                     }
                 }
             } else {
@@ -681,12 +683,12 @@ public class DatabaseController {
                             System.out.println("Failed to add schedule.");
                         }
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        logger.error("Failure during SQL query - adding each day", e);
                     }
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - updating schedule for employee", e);
         }
     }
 
@@ -727,7 +729,7 @@ public class DatabaseController {
             ResultSet resultSet = preparedStatement.executeQuery();
             return resultSet.next();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - checking if schedule exists", e);
             return false;
         }
     }
@@ -785,7 +787,7 @@ public class DatabaseController {
                 System.out.println("Failed to add employee.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - adding employee data", e);
         }
     }
 
@@ -815,7 +817,7 @@ public class DatabaseController {
                 System.out.println("Failed to create login.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - creating login", e);
         }
     }
 
@@ -836,7 +838,7 @@ public class DatabaseController {
                 System.out.println("Failed to add bank details.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - adding bank details", e);
         }
     }
 
@@ -863,7 +865,7 @@ public class DatabaseController {
                 System.out.println("Failed to add payroll info.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - adding payroll info", e);
         }
     }
 
@@ -885,7 +887,7 @@ public class DatabaseController {
                 System.out.println("Failed to add emergency contact info.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - adding emergency contact details", e);
         }
     }
 
@@ -905,7 +907,7 @@ public class DatabaseController {
                 System.out.println("Failed to add help info.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - adding help", e);
         }
     }
 
@@ -925,7 +927,7 @@ public class DatabaseController {
                 System.out.println("Failed to add email info.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - adding email", e);
         }
     }
 
@@ -949,7 +951,7 @@ public class DatabaseController {
                     System.out.println("No login found with the given ID.");
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("Failure during SQL query - deleting login data by employee ID", e);
             }
 
             // Delete the bank details
@@ -964,7 +966,7 @@ public class DatabaseController {
                     System.out.println("No bank details found with the given ID.");
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("Failure during SQL query - deleting bank details by employee ID", e);
             }
 
             // Delete the emergency contact details
@@ -979,7 +981,7 @@ public class DatabaseController {
                     System.out.println("No emergency contact details found with the given ID.");
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("Failure during SQL query - deleting emergency contact by employee ID", e);
             }
 
             // Delete the address details
@@ -994,7 +996,7 @@ public class DatabaseController {
                     System.out.println("No address details found with the given ID.");
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("Failure during SQL query - deleting address by employee ID", e);
             }
 
             // Delete the employee details
@@ -1010,7 +1012,7 @@ public class DatabaseController {
                 }
 
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("Failure during SQL query - deleting employee by ID", e);
             }
 
             // Delete the schedule entries
@@ -1033,7 +1035,7 @@ public class DatabaseController {
                 System.out.println("No help record found with the given error code.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - deleting help by error code", e);
         }
     }
 
@@ -1050,7 +1052,7 @@ public class DatabaseController {
                 System.out.println("No schedule entries found for the given employee ID.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - deleting schedule data for employee", e);
         }
     }
 
@@ -1091,7 +1093,7 @@ public class DatabaseController {
                 return count > 0; // If count > 0, a match is found
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - checking login details", e);
         }
 
         return false; // Default to false if an exception occurs or no match is found
@@ -1108,6 +1110,8 @@ public class DatabaseController {
             if (resultSet.next()) {
                 employeeId = resultSet.getInt("ID");
             }
+        } catch (SQLException e) {
+            logger.error("Failure during SQL query - getting employee ID by email", e);
         }
         return employeeId;
     }
@@ -1120,7 +1124,7 @@ public class DatabaseController {
             ResultSet resultSet = preparedStatement.executeQuery();
             loginExists = resultSet.next();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - checking if a login has level zero", e);
         }
         return loginExists;
     }
@@ -1156,7 +1160,7 @@ public class DatabaseController {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - getting all employee data", e);
         }
 
         return data;
@@ -1182,7 +1186,7 @@ public class DatabaseController {
                 data.add(payrollOverview);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - getting payroll overview", e);
         }
 
         return data;
@@ -1220,7 +1224,8 @@ public class DatabaseController {
                         salary = resultSet2.getInt("SALARY");
                     }
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failure during SQL query - getting employee details for month - " +
+                            "employee info", e);
                 }
 
                 DetailedPayroll employeeDetails = new DetailedPayroll(employeeId, firstName, lastName, hoursWorked,
@@ -1229,7 +1234,7 @@ public class DatabaseController {
                 data.add(employeeDetails);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - getting employee details for month", e);
         }
 
         return data;
@@ -1273,7 +1278,7 @@ public class DatabaseController {
                         location, contractType, department, jobTitle);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - getting employee data", e);
         }
 
         // Get data from BANK_DETAILS Table
@@ -1292,7 +1297,7 @@ public class DatabaseController {
                 person.setSortCode(sortCode);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - getting bank details data", e);
         }
 
         // Get data from PAYROLL Table
@@ -1319,7 +1324,7 @@ public class DatabaseController {
                 person.setPension(pension);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - getting payroll data", e);
         }
 
         // Get data from EMERGENCY_CONTACT Table
@@ -1340,7 +1345,7 @@ public class DatabaseController {
                 person.setERelationship(emergencyContactRelationship);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - getting emergency contact data", e);
         }
 
         // Get data from ADDRESSES Table
@@ -1361,7 +1366,7 @@ public class DatabaseController {
                 person.setPostcode(postcode);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - getting address table data", e);
         }
 
         return person;
@@ -1376,7 +1381,7 @@ public class DatabaseController {
             ResultSet resultSet = preparedStatement.executeQuery();
             employeeExists = resultSet.next();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - checking if an employee exists", e);
         }
         return employeeExists;
     }
@@ -1392,6 +1397,8 @@ public class DatabaseController {
             if (resultSet.next()) {
                 accessLevel = resultSet.getString("ACCESS_LEVEL");
             }
+        } catch (SQLException e) {
+            logger.error("Failure during SQL query - getting access level by email", e);
         }
         return accessLevel;
     }
@@ -1408,7 +1415,7 @@ public class DatabaseController {
                 email = resultSet.getString("EMAIL");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - getting email by ID", e);
         }
         return email;
     }
@@ -1447,7 +1454,7 @@ public class DatabaseController {
                 email = resultSet.getString("FROM_USER_EMAIL");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - getting email info", e);
         }
         return email;
     }
@@ -1462,7 +1469,7 @@ public class DatabaseController {
                 password = resultSet.getString("FROM_USER_PASSWORD");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - getting password info", e);
         }
         return password;
     }
@@ -1477,7 +1484,7 @@ public class DatabaseController {
                 emailDate = resultSet.getString("EMAIL_DATE");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - getting email data info", e);
         }
         return emailDate;
     }
@@ -1512,7 +1519,7 @@ public class DatabaseController {
                         lastName = resultSet2.getString("LAST_NAME");
                     }
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Failure during SQL query - getting schedule data - getting employee name", e);
                 }
 
                 String key = employeeId + "-" + weekId; // Unique key for each employee and week
@@ -1548,7 +1555,7 @@ public class DatabaseController {
 
             data.addAll(scheduleMap.values());
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failure during SQL query - getting schedule data ", e);
         }
         return data;
     }
@@ -1578,7 +1585,15 @@ public class DatabaseController {
     private static String encryptString(String stringToEncrypt) {
         String encryptedString = stringToEncrypt;
 
+
         return encryptedString;
+    }
+
+    public static String toLowerCase(String input) {
+        if (input == null) {
+            return null;  // Handle null input gracefully
+        }
+        return input.toLowerCase();
     }
 
     // Method to get the current logged in employee ID
