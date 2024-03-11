@@ -185,7 +185,8 @@ public class ScheduleController implements Initializable {
     @FXML
     private void loadTableData() {
         // Get the week ID by checking the selected tab
-        String weekID = String.valueOf(weekTabPane.getSelectionModel().getSelectedIndex());
+        //String weekID = String.valueOf(weekTabPane.getSelectionModel().getSelectedIndex());
+        String weekID = "2";
 
         // Get the data for the selected week
         ObservableList<Schedule> scheduleData = getScheduleData(weekID);
@@ -194,7 +195,7 @@ public class ScheduleController implements Initializable {
 
         // Set the table data
         switch (weekID) {
-            case "0":
+            case "2":
                 Week1Table.setItems(scheduleData);
                 break;
             case "1":
