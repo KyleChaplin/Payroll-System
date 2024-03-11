@@ -12,6 +12,10 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.EventHandler;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
@@ -153,6 +157,9 @@ public class ScheduleController implements Initializable {
     @FXML
     private Label lblSelectedWeek;
 
+    @FXML
+    private Label txtEmptyError;
+
     private int selectedWeek = 0;
 
     @Override
@@ -162,6 +169,7 @@ public class ScheduleController implements Initializable {
             adminBox.setVisible(true);
             btnPurple.setVisible(true);
             btnGreen.setVisible(true);
+            txtEmptyError.setVisible(true);
         }
 
         DatabaseController.initializeScheduleForAllEmployees();
@@ -201,7 +209,6 @@ public class ScheduleController implements Initializable {
 
         Week0Table.setItems(scheduleData);
     }
-
 
     private void updateSelectedWeekLabel() {
         lblSelectedWeek.setText("Week " + (selectedWeek + 1));
@@ -271,21 +278,6 @@ public class ScheduleController implements Initializable {
     }
 
     private Schedule createScheduleFromTextFields() {
-        String MonStart = txtMonStart.getText();
-        String MonEnd = txtMonEnd.getText();
-        String TueStart = txtTueStart.getText();
-        String TueEnd = txtTueEnd.getText();
-        String WedStart = txtWedStart.getText();
-        String WedEnd = txtWedEnd.getText();
-        String ThuStart = txtThuStart.getText();
-        String ThuEnd = txtThuEnd.getText();
-        String FriStart = txtFriStart.getText();
-        String FriEnd = txtFriEnd.getText();
-        String SatStart = txtSatStart.getText();
-        String SatEnd = txtSatEnd.getText();
-        String SunStart = txtSunStart.getText();
-        String SunEnd = txtSunEnd.getText();
-
         String name = txtName.getText();
 
         // Get the employee ID from the text field
@@ -293,15 +285,85 @@ public class ScheduleController implements Initializable {
 
         Schedule schedule = new Schedule(name, employeeID);
         schedule.setWeekID(String.valueOf(selectedWeek));
-        schedule.setMonday(MonStart, MonEnd);
-        schedule.setTuesday(TueStart, TueEnd);
-        schedule.setWednesday(WedStart, WedEnd);
-        schedule.setThursday(ThuStart, ThuEnd);
-        schedule.setFriday(FriStart, FriEnd);
-        schedule.setSaturday(SatStart, SatEnd);
-        schedule.setSunday(SunStart, SunEnd);
+        txtEmptyError.setText("");
+
+        // Define the array of TextField pairs and their corresponding days
+        TextField[] startFields = {txtMonStart, txtTueStart, txtWedStart, txtThuStart, txtFriStart, txtSatStart, txtSunStart};
+        TextField[] endFields = {txtMonEnd, txtTueEnd, txtWedEnd, txtThuEnd, txtFriEnd, txtSatEnd, txtSunEnd};
+        String[] daysOfWeek = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+
+        // Validate and set schedule for each day
+        for (int i = 0; i < startFields.length; i++) {
+            TextField startField = startFields[i];
+            TextField endField = endFields[i];
+
+            if (startField.getText() != null && endField.getText() != null &&
+                    isValidTime(startField.getText()) && isValidTime(endField.getText())) {
+                setScheduleForDay(schedule, daysOfWeek[i], startField.getText(), endField.getText());
+            } else if ((startField.getText() != null && endField.getText() != null) &&
+                    (!isValidTime(startField.getText()) || !isValidTime(endField.getText()))) {
+                txtEmptyError.setText("Please check " + daysOfWeek[i] + "'s times and try again!");
+                // Set up a timeline to clear the error message after 5 seconds
+                setupErrorTimer();
+            }
+        }
+
 
         return schedule;
+    }
+
+    // Validate time format (24-hour)
+    private boolean isValidTime(String time) {
+        if (time == null) {
+            return false;
+        }
+
+        // Using regex to validate 24-hour time format (HH:mm)
+        String timeRegex = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
+
+        return time.matches(timeRegex);
+    }
+
+    // Helper method to set schedule for a specific day
+    private void setScheduleForDay(Schedule schedule, String day, String startTime, String endTime) {
+        switch (day) {
+            case "Monday":
+                schedule.setMonday(startTime, endTime);
+                break;
+            case "Tuesday":
+                schedule.setTuesday(startTime, endTime);
+                break;
+            case "Wednesday":
+                schedule.setWednesday(startTime, endTime);
+                break;
+            case "Thursday":
+                schedule.setThursday(startTime, endTime);
+                break;
+            case "Friday":
+                schedule.setFriday(startTime, endTime);
+                break;
+            case "Saturday":
+                schedule.setSaturday(startTime, endTime);
+                break;
+            case "Sunday":
+                schedule.setSunday(startTime, endTime);
+                break;
+            // Handle any additional cases or throw an exception for invalid day
+        }
+    }
+
+    private void setupErrorTimer() {
+        Duration duration = Duration.seconds(5);
+        KeyFrame keyFrame = new KeyFrame(duration, new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                // Clear the error message after the specified duration
+                txtEmptyError.setText("");
+            }
+        });
+
+        Timeline timeline = new Timeline(keyFrame);
+        timeline.play();
     }
 
     @FXML
@@ -325,6 +387,7 @@ public class ScheduleController implements Initializable {
                 textField.clear();
             }
         }
+        txtEmptyError.setText("");
     }
 
     public void openDashboard(ActionEvent event) throws IOException {

@@ -42,7 +42,7 @@ public class DatabaseController {
                 logger.info("Connected to Oracle Database.\n");
 
             } catch (SQLException e) {
-                System.out.println("Connection to Oracle Database failed.");
+                logger.info("Connection to Oracle Database failed.");
                 logger.error("Connection to Oracle Database Failed.", e);
             }
         } else {
@@ -433,9 +433,9 @@ public class DatabaseController {
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Employee record updated successfully.");
+                logger.info("Employee record updated successfully.");
             } else {
-                System.out.println("No employee found with the given ID.");
+                logger.info("No employee found with the given ID.");
             }
         } catch (SQLException e) {
             logger.error("Failure during SQL query - updating employee personal data", e);
@@ -452,9 +452,9 @@ public class DatabaseController {
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Employee address updated successfully.");
+                logger.info("Employee address updated successfully.");
             } else {
-                System.out.println("No employee found with the given ID.");
+                logger.info("No employee found with the given ID.");
                 // Add the address if it doesn't exist
                 try (PreparedStatement preparedStatement2 = connection.prepareStatement(
                         "INSERT INTO NPS_ADDRESSES (EMPLOYEE_ID, ADDRESS_LINE_1, ADDRESS_LINE_2, CITY, POSTCODE) VALUES (?, ?, ?, ?, ?)")) {
@@ -466,9 +466,9 @@ public class DatabaseController {
 
                     int rowsAffected2 = preparedStatement2.executeUpdate();
                     if (rowsAffected2 > 0) {
-                        System.out.println("Employee address added successfully.");
+                        logger.info("Employee address added successfully.");
                     } else {
-                        System.out.println("Failed to add employee address.");
+                        logger.info("Failed to add employee address.");
                     }
                 } catch (SQLException e) {
                     logger.error("Failure during SQL query - adding address data", e);
@@ -488,9 +488,9 @@ public class DatabaseController {
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Employee bank details updated successfully.");
+                logger.info("Employee bank details updated successfully.");
             } else {
-                System.out.println("No employee found with the given ID.");
+                logger.info("No employee found with the given ID.");
                 // Add the bank details if they don't exist
                 try (PreparedStatement preparedStatement2 = connection.prepareStatement(
                         "INSERT INTO NPS_BANK_DETAILS (EMPLOYEE_ID, BANK_NAME, ACCOUNT_NUMBER, SORT_CODE) VALUES (?, ?, ?, ?)")) {
@@ -501,9 +501,9 @@ public class DatabaseController {
 
                     int rowsAffected2 = preparedStatement2.executeUpdate();
                     if (rowsAffected2 > 0) {
-                        System.out.println("Employee bank details added successfully.");
+                        logger.info("Employee bank details added successfully.");
                     } else {
-                        System.out.println("Failed to add employee bank details.");
+                        logger.info("Failed to add employee bank details.");
                     }
                 } catch (SQLException e) {
                     logger.error("Failure during SQL query - updating bank details", e);
@@ -524,9 +524,9 @@ public class DatabaseController {
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Employee emergency contact details updated successfully.");
+                logger.info("Employee emergency contact details updated successfully.");
             } else {
-                System.out.println("No employee found with the given ID.");
+                logger.info("No employee found with the given ID.");
                 // Add the emergency contact details if they don't exist
                 try (PreparedStatement preparedStatement2 = connection.prepareStatement(
                         "INSERT INTO NPS_EMERGENCY_CONTACT (EMPLOYEE_ID, FIRST_NAME, LAST_NAME, PHONE, RELATIONSHIP) VALUES (?, ?, ?, ?, ?)")) {
@@ -538,9 +538,9 @@ public class DatabaseController {
 
                     int rowsAffected2 = preparedStatement2.executeUpdate();
                     if (rowsAffected2 > 0) {
-                        System.out.println("Employee emergency contact details added successfully.");
+                        logger.info("Employee emergency contact details added successfully.");
                     } else {
-                        System.out.println("Failed to add employee emergency contact details.");
+                        logger.info("Failed to add employee emergency contact details.");
                     }
                 } catch (SQLException e) {
                     logger.error("Failure during SQL query - adding emergency contact", e);
@@ -569,9 +569,9 @@ public class DatabaseController {
 
                 int rowsAffected = preparedStatement.executeUpdate();
                 if (rowsAffected > 0) {
-                    System.out.println("Login access level updated successfully.");
+                    logger.info("Login access level updated successfully.");
                 } else {
-                    System.out.println("Failed to update login access level.");
+                    logger.info("Failed to update login access level.");
                 }
             } catch (SQLException e) {
                 logger.error("Failure during SQL query - updating employee access level", e);
@@ -592,9 +592,9 @@ public class DatabaseController {
 
                 int rowsAffected = preparedStatement.executeUpdate();
                 if (rowsAffected > 0) {
-                    System.out.println("Login username updated successfully.");
+                    logger.info("Login username updated successfully.");
                 } else {
-                    System.out.println("Failed to update login username.");
+                    logger.info("Failed to update login username.");
                 }
             } catch (SQLException e) {
                 logger.error("Failure during SQL query - updating employee email", e);
@@ -621,9 +621,9 @@ public class DatabaseController {
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Employee record updated successfully.");
+                logger.info("Employee record updated successfully.");
             } else {
-                System.out.println("No employee found with the given ID.");
+                logger.info("No employee found with the given ID.");
             }
 
         } catch (SQLException e) {
@@ -641,9 +641,9 @@ public class DatabaseController {
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Email info updated successfully.");
+                logger.info("Email info updated successfully.");
             } else {
-                System.out.println("Failed to update email info.");
+                logger.info("Failed to update email info.");
             }
         } catch (SQLException e) {
             logger.error("Failure during SQL query - updating email data", e);
@@ -668,9 +668,9 @@ public class DatabaseController {
 
                     int rowsAffected = preparedStatement.executeUpdate();
                     if (rowsAffected > 0) {
-                        System.out.println("Schedule updated successfully.");
+                        logger.info("Schedule updated");
                     } else {
-                        System.out.println("Failed to update schedule.");
+                        logger.info("Schedule failed to update");
                     }
                 } catch (SQLException e) {
                     logger.error("Failure during SQL query - updating schedule for each day", e);
@@ -684,9 +684,9 @@ public class DatabaseController {
 
                 int rowsAffected = preparedStatement.executeUpdate();
                 if (rowsAffected > 0) {
-                    System.out.println("Employee record added successfully.");
+                    logger.info("Employee record added successfully.");
                 } else {
-                    System.out.println("Failed to add employee record.");
+                    logger.info("Failed to add employee record.");
                 }
             } catch (SQLException e) {
                 logger.error("Failure during SQL query - creating employee record in schedule", e);
@@ -706,9 +706,9 @@ public class DatabaseController {
 
                     int rowsAffected = preparedStatement.executeUpdate();
                     if (rowsAffected > 0) {
-                        System.out.println("Schedule updated successfully.");
+                        logger.info("Schedule updated successfully.");
                     } else {
-                        System.out.println("Failed to update schedule.");
+                        logger.info("Failed to update schedule.");
                     }
                 } catch (SQLException e) {
                     logger.error("Failure during SQL query - updating schedule for each day", e);
@@ -781,7 +781,7 @@ public class DatabaseController {
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Employee added successfully.");
+                logger.info("Employee added successfully.");
 
                 // Create a login for the employee
                 int employeeId = getEmployeeId(email);
@@ -803,7 +803,7 @@ public class DatabaseController {
                 initializeScheduleForAllEmployees();
 
             } else {
-                System.out.println("Failed to add employee.");
+                logger.info("Failed to add employee.");
             }
         } catch (SQLException e) {
             logger.error("Failure during SQL query - adding employee data", e);
@@ -831,9 +831,9 @@ public class DatabaseController {
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Login created successfully.");
+                logger.info("Login created successfully.");
             } else {
-                System.out.println("Failed to create login.");
+                logger.info("Failed to create login.");
             }
         } catch (SQLException e) {
             logger.error("Failure during SQL query - creating login", e);
@@ -852,9 +852,9 @@ public class DatabaseController {
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Bank details added successfully.");
+                logger.info("Bank details added successfully.");
             } else {
-                System.out.println("Failed to add bank details.");
+                logger.info("Failed to add bank details.");
             }
         } catch (SQLException e) {
             logger.error("Failure during SQL query - adding bank details", e);
@@ -879,9 +879,9 @@ public class DatabaseController {
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Payroll info added successfully.");
+                logger.info("Payroll info added successfully.");
             } else {
-                System.out.println("Failed to add payroll info.");
+                logger.info("Failed to add payroll info.");
             }
         } catch (SQLException e) {
             logger.error("Failure during SQL query - adding payroll info", e);
@@ -901,9 +901,9 @@ public class DatabaseController {
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Emergency contact info added successfully.");
+                logger.info("Emergency contact info added successfully.");
             } else {
-                System.out.println("Failed to add emergency contact info.");
+                logger.info("Failed to add emergency contact info.");
             }
         } catch (SQLException e) {
             logger.error("Failure during SQL query - adding emergency contact details", e);
@@ -921,9 +921,9 @@ public class DatabaseController {
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Help info added successfully.");
+                logger.info("Help info added successfully.");
             } else {
-                System.out.println("Failed to add help info.");
+                logger.info("Failed to add help info.");
             }
         } catch (SQLException e) {
             logger.error("Failure during SQL query - adding help", e);
@@ -941,9 +941,9 @@ public class DatabaseController {
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Email info added successfully.");
+                logger.info("Email info added successfully.");
             } else {
-                System.out.println("Failed to add email info.");
+                logger.info("Failed to add email info.");
             }
         } catch (SQLException e) {
             logger.error("Failure during SQL query - adding email", e);
@@ -965,9 +965,9 @@ public class DatabaseController {
 
                 int rowsAffected = preparedStatement.executeUpdate();
                 if (rowsAffected > 0) {
-                    System.out.println("Login record deleted successfully.");
+                    logger.info("Login record deleted successfully.");
                 } else {
-                    System.out.println("No login found with the given ID.");
+                    logger.info("No login found with the given ID.");
                 }
             } catch (SQLException e) {
                 logger.error("Failure during SQL query - deleting login data by employee ID", e);
@@ -980,9 +980,9 @@ public class DatabaseController {
 
                 int rowsAffected = preparedStatement.executeUpdate();
                 if (rowsAffected > 0) {
-                    System.out.println("Bank details deleted successfully.");
+                    logger.info("Bank details deleted successfully.");
                 } else {
-                    System.out.println("No bank details found with the given ID.");
+                    logger.info("No bank details found with the given ID.");
                 }
             } catch (SQLException e) {
                 logger.error("Failure during SQL query - deleting bank details by employee ID", e);
@@ -995,9 +995,9 @@ public class DatabaseController {
 
                 int rowsAffected = preparedStatement.executeUpdate();
                 if (rowsAffected > 0) {
-                    System.out.println("Emergency contact details deleted successfully.");
+                    logger.info("Emergency contact details deleted successfully.");
                 } else {
-                    System.out.println("No emergency contact details found with the given ID.");
+                    logger.info("No emergency contact details found with the given ID.");
                 }
             } catch (SQLException e) {
                 logger.error("Failure during SQL query - deleting emergency contact by employee ID", e);
@@ -1010,9 +1010,9 @@ public class DatabaseController {
 
                 int rowsAffected = preparedStatement.executeUpdate();
                 if (rowsAffected > 0) {
-                    System.out.println("Address details deleted successfully.");
+                    logger.info("Address details deleted successfully.");
                 } else {
-                    System.out.println("No address details found with the given ID.");
+                    logger.info("No address details found with the given ID.");
                 }
             } catch (SQLException e) {
                 logger.error("Failure during SQL query - deleting address by employee ID", e);
@@ -1025,9 +1025,9 @@ public class DatabaseController {
 
                 int rowsAffected = preparedStatement.executeUpdate();
                 if (rowsAffected > 0) {
-                    System.out.println("Employee record deleted successfully.");
+                    logger.info("Employee record deleted successfully.");
                 } else {
-                    System.out.println("No employee found with the given ID.");
+                    logger.info("No employee found with the given ID.");
                 }
 
             } catch (SQLException e) {
@@ -1037,7 +1037,7 @@ public class DatabaseController {
             // Delete the schedule entries
             deleteSchedule(employeeId);
         } else {
-            System.out.println("You cannot delete the currently logged-in user.");
+            logger.error("You cannot delete the currently logged-in user.");
         }
     }
 
@@ -1049,9 +1049,9 @@ public class DatabaseController {
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Help record deleted successfully.");
+                logger.info("Help record deleted successfully.");
             } else {
-                System.out.println("No help record found with the given error code.");
+                logger.info("No help record found with the given error code.");
             }
         } catch (SQLException e) {
             logger.error("Failure during SQL query - deleting help by error code", e);
@@ -1066,9 +1066,9 @@ public class DatabaseController {
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Schedule entries deleted successfully.");
+                logger.info("Schedule entries deleted successfully.");
             } else {
-                System.out.println("No schedule entries found for the given employee ID.");
+                logger.info("No schedule entries found for the given employee ID.");
             }
         } catch (SQLException e) {
             logger.error("Failure during SQL query - deleting schedule data for employee", e);
@@ -1103,10 +1103,10 @@ public class DatabaseController {
                 int count = resultSet.getInt("count");
 
                 if (count > 0) {
-                    System.out.println("Login successful.");
+                    logger.info("Login successful.");
                     currentLoggedInEmployeeId = String.valueOf(getEmployeeId(username));
                 } else {
-                    System.out.println("Login failed.");
+                    logger.info("Login failed.");
                 }
 
                 return count > 0; // If count > 0, a match is found
