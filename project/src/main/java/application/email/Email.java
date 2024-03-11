@@ -118,6 +118,32 @@ public class Email {
             return mimeMessage;
         }
 
+        public static void sendAccountCreationEmail(String toEmail, String employeeName) throws MessagingException {
+            String fromUser = DatabaseController.getEmailInfo();   // TODO: get the from user from the database
+            String fromUserPassword = DatabaseController.getPasswordInfo();   // TODO: get the from user password from the database
+            String emailHost = "smtp.gmail.com";
+            Transport transport = newSession.getTransport("smtp");
+            transport.connect(emailHost, fromUser, fromUserPassword);
+
+            try {
+                Message message = new MimeMessage(newSession);
+                message.setFrom(new InternetAddress(fromUser));
+                message.setRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
+                message.setSubject("Account Created");
+                message.setText("Dear " + employeeName +
+                        ",\n\nYour account has been successfully created." +
+                        "\n\n Please use password: {your first}_{last 4 characters of NIN}");
+
+                Transport.send(message);
+
+                System.out.println("Email sent successfully!");
+
+            } catch (MessagingException e) {
+                e.printStackTrace();
+                System.err.println("Failed to send email: " + e.getMessage());
+            }
+        }
+
         private void setupServerProperties() {
             Properties properties = System.getProperties();
             properties.put("mail.smtp.host", "smtp.gmail.com");     // TODO: get the host port from the database

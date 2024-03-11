@@ -824,8 +824,9 @@ public class DatabaseController {
             } else {
                 preparedStatement.setString(3, email);
 
-                // Get last 4 digits of NI number
+                // Get last 4 character of NI number
                 niNumber = niNumber.substring(niNumber.length() - 4);
+                // Sets the password to the employee's first name an _ and the last 4 characters of NIN
                 preparedStatement.setString(4, firstName + "_" + niNumber);
             }
 

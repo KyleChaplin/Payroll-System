@@ -56,7 +56,7 @@
                   </HBox>
                   <HBox alignment="CENTER_RIGHT" prefHeight="53.0" prefWidth="930.0">
                      <children>
-                        <Button fx:id="btnGreen" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#btnToggleUpdate" prefHeight="43.0" prefWidth="68.0" text="Update" textAlignment="CENTER" textFill="WHITE">
+                        <Button fx:id="btnGreen" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#btnToggleUpdate" prefHeight="43.0" prefWidth="68.0" text="Edit" textAlignment="CENTER" textFill="WHITE">
                            <HBox.margin>
                               <Insets right="30.0" />
                            </HBox.margin>
