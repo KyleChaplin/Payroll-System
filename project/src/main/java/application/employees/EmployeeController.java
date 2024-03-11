@@ -2,6 +2,8 @@ package application.employees;
 
 import application.SceneController;
 import application.ThemeManager;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -9,10 +11,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.net.URL;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 import static application.DatabaseController.*;
@@ -99,6 +99,8 @@ public class EmployeeController implements Initializable {
     @FXML
     private Label txtEmptyError;
 
+    @FXML
+    private TextField txtSearch;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -304,6 +306,26 @@ public class EmployeeController implements Initializable {
         txtContractType.clear();
         txtDepartment.clear();
         txtJobTitle.clear();
+        txtSearch.clear();
+    }
+
+    @FXML
+    private void searchForEmployee() {
+        ObservableList<Person> filteredData = FXCollections.observableArrayList();
+
+        String searchQuery = txtSearch.getText();
+
+        // Iterate through your data and add matching rows to the filteredData
+        for (Person person : getAllEmployees()) {
+            if (person.getEmployeeID().toLowerCase().contains(searchQuery.toLowerCase()) ||
+                    person.getFirstName().toLowerCase().contains(searchQuery.toLowerCase()) ||
+                    person.getLastName().toLowerCase().contains(searchQuery.toLowerCase())) {
+                filteredData.add(person);
+            }
+        }
+
+        // Update the TableView with the filtered data
+        EmployeeTable.setItems(filteredData);
     }
 
     @FXML
@@ -325,12 +347,6 @@ public class EmployeeController implements Initializable {
             txtDepartment.setText(person.getDepartment());
             txtJobTitle.setText(person.getJobTitle());
         }
-    }
-
-
-    public void CloseApplication(ActionEvent event) throws IOException {
-        // Close the application
-        System.exit(0);
     }
 
     public void openDashboard(ActionEvent event) throws IOException {

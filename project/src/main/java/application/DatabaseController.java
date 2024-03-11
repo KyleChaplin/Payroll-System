@@ -1035,7 +1035,7 @@ public class DatabaseController {
             }
 
             // Delete the schedule entries
-            deleteSchedule(employeeId);
+            //deleteSchedule(employeeId);
         } else {
             logger.error("You cannot delete the currently logged-in user.");
         }

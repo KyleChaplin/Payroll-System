@@ -29,7 +29,7 @@
                      <children>
                         <Pane prefHeight="55.0" prefWidth="1034.0">
                            <children>
-                              <TextField layoutX="21.0" layoutY="17.0" />
+                              <TextField fx:id="txtSearch" layoutX="21.0" layoutY="17.0" onKeyTyped="#searchForEmployee" promptText="Search..." />
                               <Button layoutX="984.0" layoutY="12.0" mnemonicParsing="false" onAction="#btnRefresh" prefHeight="28.0" prefWidth="34.0" style="-fx-background-radius: 0; -fx-background-color: #00000000;" text="⟳" textAlignment="CENTER">
                                  <font>
                                     <Font name="System Bold" size="16.0" />

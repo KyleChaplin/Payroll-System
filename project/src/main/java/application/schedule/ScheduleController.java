@@ -3,6 +3,7 @@ package application.schedule;
 import application.DatabaseController;
 import application.SceneController;
 import application.ThemeManager;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -160,6 +161,9 @@ public class ScheduleController implements Initializable {
     @FXML
     private Label txtEmptyError;
 
+    @FXML
+    private TextField txtSearch;
+
     private int selectedWeek = 0;
 
     @Override
@@ -210,40 +214,26 @@ public class ScheduleController implements Initializable {
         Week0Table.setItems(scheduleData);
     }
 
+    @FXML
+    private void searchForSchedule() {
+        ObservableList<Schedule> filteredData = FXCollections.observableArrayList();
+
+        String searchQuery = txtSearch.getText();
+
+        // Iterate through your data and add matching rows to the filteredData
+        for (Schedule schedule : getScheduleData(String.valueOf(selectedWeek))) {
+            if (schedule.getEmployeeID().toLowerCase().contains(searchQuery.toLowerCase()) ||
+                    schedule.getName().toLowerCase().contains(searchQuery.toLowerCase())) {
+                filteredData.add(schedule);
+            }
+        }
+
+        // Update the TableView with the filtered data
+        Week0Table.setItems(filteredData);
+    }
+
     private void updateSelectedWeekLabel() {
         lblSelectedWeek.setText("Week " + (selectedWeek + 1));
-    }
-
-    @FXML
-    private void btnWeek0Click() {
-        selectedWeek = 0;
-        loadTableData();
-        btnClear();
-        updateSelectedWeekLabel();
-    }
-
-    @FXML
-    private void btnWeek1Click() {
-        selectedWeek = 1;
-        loadTableData();
-        btnClear();
-        updateSelectedWeekLabel();
-    }
-
-    @FXML
-    private void btnWeek2Click() {
-        selectedWeek = 2;
-        loadTableData();
-        btnClear();
-        updateSelectedWeekLabel();
-    }
-
-    @FXML
-    private void btnWeek3Click() {
-        selectedWeek = 3;
-        loadTableData();
-        btnClear();
-        updateSelectedWeekLabel();
     }
 
     @FXML
@@ -307,7 +297,6 @@ public class ScheduleController implements Initializable {
                 setupErrorTimer();
             }
         }
-
 
         return schedule;
     }
@@ -376,6 +365,38 @@ public class ScheduleController implements Initializable {
     }
 
     @FXML
+    private void btnWeek0Click() {
+        selectedWeek = 0;
+        loadTableData();
+        btnClear();
+        updateSelectedWeekLabel();
+    }
+
+    @FXML
+    private void btnWeek1Click() {
+        selectedWeek = 1;
+        loadTableData();
+        btnClear();
+        updateSelectedWeekLabel();
+    }
+
+    @FXML
+    private void btnWeek2Click() {
+        selectedWeek = 2;
+        loadTableData();
+        btnClear();
+        updateSelectedWeekLabel();
+    }
+
+    @FXML
+    private void btnWeek3Click() {
+        selectedWeek = 3;
+        loadTableData();
+        btnClear();
+        updateSelectedWeekLabel();
+    }
+
+    @FXML
     private void btnClear() {
         TextField[] textFields = {txtEmployeeID, txtName, txtMonStart, txtMonEnd, txtTueStart, txtTueEnd, txtWedStart, txtWedEnd, txtThuStart,
                 txtThuEnd, txtFriStart, txtFriEnd, txtSatStart, txtSatEnd, txtSunStart, txtSunEnd};
@@ -388,6 +409,7 @@ public class ScheduleController implements Initializable {
             }
         }
         txtEmptyError.setText("");
+        txtSearch.setText("");
     }
 
     public void openDashboard(ActionEvent event) throws IOException {
