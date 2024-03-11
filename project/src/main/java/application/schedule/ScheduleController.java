@@ -25,10 +25,16 @@ public class ScheduleController implements Initializable {
     private Scene scene;
 
     @FXML
+    private TableView<Schedule> Week0Table;
+
+    @FXML
     private TableView<Schedule> Week1Table;
 
     @FXML
     private TableView<Schedule> Week2Table;
+
+    @FXML
+    private TableView<Schedule> Week3Table;
 
     @FXML
     private Button btnDark;
@@ -94,9 +100,6 @@ public class ScheduleController implements Initializable {
     private TextField txtWedStart;
 
     @FXML
-    private TabPane weekTabPane;
-
-    @FXML
     private TableColumn<Schedule, String> employeeName;
 
     @FXML
@@ -147,6 +150,11 @@ public class ScheduleController implements Initializable {
     @FXML
     private HBox adminBox;
 
+    @FXML
+    private Label lblSelectedWeek;
+
+    private int selectedWeek = 0;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -160,6 +168,8 @@ public class ScheduleController implements Initializable {
 
         //initializeColumns();
         loadTableData();
+
+        updateSelectedWeekLabel();
     }
 
     private void initializeColumns() {
@@ -184,43 +194,57 @@ public class ScheduleController implements Initializable {
 
     @FXML
     private void loadTableData() {
-        // Get the week ID by checking the selected tab
-        //String weekID = String.valueOf(weekTabPane.getSelectionModel().getSelectedIndex());
-        String weekID = "2";
-
         // Get the data for the selected week
-        ObservableList<Schedule> scheduleData = getScheduleData(weekID);
+        ObservableList<Schedule> scheduleData = getScheduleData(String.valueOf(selectedWeek));
 
         initializeColumns();
 
-        // Set the table data
-        switch (weekID) {
-            case "2":
-                Week1Table.setItems(scheduleData);
-                break;
-            case "1":
-                Week2Table.setItems(scheduleData);
-                break;
-        }
+        Week0Table.setItems(scheduleData);
+    }
+
+
+    private void updateSelectedWeekLabel() {
+        lblSelectedWeek.setText("Week " + (selectedWeek + 1));
     }
 
     @FXML
-    private void onTableClick() {
-        // Check if the tableview is empty
-        if (!Week1Table.getSelectionModel().isEmpty()) {
-            // Get the selected schedule
-            Schedule schedule = Week1Table.getSelectionModel().getSelectedItem();
-
-            setTextFields(schedule);
-        }
+    private void btnWeek0Click() {
+        selectedWeek = 0;
+        loadTableData();
+        btnClear();
+        updateSelectedWeekLabel();
     }
 
     @FXML
-    private void onTable2Click() {
+    private void btnWeek1Click() {
+        selectedWeek = 1;
+        loadTableData();
+        btnClear();
+        updateSelectedWeekLabel();
+    }
+
+    @FXML
+    private void btnWeek2Click() {
+        selectedWeek = 2;
+        loadTableData();
+        btnClear();
+        updateSelectedWeekLabel();
+    }
+
+    @FXML
+    private void btnWeek3Click() {
+        selectedWeek = 3;
+        loadTableData();
+        btnClear();
+        updateSelectedWeekLabel();
+    }
+
+    @FXML
+    private void onTable0Click() {
         // Check if the tableview is empty
-        if (!Week2Table.getSelectionModel().isEmpty()) {
+        if (!Week0Table.getSelectionModel().isEmpty()) {
             // Get the selected schedule
-            Schedule schedule = Week2Table.getSelectionModel().getSelectedItem();
+            Schedule schedule = Week0Table.getSelectionModel().getSelectedItem();
 
             setTextFields(schedule);
         }
@@ -267,11 +291,8 @@ public class ScheduleController implements Initializable {
         // Get the employee ID from the text field
         String employeeID = txtEmployeeID.getText();
 
-        // Get the week ID by checking the selected tab
-        String weekID = String.valueOf(weekTabPane.getSelectionModel().getSelectedIndex());
-
         Schedule schedule = new Schedule(name, employeeID);
-        schedule.setWeekID(weekID);
+        schedule.setWeekID(String.valueOf(selectedWeek));
         schedule.setMonday(MonStart, MonEnd);
         schedule.setTuesday(TueStart, TueEnd);
         schedule.setWednesday(WedStart, WedEnd);
@@ -294,21 +315,16 @@ public class ScheduleController implements Initializable {
 
     @FXML
     private void btnClear() {
-        TextField[] textFields = {txtMonStart, txtMonEnd, txtTueStart, txtTueEnd, txtWedStart, txtWedEnd, txtThuStart,
+        TextField[] textFields = {txtEmployeeID, txtName, txtMonStart, txtMonEnd, txtTueStart, txtTueEnd, txtWedStart, txtWedEnd, txtThuStart,
                 txtThuEnd, txtFriStart, txtFriEnd, txtSatStart, txtSatEnd, txtSunStart, txtSunEnd};
 
         for (TextField textField : textFields) {
             // Check if the text field is empty
-            if (!textField.getText().isEmpty()) {
+            if (textField.getText() != null) {
                 // Clear the text field
                 textField.clear();
             }
         }
-    }
-
-    public void CloseApplication(ActionEvent event) throws IOException {
-        // Close the application
-        System.exit(0);
     }
 
     public void openDashboard(ActionEvent event) throws IOException {

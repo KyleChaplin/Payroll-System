@@ -101,11 +101,6 @@ public class PayrollController implements Initializable {
         }
     }
 
-    public void CloseApplication(ActionEvent event) throws IOException {
-        // Close the application
-        System.exit(0);
-    }
-
     public void openDashboard(ActionEvent event) throws IOException {
         SceneController.openScene(event, "home", stage, scene);
     }
