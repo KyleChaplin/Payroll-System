@@ -9,19 +9,21 @@ import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
+import javax.mail.MessagingException;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.Objects;
 
 public class Main extends Application {
     @Override
-    public void start(Stage stage) throws IOException, SQLException {
+    public void start(Stage stage) throws IOException, SQLException, MessagingException {
         DatabaseController.loadEnvVariables();
         DatabaseController.databaseChecks();
 
-        // Testing directory creation for PDFs
-        //PDFBox.createPDF("1");
         Email.sendEmailTask();
+
+        //Email.sendEmailTask();
 
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("views/login-view.fxml")));
         Scene scene = new Scene(root);

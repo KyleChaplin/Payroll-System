@@ -1,5 +1,6 @@
 package application;
 
+import application.email.SingleEmail;
 import application.employees.Person;
 import application.help.HelpInfo;
 import application.payroll.DetailedPayroll;
@@ -14,10 +15,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import application.email.Email;
 
 public class DatabaseController {
     private static final Map<String, String> envVariables = new HashMap<>();
@@ -717,6 +722,17 @@ public class DatabaseController {
         }
     }
 
+    // Method to update email date in email info table
+    public static void updateEmailDate(String newEmailDate) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "UPDATE NPS_EMAIL_INFO SET EMAIL_DATE = ?")) {
+            preparedStatement.setString(1, newEmailDate);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Failure during SQL query - updating email date", e);
+        }
+    }
+
     private static String getFirstThreeLetter(String input) {
         String firstThreeLetters = input.substring(0, 3);
         return firstThreeLetters.toUpperCase();
@@ -802,6 +818,8 @@ public class DatabaseController {
                 // Add schedule info for the employee
                 initializeScheduleForAllEmployees();
 
+
+                SingleEmail.sendAccountCreationEmail(email, firstName);
             } else {
                 logger.info("Failed to add employee.");
             }
@@ -1260,17 +1278,51 @@ public class DatabaseController {
         return data;
     }
 
+    public static List<Person> getAllEmployeeInfo() {
+        List<Person> employees = new ArrayList<>();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_EMPLOYEE")) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String id = resultSet.getString("ID");
+                String firstName = resultSet.getString("FIRST_NAME");
+                String lastName = resultSet.getString("LAST_NAME");
+                String email = resultSet.getString("EMAIL");
+                String niNumber = resultSet.getString("NI_NUMBER");
+
+                // Get access level
+                String accessLevel = getAccessLevel(email);
+
+                Person person = new Person(id, firstName, lastName, email, null, null,
+                        null, niNumber, null, null, null, null);
+
+                // Fetch additional details
+                fetchAdditionalDetails(person);
+
+                employees.add(person);
+            }
+        } catch (SQLException e) {
+            logger.error("Failure during SQL query - getting all employee data", e);
+        }
+
+        return employees;
+    }
+
+    private static void fetchAdditionalDetails(Person person) {
+        // Fetch additional details for the given person
+        // You can reuse the logic from your existing method
+        // ... (code to retrieve bank details, payroll, emergency contact, addresses, etc.)
+    }
+
+
     // Method to get an employees details by ID
     public static Person getEmployeeInfo() {
-        return getEmployeeInfoMethod(currentLoggedInEmployeeId);
+        return getEmployeeInfoByID(currentLoggedInEmployeeId);
     }
 
-    // Method to get employee details by ID
     public static Person getEmployeeInfoByID(String ID) {
-        return getEmployeeInfoMethod(ID);
-    }
-
-    private static Person getEmployeeInfoMethod(String ID) {
         Person person = null;
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -1491,6 +1543,7 @@ public class DatabaseController {
         } catch (SQLException e) {
             logger.error("Failure during SQL query - getting password info", e);
         }
+
         return password;
     }
 

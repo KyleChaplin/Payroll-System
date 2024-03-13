@@ -2,11 +2,9 @@ package application.email;
 
 import application.DatabaseController;
 import application.employees.Person;
+import javafx.scene.chart.PieChart;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -14,97 +12,128 @@ import javax.mail.internet.MimeMultipart;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Email {
-    static Session newSession = null;
-    static MimeMessage[] mimeMessage = null;
+    private static MimeMessage[] mimeMessage = null;
 
     public static void sendEmailTask() {
-        Timer timer = new Timer();
-        timer.schedule(new EmailTask(), getNextExecutionTime());
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+        // Schedule the task to run periodically every month
+        scheduler.scheduleAtFixedRate(new EmailTask(), 0, 30, TimeUnit.DAYS);
     }
 
-    private static Date getNextExecutionTime() {
-        // Set the desired time of the month for sending the email
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        String scheduledDateStr = DatabaseController.getEmailDateInfo();// "26-01-2024 15:11:00";
-        try {
-            Date scheduledDate = sdf.parse(scheduledDateStr);
-            Date currentDate = new Date();
+    static class EmailTask implements Runnable {
+        private static Session newSession;
 
-            if (scheduledDate.before(currentDate)) {
-                // Increment month if the scheduled date has passed
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(scheduledDate);
-                calendar.add(Calendar.MONTH, 1);
-                scheduledDate = calendar.getTime();
-            }
-
-            return scheduledDate;
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    static class EmailTask extends TimerTask {
         @Override
         public void run() {
-            // Setup mail server properties
-            // Draft an email
-            // Send the email
             try {
-                setupServerProperties();
-                draftEmail();
-                sendEmail();
-            } catch (MessagingException | IOException e) {
+                // Fetch the next scheduled time from the database
+                String currentEmailDate = DatabaseController.getEmailDateInfo();
+
+                // Parse the retrieved date and time
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+                Date scheduledDate = sdf.parse(currentEmailDate);
+
+                // Check if the scheduled date has passed
+                if (scheduledDate.before(new Date())) {
+                    // Setup mail server properties
+                    System.out.println("Setting up email server properties...");
+                    setupServerProperties();
+
+                    // Draft an email
+                    System.out.println("Drafting emails...");
+                    draftEmail();
+
+                    // Send the email
+                    System.out.println("Sending emails...");
+                    sendEmail();
+
+                    System.out.println("Updating database...");
+                    updateEmailDateInDatabase();
+                }
+            } catch (MessagingException | IOException | ParseException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        private void sendEmail() throws MessagingException {
-            String fromUser = DatabaseController.getEmailInfo();   // TODO: get the from user from the database
-            String fromUserPassword = DatabaseController.getPasswordInfo();   // TODO: get the from user password from the database
+        private void updateEmailDateInDatabase() {
+            try {
+                // Update the email date in the database
+                String newEmailDate = calculateNextExecutionDate();
+                DatabaseController.updateEmailDate(newEmailDate);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private String calculateNextExecutionDate() throws ParseException {
+            // Fetch the next scheduled time from the database
+            String currentEmailDate = DatabaseController.getEmailDateInfo();
+
+            // Parse the retrieved date and time
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+            Date scheduledDate = sdf.parse(currentEmailDate);
+
+            // Calculate the next scheduled time (e.g., add one month to the retrieved date)
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(scheduledDate);
+            calendar.add(Calendar.MONTH, 1);
+
+            return sdf.format(calendar.getTime());
+        }
+
+        private static void sendEmail() throws MessagingException {
+            String fromUser = DatabaseController.getEmailInfo();
+            String fromUserPassword = DatabaseController.getPasswordInfo();
             String emailHost = "smtp.gmail.com";
             Transport transport = newSession.getTransport("smtp");
             transport.connect(emailHost, fromUser, fromUserPassword);
 
-            for (int i = 0; i < mimeMessage.length; i++)
-            {
-                transport.sendMessage(mimeMessage[i], mimeMessage[i].getAllRecipients());
+            for (MimeMessage message : mimeMessage) {
+                transport.sendMessage(message, message.getAllRecipients());
             }
-            //transport.sendMessage(mimeMessage, mimeMessage.getAllRecipients());
+
             transport.close();
 
             // Output message to test
             System.out.println("Email sent successfully");
         }
 
-        private MimeMessage[] draftEmail() throws MessagingException, IOException {
-            String emailSubject;    // TODO: Allow setting and get the email subject from the database - Maybe
-            String emailBody; // TODO: Allow setting and get the email body from the database - Maybe
+        private static void draftEmail() throws MessagingException, IOException {
+            String emailSubject;
+            String emailBody;
 
-            Person[] person = new Person[]{DatabaseController.getEmployeeInfo()};
-            for (int i = 0; i < person.length; i++) {
-                emailSubject = "Payslip for " + Calendar.MONTH;
-                emailBody = "Dear, " + person[i].getFirstName() + " " + person[i].getLastName() + "\n\n" +
-                        "Please find attached your payslip for the month of " + Calendar.MONTH + ".\n\n" +
-                        "Kind regards,\n" +
+            List<Person> employees = DatabaseController.getAllEmployeeInfo();
+            mimeMessage = new MimeMessage[employees.size()];
+            Calendar currentCalendar = Calendar.getInstance();
+
+            for (int i = 0; i < employees.size(); i++) {
+                Person person = employees.get(i);
+
+                SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM", java.util.Locale.getDefault());
+                String currentMonth = monthFormat.format(currentCalendar.getTime());
+
+                emailSubject = "Payslip for " + currentMonth;
+                emailBody = "Dear, " + person.getFirstName() + " " + person.getLastName() +
+                        "<br><br>Please find attached your payslip for the month of " + currentMonth + ".<br><br>" +
+                        "Kind regards,<br>" +
                         "Payroll Team";
 
-                mimeMessage = new MimeMessage[]{new MimeMessage(newSession)};
-
-//                for (int i = 0; i < emailRecipients.length; i++) {
-//                    mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(emailRecipients[i]));
-//                }
-
-                mimeMessage[i].addRecipient(Message.RecipientType.TO, new InternetAddress(person[i].getEmail()));
+                mimeMessage[i] = new MimeMessage(newSession);
+                mimeMessage[i].addRecipient(Message.RecipientType.TO, new InternetAddress(person.getEmail()));
                 mimeMessage[i].setSubject(emailSubject);
 
                 MimeBodyPart pdfAttachment = new MimeBodyPart();
-                String source = PDFBox.createPDF(person[i].getEmployeeID(), person[i].getNiNumber());
-
+                String source = PDFBox.createPDF(person.getEmployeeID(), person.getNiNumber());
                 pdfAttachment.attachFile(source);
 
                 MimeBodyPart bodyPart = new MimeBodyPart();
@@ -115,38 +144,11 @@ public class Email {
 
                 mimeMessage[i].setContent(multipart);
             }
-            return mimeMessage;
         }
 
-        public static void sendAccountCreationEmail(String toEmail, String employeeName) throws MessagingException {
-            String fromUser = DatabaseController.getEmailInfo();   // TODO: get the from user from the database
-            String fromUserPassword = DatabaseController.getPasswordInfo();   // TODO: get the from user password from the database
-            String emailHost = "smtp.gmail.com";
-            Transport transport = newSession.getTransport("smtp");
-            transport.connect(emailHost, fromUser, fromUserPassword);
-
-            try {
-                Message message = new MimeMessage(newSession);
-                message.setFrom(new InternetAddress(fromUser));
-                message.setRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
-                message.setSubject("Account Created");
-                message.setText("Dear " + employeeName +
-                        ",\n\nYour account has been successfully created." +
-                        "\n\n Please use password: {your first}_{last 4 characters of NIN}");
-
-                Transport.send(message);
-
-                System.out.println("Email sent successfully!");
-
-            } catch (MessagingException e) {
-                e.printStackTrace();
-                System.err.println("Failed to send email: " + e.getMessage());
-            }
-        }
-
-        private void setupServerProperties() {
+        private static void setupServerProperties() {
             Properties properties = System.getProperties();
-            properties.put("mail.smtp.host", "smtp.gmail.com");     // TODO: get the host port from the database
+            properties.put("mail.smtp.host", "smtp.gmail.com");
             properties.put("mail.smtp.port", "587");
             properties.put("mail.smtp.auth", "true");
             properties.put("mail.smtp.starttls.enable", "true");
