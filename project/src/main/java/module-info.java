@@ -22,7 +22,7 @@ module org.example.project {
     opens application.employees to javafx.fxml;
     exports application.profile;
     opens application.profile to javafx.fxml;
-    exports application.timeoff;
+    exports application.admin;
     exports application.help;
     opens application.help to javafx.fxml;
 }

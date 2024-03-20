@@ -9,16 +9,13 @@ public class DetailedPayroll {
     private Double overtimeHours;
     private Double overtimePay;
     private Double taxPaid;
+    private String payDay;
+    private Double pension;
+    private Double netPay;
+    private Double salary;
 
-    public DetailedPayroll(String employeeID, String firstName, String lastName, Double hoursWorked, Double basePay, Double overtimeHours, Double overtimePay, Double taxPaid) {
-        this.employeeID = employeeID;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.hoursWorked = hoursWorked;
-        this.basePay = basePay;
-        this.overtimeHours = overtimeHours;
-        this.overtimePay = overtimePay;
-        this.taxPaid = taxPaid;
+    public DetailedPayroll() {
+
     }
 
     public String getEmployeeID() {
@@ -51,5 +48,58 @@ public class DetailedPayroll {
 
     public Double getTaxPaid() {
         return taxPaid;
+    }
+
+    public Double getsalary() { return salary; }
+
+    public Double getNetPay() { return netPay; }
+
+    // Setters
+    public void setEmployeeID(String employeeID) {
+        this.employeeID = employeeID;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setHoursWorked(Double hoursWorked) {
+        this.hoursWorked = hoursWorked;
+    }
+
+    public void setBasePay(Double basePay) {
+        this.basePay = basePay;
+    }
+
+    public void setOvertimeHours(Double overtimeHours) {
+        this.overtimeHours = overtimeHours;
+    }
+
+    public void setOvertimePay(Double overtimePay) {
+        this.overtimePay = overtimePay;
+    }
+
+    public void setTaxPaid(Double taxPaid) {
+        this.taxPaid = taxPaid;
+    }
+
+    public void setPayDay(String payDay) {
+        this.payDay = payDay;
+    }
+
+    public void setPension(double pension) {
+        this.pension = pension;
+    }
+
+    public void setNetPay(double netPay) {
+        this.netPay = netPay;
+    }
+
+    public void setsalary(double salary) {
+        this.salary = salary;
     }
 }

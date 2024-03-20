@@ -21,9 +21,7 @@ public class Main extends Application {
         DatabaseController.loadEnvVariables();
         DatabaseController.databaseChecks();
 
-        Email.sendEmailTask();
-
-        //Email.sendEmailTask();
+        //Email.sendEmailTask();    // Uncomment to enable emails sending
 
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("views/login-view.fxml")));
         Scene scene = new Scene(root);

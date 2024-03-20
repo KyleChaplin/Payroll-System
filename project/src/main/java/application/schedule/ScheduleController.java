@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
@@ -265,6 +266,62 @@ public class ScheduleController implements Initializable {
         txtSatEnd.setText(schedule.getSaturdayEnd());
         txtSunStart.setText(schedule.getSundayStart());
         txtSunEnd.setText(schedule.getSundayEnd());
+        //txtContractHours.setText();   // TODO: Get contracted hours from database
+        txtPlannedHours.setText(String.valueOf(calculateTotalHoursWorked(schedule)));
+    }
+
+    public double calculateTotalHoursWorked(Schedule schedule) {
+        double totalHours = 0;
+
+        // Calculate hours worked for Monday
+        double monHours = calculateHoursBetween(schedule.getMondayStart(), schedule.getMondayEnd());
+        totalHours += monHours;
+
+        // Calculate hours worked for Tuesday
+        double tueHours = calculateHoursBetween(schedule.getTuesdayStart(), schedule.getTuesdayEnd());
+        totalHours += tueHours;
+
+        // Calculate hours worked for Wednesday
+        double wedHours = calculateHoursBetween(schedule.getWednesdayStart(), schedule.getWednesdayEnd());
+        totalHours += wedHours;
+
+        // Calculate hours worked for Thursday
+        double thuHours = calculateHoursBetween(schedule.getThursdayStart(), schedule.getThursdayEnd());
+        totalHours += thuHours;
+
+        // Calculate hours worked for Friday
+        double friHours = calculateHoursBetween(schedule.getFridayStart(), schedule.getFridayEnd());
+        totalHours += friHours;
+
+        // Calculate hours worked for Saturday
+        double satHours = calculateHoursBetween(schedule.getSaturdayStart(), schedule.getSaturdayEnd());
+        totalHours += satHours;
+
+        // Calculate hours worked for Sunday
+        double sunHours = calculateHoursBetween(schedule.getSundayStart(), schedule.getSundayEnd());
+        totalHours += sunHours;
+
+        return totalHours;
+    }
+
+    private double calculateHoursBetween(String startTime, String endTime) {
+        // Check if start time and end time are not null
+        if (startTime != null && endTime != null) {
+            String[] startTokens = startTime.split(":");
+            String[] endTokens = endTime.split(":");
+
+            // Extract hours and minutes from the time strings
+            int startHour = Integer.parseInt(startTokens[0]);
+            int startMinute = Integer.parseInt(startTokens[1]);
+            int endHour = Integer.parseInt(endTokens[0]);
+            int endMinute = Integer.parseInt(endTokens[1]);
+
+            // Calculate total hours between start time and end time
+            int totalMinutes = (endHour - startHour) * 60 + (endMinute - startMinute);
+            return (double) totalMinutes / 60;
+        } else {
+            return 0.0; // Return 0 if either start time or end time is null
+        }
     }
 
     private Schedule createScheduleFromTextFields() {
@@ -360,6 +417,9 @@ public class ScheduleController implements Initializable {
         Schedule schedule = createScheduleFromTextFields();
         DatabaseController.updateSchedule(schedule);
 
+        // TODO: Add payroll data for whole month when data is updated
+        //DatabaseController.addPayrollInfo();
+
         // Refresh the table
         loadTableData();
     }
@@ -399,7 +459,7 @@ public class ScheduleController implements Initializable {
     @FXML
     private void btnClear() {
         TextField[] textFields = {txtEmployeeID, txtName, txtMonStart, txtMonEnd, txtTueStart, txtTueEnd, txtWedStart, txtWedEnd, txtThuStart,
-                txtThuEnd, txtFriStart, txtFriEnd, txtSatStart, txtSatEnd, txtSunStart, txtSunEnd};
+                txtThuEnd, txtFriStart, txtFriEnd, txtSatStart, txtSatEnd, txtSunStart, txtSunEnd, txtContractHours, txtPlannedHours};
 
         for (TextField textField : textFields) {
             // Check if the text field is empty
@@ -433,7 +493,7 @@ public class ScheduleController implements Initializable {
     }
 
     public void openTimeoff(ActionEvent event) throws IOException {
-        SceneController.openScene(event, "timeoff", stage, scene);
+        SceneController.openScene(event, "admin", stage, scene);
     }
 
     public void openHelp(ActionEvent event) throws IOException {

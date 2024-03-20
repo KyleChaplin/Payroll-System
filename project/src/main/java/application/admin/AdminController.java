@@ -1,4 +1,4 @@
-package application.timeoff;
+package application.admin;
 
 import application.SceneController;
 import application.ThemeManager;
@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class TimeoffController {
+public class AdminController {
 
     private Stage stage;
     private Scene scene;
@@ -39,7 +39,7 @@ public class TimeoffController {
     }
 
     public void openTimeoff(ActionEvent event) throws IOException {
-        SceneController.openScene(event, "timeoff", stage, scene);
+        SceneController.openScene(event, "admin", stage, scene);
     }
 
     public void openHelp(ActionEvent event) throws IOException {

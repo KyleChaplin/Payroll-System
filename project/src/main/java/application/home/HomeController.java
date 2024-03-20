@@ -39,7 +39,7 @@ public class HomeController {
     }
 
     public void openTimeoff(ActionEvent event) throws IOException {
-        SceneController.openScene(event, "timeoff", stage, scene);
+        SceneController.openScene(event, "admin", stage, scene);
     }
 
     public void openHelp(ActionEvent event) throws IOException {

@@ -808,9 +808,8 @@ public class DatabaseController {
                         "Sort Code");
 
                 // Add payroll info for the employee
-                addPayrollInfo(String.valueOf(employeeId), "Date", "Month", "",
-                        "Hours Worked", "Pension", "Overtime Hours",
-                        "Overtime Pay", "Gross Pay", "Taxes", "Net Pay");
+                addPayrollInfo(String.valueOf(employeeId), "Date", "Month", "0",
+                        "0", "0", "0", "0", "0", "0");
 
                 // Add emergency contact info for the employee
                 addEmergencyDetails("First Name", "Last Name", "Mobile", "Relationship");
@@ -881,7 +880,9 @@ public class DatabaseController {
     }
 
     // Method to add payroll info
-    public static void addPayrollInfo(String employeeId, String payDate, String month, String hoursWorked, String pension, String overtimeHours, String overtimePay, String grossPay, String taxes, String netPay, String net_pay) {
+    public static void addPayrollInfo(String employeeId, String payDate, String month, String hoursWorked,
+                                      String pension, String overtimeHours, String overtimePay, String grossPay,
+                                      String taxes, String netPay) {
         // Add record
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO NPS_PAYROLL (EMPLOYEE_ID, PAY_DATE, MONTH, HOURS_WORKED, PENSION, OVERTIME_HOURS, OVERTIME_PAY, GROSS_PAY, TAXES, NET_PAY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
@@ -1199,80 +1200,6 @@ public class DatabaseController {
 
         } catch (SQLException e) {
             logger.error("Failure during SQL query - getting all employee data", e);
-        }
-
-        return data;
-    }
-
-    // Retrieve payroll overview data for a specific month
-    public static ObservableList<PayrollOverview> getPayrollOverviewForMonth() {
-        ObservableList<PayrollOverview> data = FXCollections.observableArrayList();
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT MONTH, TO_CHAR(PAY_DATE, 'DD-MM-YYYY') AS PAY_DATE, SUM(GROSS_PAY) AS TOTAL_AMOUNT, COUNT(EMPLOYEE_ID) AS EMPLOYEE_COUNT FROM NPS_PAYROLL GROUP BY MONTH, TO_CHAR(PAY_DATE, 'DD-MM-YYYY')")) {
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                String payDate = resultSet.getString("PAY_DATE");
-                String month = resultSet.getString("MONTH");
-                String totalAmount = resultSet.getString("TOTAL_AMOUNT");
-                String employeeCount = resultSet.getString("EMPLOYEE_COUNT");
-
-                PayrollOverview payrollOverview = new PayrollOverview(payDate, month, totalAmount, employeeCount);
-
-                data.add(payrollOverview);
-            }
-        } catch (SQLException e) {
-            logger.error("Failure during SQL query - getting payroll overview", e);
-        }
-
-        return data;
-    }
-
-    public static ObservableList<DetailedPayroll> getEmployeeDetailsForMonth(String selectedMonth) {
-        ObservableList<DetailedPayroll> data = FXCollections.observableArrayList();
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT EMPLOYEE_ID, HOURS_WORKED, OVERTIME_HOURS, OVERTIME_PAY, TAXES FROM NPS_PAYROLL WHERE MONTH = ?")) {
-
-            preparedStatement.setString(1, selectedMonth);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                String employeeId = resultSet.getString("EMPLOYEE_ID");
-                Double hoursWorked = resultSet.getDouble("HOURS_WORKED");
-                Double overtimeWorked = resultSet.getDouble("OVERTIME_HOURS");
-                Double overtimePay = resultSet.getDouble("OVERTIME_PAY");
-                Double taxes = resultSet.getDouble("TAXES");
-
-                // Get employee first and last name
-                String firstName = "";
-                String lastName = "";
-                int salary = 0;
-                try (PreparedStatement preparedStatement2 = connection.prepareStatement(
-                        "SELECT FIRST_NAME, LAST_NAME, SALARY FROM NPS_EMPLOYEE WHERE ID = ?")) {
-                    preparedStatement2.setString(1, employeeId);
-
-                    ResultSet resultSet2 = preparedStatement2.executeQuery();
-                    if (resultSet2.next()) {
-                        firstName = resultSet2.getString("FIRST_NAME");
-                        lastName = resultSet2.getString("LAST_NAME");
-                        salary = resultSet2.getInt("SALARY");
-                    }
-                } catch (SQLException e) {
-                    logger.error("Failure during SQL query - getting employee details for month - " +
-                            "employee info", e);
-                }
-
-                DetailedPayroll employeeDetails = new DetailedPayroll(employeeId, firstName, lastName, hoursWorked,
-                        (salary * hoursWorked), overtimeWorked, overtimePay, taxes);
-
-                data.add(employeeDetails);
-            }
-        } catch (SQLException e) {
-            logger.error("Failure during SQL query - getting employee details for month", e);
         }
 
         return data;
@@ -1611,6 +1538,124 @@ public class DatabaseController {
             logger.error("Failure during SQL query - getting schedule data ", e);
         }
         return data;
+    }
+
+    // Methods to read from payroll table
+
+    // Retrieve payroll overview data for a specific month
+    public static ObservableList<PayrollOverview> getPayrollOverviewForMonth() {
+        ObservableList<PayrollOverview> data = FXCollections.observableArrayList();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT MONTH, TO_CHAR(PAY_DATE, 'DD-MM-YYYY') AS PAY_DATE, SUM(GROSS_PAY) AS TOTAL_AMOUNT, COUNT(EMPLOYEE_ID) AS EMPLOYEE_COUNT FROM NPS_PAYROLL GROUP BY MONTH, TO_CHAR(PAY_DATE, 'DD-MM-YYYY')")) {
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String payDate = resultSet.getString("PAY_DATE");
+                String month = resultSet.getString("MONTH");
+                String totalAmount = resultSet.getString("TOTAL_AMOUNT");
+                String employeeCount = resultSet.getString("EMPLOYEE_COUNT");
+
+                PayrollOverview payrollOverview = new PayrollOverview(payDate, month, totalAmount, employeeCount);
+
+                data.add(payrollOverview);
+            }
+        } catch (SQLException e) {
+            logger.error("Failure during SQL query - getting payroll overview", e);
+        }
+
+        return data;
+    }
+
+    public static ObservableList<DetailedPayroll> getEmployeeDetailsForMonth(String selectedMonth) {
+        ObservableList<DetailedPayroll> data = FXCollections.observableArrayList();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT EMPLOYEE_ID, HOURS_WORKED, OVERTIME_HOURS, OVERTIME_PAY, TAXES FROM NPS_PAYROLL WHERE MONTH = ?")) {
+
+            preparedStatement.setString(1, selectedMonth);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                // Get employee first and last name
+                DetailedPayroll employeeDetails = new DetailedPayroll();
+
+                String employeeId = resultSet.getString("EMPLOYEE_ID");
+
+                try (PreparedStatement preparedStatement2 = connection.prepareStatement(
+                        "SELECT FIRST_NAME, LAST_NAME, SALARY FROM NPS_EMPLOYEE WHERE ID = ?")) {
+                    preparedStatement2.setString(1, employeeId);
+
+                    ResultSet resultSet2 = preparedStatement2.executeQuery();
+                    if (resultSet2.next()) {
+                        employeeDetails.setFirstName(resultSet2.getString("FIRST_NAME"));
+                        employeeDetails.setLastName(resultSet2.getString("LAST_NAME"));
+                        employeeDetails.setsalary(resultSet2.getInt("SALARY"));
+                    }
+                } catch (SQLException e) {
+                    logger.error("Failure during SQL query - getting employee details for month - " +
+                            "employee info", e);
+                }
+
+                employeeDetails.setEmployeeID(employeeId);
+                employeeDetails.setHoursWorked(resultSet.getDouble("HOURS_WORKED"));
+                employeeDetails.setBasePay(resultSet.getDouble("GROSS_PAY"));
+                employeeDetails.setOvertimeHours(resultSet.getDouble("OVERTIME_HOURS"));
+                employeeDetails.setOvertimePay(resultSet.getDouble("OVERTIME_PAY"));
+                employeeDetails.setTaxPaid(resultSet.getDouble("TAXES"));
+
+                data.add(employeeDetails);
+            }
+        } catch (SQLException e) {
+            logger.error("Failure during SQL query - getting employee details for month", e);
+        }
+
+        return data;
+    }
+
+    public static DetailedPayroll getSpecificEmployeePayroll(String employeeID) {
+        DetailedPayroll employeeDetails = new DetailedPayroll();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    "SELECT * FROM NPS_PAYROLL WHERE EMPLOYEE_ID = ?")) {
+            preparedStatement.setString(1, employeeID);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                try (PreparedStatement preparedStatement2 = connection.prepareStatement(
+                        "SELECT FIRST_NAME, LAST_NAME, SALARY FROM NPS_EMPLOYEE WHERE ID = ?")) {
+                    preparedStatement2.setString(1, employeeID);
+
+                    ResultSet resultSet2 = preparedStatement2.executeQuery();
+                    if (resultSet2.next()) {
+                        employeeDetails.setFirstName(resultSet2.getString("FIRST_NAME"));
+                        employeeDetails.setLastName(resultSet2.getString("LAST_NAME"));
+                        employeeDetails.setsalary(resultSet2.getInt("SALARY"));
+                    }
+                } catch (SQLException e) {
+                    logger.error("Failure during SQL query - getting employee details for month - " +
+                            "employee info", e);
+                }
+
+                employeeDetails.setEmployeeID(employeeID);
+                employeeDetails.setPayDay(resultSet.getString("PAY_DATE"));
+                employeeDetails.setHoursWorked(resultSet.getDouble("HOURS_WORKED"));
+                employeeDetails.setPension(resultSet.getDouble("PENSION"));
+                employeeDetails.setBasePay(resultSet.getDouble("GROSS_PAY"));
+                employeeDetails.setOvertimeHours(resultSet.getDouble("OVERTIME_HOURS"));
+                employeeDetails.setOvertimePay(resultSet.getDouble("OVERTIME_PAY"));
+                employeeDetails.setTaxPaid(resultSet.getDouble("TAXES"));
+                employeeDetails.setNetPay(resultSet.getDouble("NET_PAY"));
+            }
+
+        } catch (SQLException e) {
+            logger.error("Failure during SQL query - getting specific employee details for payroll", e);
+        }
+
+        return employeeDetails;
     }
 
 

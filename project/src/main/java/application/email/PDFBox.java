@@ -12,6 +12,7 @@ import java.util.Date;
 
 import application.DatabaseController;
 import application.employees.Person;
+import application.payroll.DetailedPayroll;
 import javafx.scene.chart.PieChart;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -59,16 +60,16 @@ public class PDFBox {
         PDFont italicFont = PDType1Font.HELVETICA_OBLIQUE;
 
         // ****************Employee details***************
-        Person employee = DatabaseController.getEmployeeInfoByID(employeeNumber); // Gets the employee info from the database using the employee ID
+        DetailedPayroll employee = DatabaseController.getSpecificEmployeePayroll(employeeNumber); // Gets the employee info from the database using the employee ID
         String employeeID = employee.getEmployeeID();
         String name = employee.getFirstName() + " " + employee.getLastName();
-        String hoursWorked = ""; // TODO: Get hours worked from database
-        String hourlyRate = "12.60"; // TODO: Get hourly rate from database
-        String overTimeWorked = "0"; // TODO: Get overtime worked from database
-        String overTimeRate = "30"; // TODO: Get overtime rate from database
-        String overAllPay = "504"; // TODO: Get gross pay from database
-        String tax = "200"; // TODO: Get tax from database
-        String payAfterSacrifice = "600"; // TODO: Get net pay from database
+        String hoursWorked = String.valueOf(employee.getHoursWorked());
+        String hourlyRate = String.valueOf(employee.getsalary());
+        String overTimeWorked = String.valueOf(employee.getOvertimeHours());
+        String overTimeRate = String.valueOf(employee.getOvertimePay());
+        String overAllPay = String.valueOf(employee.getBasePay());
+        String tax = String.valueOf(employee.getTaxPaid());
+        String payAfterSacrifice = String.valueOf(employee.getNetPay());
         // ****************Employee details***************
 
 
