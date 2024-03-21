@@ -32,138 +32,97 @@ public class ScheduleController implements Initializable {
 
     @FXML
     private TableView<Schedule> Week0Table;
-
     @FXML
     private TableView<Schedule> Week1Table;
-
     @FXML
     private TableView<Schedule> Week2Table;
-
     @FXML
     private TableView<Schedule> Week3Table;
-
     @FXML
     private Button btnDark;
-
     @FXML
     private Button btnGreen;
-
     @FXML
     private Button btnPurple;
-
     @FXML
     private TextField txtContractHours;
-
     @FXML
     private TextField txtEmployeeID;
-
     @FXML
     private TextField txtFriEnd;
-
     @FXML
     private TextField txtFriStart;
-
     @FXML
     private TextField txtMonEnd;
-
     @FXML
     private TextField txtMonStart;
-
     @FXML
     private TextField txtName;
-
     @FXML
     private TextField txtPlannedHours;
-
     @FXML
     private TextField txtSatEnd;
-
     @FXML
     private TextField txtSatStart;
-
     @FXML
     private TextField txtSunEnd;
-
     @FXML
     private TextField txtSunStart;
-
     @FXML
     private TextField txtThuEnd;
-
     @FXML
     private TextField txtThuStart;
-
     @FXML
     private TextField txtTueEnd;
-
     @FXML
     private TextField txtTueStart;
-
     @FXML
     private TextField txtWedEnd;
-
     @FXML
     private TextField txtWedStart;
-
     @FXML
     private TableColumn<Schedule, String> employeeName;
-
     @FXML
     private TableColumn<Schedule, String> employeeID;
-
     @FXML
     private TableColumn<Schedule, String> FriEnd;
-
     @FXML
     private TableColumn<Schedule, String> FriStart;
-
     @FXML
     private TableColumn<Schedule, String> MonEnd;
-
     @FXML
     private TableColumn<Schedule, String> MonStart;
-
     @FXML
     private TableColumn<Schedule, String> SatEnd;
-
     @FXML
     private TableColumn<Schedule, String> SatStart;
-
     @FXML
     private TableColumn<Schedule, String> SunEnd;
-
     @FXML
     private TableColumn<Schedule, String> SunStart;
-
     @FXML
     private TableColumn<Schedule, String> ThuEnd;
-
     @FXML
     private TableColumn<Schedule, String> ThuStart;
-
     @FXML
     private TableColumn<Schedule, String> TueEnd;
-
     @FXML
     private TableColumn<Schedule, String> TueStart;
-
     @FXML
     private TableColumn<Schedule, String> WedEnd;
-
     @FXML
     private TableColumn<Schedule, String> WedStart;
-
     @FXML
     private HBox adminBox;
-
     @FXML
     private Label lblSelectedWeek;
-
     @FXML
     private Label txtEmptyError;
-
     @FXML
     private TextField txtSearch;
+    @FXML
+    private Button btnAdmin;
+
 
     private int selectedWeek = 0;
 
@@ -175,6 +134,7 @@ public class ScheduleController implements Initializable {
             btnPurple.setVisible(true);
             btnGreen.setVisible(true);
             txtEmptyError.setVisible(true);
+            btnAdmin.setVisible(true);
         }
 
         DatabaseController.initializeScheduleForAllEmployees();

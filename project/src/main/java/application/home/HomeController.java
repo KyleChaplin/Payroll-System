@@ -1,21 +1,30 @@
 package application.home;
 
+import application.DatabaseController;
 import application.SceneController;
 import application.ThemeManager;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.stage.Stage;
-
 import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class HomeController {
+public class HomeController implements Initializable {
 
     private Stage stage;
     private Scene scene;
+    @FXML
+    private Button btnAdmin;
 
-    public void CloseApplication(ActionEvent event) throws IOException {
-        // Close the application
-        System.exit(0);
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        if (Integer.parseInt(DatabaseController.getAccessLevel(DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()))) == 0) {
+            btnAdmin.setVisible(true);
+        }
     }
 
     public void openDashboard(ActionEvent event) throws IOException {

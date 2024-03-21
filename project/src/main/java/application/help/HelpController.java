@@ -9,10 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -29,30 +26,28 @@ public class HelpController implements Initializable {
 
     @FXML
     private TextField txtHelp;
-
     @FXML
     private ScrollPane scrollHelp;
-
     @FXML
     private VBox vboxHelp;
-
     @FXML
     private Pane pane;
-
     @FXML
     private Pane addPane;
-
     @FXML
     private TextField txtErrorCode;
-
     @FXML
     private TextField txtTitle;
-
     @FXML
     private TextArea txtDescription;
+    @FXML
+    private Button btnAdmin;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        if (Integer.parseInt(DatabaseController.getAccessLevel(DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()))) == 0) {
+            btnAdmin.setVisible(true);
+        }
         // TODO: This currently only works with dark mode - Setup support for light mode
 
         ObservableList<HelpInfo> helpInfo = (ObservableList<HelpInfo>) DatabaseController.getHelpInfo();
@@ -98,11 +93,6 @@ public class HelpController implements Initializable {
 
         addPane.setVisible(false);
         addPane.setDisable(true);
-    }
-
-    public void CloseApplication(ActionEvent event) throws IOException {
-        // Close the application
-        System.exit(0);
     }
 
     public void openDashboard(ActionEvent event) throws IOException {

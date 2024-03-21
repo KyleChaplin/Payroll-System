@@ -141,7 +141,7 @@
                <graphic>
                   <ImageView fitHeight="40.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true" styleClass="image-view">
                      <image>
-                        <Image url="@../../images/schedule.png" />
+                        <Image url="@../../images/admin.png" />
                      </image>
                      <effect>
                         <ColorAdjust brightness="1.0" />

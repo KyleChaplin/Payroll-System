@@ -1,5 +1,6 @@
 package application.employees;
 
+import application.DatabaseController;
 import application.SceneController;
 import application.ThemeManager;
 import javafx.collections.FXCollections;
@@ -23,87 +24,66 @@ public class EmployeeController implements Initializable {
 
     @FXML
     private TableView<Person> EmployeeTable;
-
     @FXML
     private TableColumn<Person, String> ID;
-
     @FXML
     private TableColumn<Person, String> FirstName;
-
     @FXML
     private TableColumn<Person, String> LastName;
-
     @FXML
     private TableColumn<Person, String> Email;
-
     @FXML
     private TableColumn<Person, String> Phone;
-
     @FXML
     private TableColumn<Person, String> HourlySalary;
-
     @FXML
     private TableColumn<Person, String> AccessLevel;
-
     @FXML
     private TableColumn<Person, String> NiNumber;
-
     @FXML
     private TableColumn<Person, String> Location;
-
     @FXML
     private TableColumn<Person, String> ContractType;
-
     @FXML
     private TableColumn<Person, String> Department;
-
     @FXML
     private TableColumn<Person, String> JobTitle;
-
     @FXML
     private TextField txtID;
-
     @FXML
     private TextField txtFirstName;
-
     @FXML
     private TextField txtLastName;
-
     @FXML
     private TextField txtEmail;
-
     @FXML
     private TextField txtPhone;
-
     @FXML
     private TextField txtNiNumber;
-
     @FXML
     private TextField txtHourlySalary;
-
     @FXML
     private TextField txtLocation;
-
     @FXML
     private TextField txtContractType;
-
     @FXML
     private TextField txtDepartment;
-
     @FXML
     private TextField txtJobTitle;
-
     @FXML
     private ComboBox cboAccessLevel;
-
     @FXML
     private Label txtEmptyError;
-
     @FXML
     private TextField txtSearch;
+    @FXML
+    private Button btnAdmin;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        if (Integer.parseInt(DatabaseController.getAccessLevel(DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()))) == 0) {
+            btnAdmin.setVisible(true);
+        }
 
         // Populate the combo box
         cboAccessLevel.getItems().addAll(

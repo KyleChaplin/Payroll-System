@@ -14,6 +14,7 @@ module org.example.project {
     exports application;
     opens application to javafx.fxml;
     exports application.home;
+    opens application.home to javafx.fxml;
     exports application.schedule;
     opens application.schedule to javafx.fxml;
     exports application.payroll;

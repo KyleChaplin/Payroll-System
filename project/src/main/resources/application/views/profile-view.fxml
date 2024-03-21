@@ -471,24 +471,6 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openTimeoff" prefHeight="60.0" prefWidth="200.0" textAlignment="CENTER" textFill="WHITE">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                     <graphic>
-                        <ImageView fitHeight="40.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true" styleClass="image-view">
-                           <image>
-                              <Image url="@../../images/schedule.png" />
-                           </image>
-                           <effect>
-                              <ColorAdjust brightness="1.0" />
-                           </effect>
-                        </ImageView>
-                     </graphic>
-                  </Button>
                   <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openHelp" prefHeight="60.0" prefWidth="200.0" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font size="18.0" />
@@ -509,6 +491,21 @@
                   </Button>
                </children>
             </VBox>
+            <Button fx:id="btnAdmin" alignment="CENTER" contentDisplay="RIGHT" layoutY="709.0" mnemonicParsing="false" onAction="#openTimeoff" prefHeight="60.0" prefWidth="63.0" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font size="18.0" />
+               </font>
+               <graphic>
+                  <ImageView fitHeight="40.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true" styleClass="image-view">
+                     <image>
+                        <Image url="@../../images/admin.png" />
+                     </image>
+                     <effect>
+                        <ColorAdjust brightness="1.0" />
+                     </effect>
+                  </ImageView>
+               </graphic>
+            </Button>
             <Button fx:id="btnDark" layoutY="769.0" mnemonicParsing="false" onAction="#toggleTheme" prefHeight="60.0" prefWidth="63.0">
                <graphic>
                   <ImageView pickOnBounds="true" preserveRatio="true">

@@ -27,86 +27,66 @@ public class ProfileController implements Initializable {
 
     @FXML
     private Label lblID;
-
     @FXML
     private Label lblName;
-
     @FXML
     private TextField txtEmail;
-
     @FXML
     private TextField txtNiNumber;
-
     @FXML
     private TextField txtPhone;
-
     @FXML
     private TextField txtfName;
-
     @FXML
     private TextField txtlName;
-
     @FXML
     private TextField txtSalaryHourly;
-
     @FXML
     private TextField txtPension;
-
     @FXML
     private TextField txtBankName;
-
     @FXML
     private TextField txtAccountNumber;
-
     @FXML
     private TextField txtSortCode;
-
     @FXML
     private TextField txtJobTitle;
-
     @FXML
     private TextField txtDepartment;
-
     @FXML
     private TextField txtContractType;
-
     @FXML
     private TextField txtLocation;
-
     @FXML
     private TextField txtAddress1;
-
     @FXML
     private TextField txtAddress2;
-
     @FXML
     private TextField txtCity;
-
     @FXML
     private TextField txtPostcode;
-
     @FXML
     private TextField txtEFirstName;
-
     @FXML
     private TextField txtELastName;
-
     @FXML
     private TextField txtERelationship;
-
     @FXML
     private TextField txtEMobile;
-
     @FXML
     private Label txtEmptyError;
-
     @FXML
     private Button btnGreen; // This button will either be "Edit" or "Update"
-
+    @FXML
+    private Button btnAdmin;
     private String id;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        if (Integer.parseInt(DatabaseController.getAccessLevel(DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()))) == 0) {
+            btnAdmin.setVisible(true);
+        }
+
         // Populate the text fields with the current user's information
         Person person = getEmployeeInfo();
 

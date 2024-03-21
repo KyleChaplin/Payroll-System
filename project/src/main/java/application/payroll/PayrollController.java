@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -27,48 +28,41 @@ public class PayrollController implements Initializable {
 
     @FXML
     private TableView<PayrollOverview> tblPayroll;
-
     @FXML
     private TableColumn<PayrollOverview, String> PayDate;
-
     @FXML
     private TableColumn<PayrollOverview, String> Month;
-
     @FXML
     private TableColumn<PayrollOverview, String> Total;
-
     @FXML
     private TableColumn<PayrollOverview, String> NoEmployees;
-
     @FXML
     private TableView<DetailedPayroll> tblEmployee;
-
     @FXML
     private TableColumn<DetailedPayroll, String> EmployeeID;
-
     @FXML
     private TableColumn<DetailedPayroll, String> FirstName;
-
     @FXML
     private TableColumn<DetailedPayroll, String> LastName;
-
     @FXML
     private TableColumn<DetailedPayroll, String> HoursWorked;
-
     @FXML
     private TableColumn<DetailedPayroll, String> BasePay;
-
     @FXML
     private TableColumn<DetailedPayroll, String> OvertimeWorked;
-
     @FXML
     private TableColumn<DetailedPayroll, String> OvertimePay;
-
     @FXML
     private TableColumn<DetailedPayroll, String> TaxPaid;
+    @FXML
+    private Button btnAdmin;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        if (Integer.parseInt(DatabaseController.getAccessLevel(DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()))) == 0) {
+            btnAdmin.setVisible(true);
+        }
+
         // Set up top table - displays general payroll information
         PayDate.setCellValueFactory(new PropertyValueFactory<PayrollOverview, String>("payDay"));
         Month.setCellValueFactory(new PropertyValueFactory<PayrollOverview, String>("month"));
