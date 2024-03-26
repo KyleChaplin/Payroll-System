@@ -3,14 +3,15 @@ package application.admin;
 import application.DatabaseController;
 import application.SceneController;
 import application.ThemeManager;
+import application.help.HelpInfo;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.w3c.dom.Text;
@@ -34,6 +35,8 @@ public class AdminController implements Initializable {
     @FXML
     private Pane paneBackupData;
     @FXML
+    private Pane paneHelp;
+    @FXML
     private TextField txtEmail;
     @FXML
     private TextField txtPassword;
@@ -41,16 +44,33 @@ public class AdminController implements Initializable {
     private DatePicker dateEmailDate;
     @FXML
     private Button btnAdmin;
+    @FXML
+    private TableView<HelpInfo> tblHelp;
+    @FXML
+    private TableColumn<HelpInfo, String> tblRErrorCode;
+    @FXML
+    private TableColumn<HelpInfo, String> tblRTitle;
+    @FXML
+    private TableColumn<HelpInfo, String> tblRDesc;
+    @FXML
+    private TableColumn<HelpInfo, String> tblRAddedBy;
+    @FXML
+    private TextField txtErrorCode;
+    @FXML
+    private TextField txtTitle;
+    @FXML
+    private TextArea txtDesc;
+    @FXML
+    private TextField txtAddedBy;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        if (Integer.parseInt(DatabaseController.getAccessLevel(DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()))) == 0) {
+        if (Integer.parseInt(DatabaseController.getAccessLevel(
+                DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()))) == 0) {
             btnAdmin.setVisible(true);
         }
 
-        paneMain.setVisible(true);
-        paneBackupData.setVisible(false);
-        paneEmailServer.setVisible(false);
+        openMainPane();
     }
 
     @FXML
@@ -74,7 +94,6 @@ public class AdminController implements Initializable {
     public void showEmailPane() {
         changePane("paneEmailServer");
 
-        // TODO: Get data from database
         txtEmail.setText(DatabaseController.getEmailInfo());
         txtPassword.setText(DatabaseController.getPasswordInfo());
         dateEmailDate.setValue(formatDate(DatabaseController.getEmailDateInfo()));
@@ -86,7 +105,49 @@ public class AdminController implements Initializable {
     }
 
     @FXML
-    public void closeEmailPane() {
+    public void showHelpPane() {
+        changePane("paneHelp");
+
+        loadHelpData();
+    }
+
+    private void loadHelpData() {
+        // Load data from database
+        ObservableList<HelpInfo> helpInfo = DatabaseController.getHelpInfo();
+
+        tblRErrorCode.setCellValueFactory(new PropertyValueFactory<>("errorCode"));
+        tblRTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
+        tblRDesc.setCellValueFactory(new PropertyValueFactory<>("description"));
+        tblRAddedBy.setCellValueFactory(new PropertyValueFactory<>("addedBy"));
+
+        tblHelp.setItems(helpInfo);
+    }
+
+    @FXML
+    public void onTableHelpClick() {
+        HelpInfo info = tblHelp.getSelectionModel().getSelectedItem();
+
+        txtErrorCode.setText(info.getErrorCode());
+        txtTitle.setText(info.getTitle());
+        txtDesc.setText(info.getDescription());
+        txtAddedBy.setText(info.getAddedBy());
+    }
+
+    @FXML
+    public void btnUpdateHelp() {
+        DatabaseController.updateHelp(txtErrorCode.getText(), txtTitle.getText(), txtDesc.getText(),
+                DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()));
+
+        loadHelpData();
+
+        txtErrorCode.clear();
+        txtTitle.clear();
+        txtDesc.clear();
+        txtAddedBy.clear();
+    }
+
+    @FXML
+    public void openMainPane() {
         changePane("paneMain");
     }
 
@@ -96,16 +157,25 @@ public class AdminController implements Initializable {
                 paneMain.setVisible(true);
                 paneBackupData.setVisible(false);
                 paneEmailServer.setVisible(false);
+                paneHelp.setVisible(false);
                 break;
             case "paneEmailServer":
                 paneMain.setVisible(false);
                 paneBackupData.setVisible(false);
                 paneEmailServer.setVisible(true);
+                paneHelp.setVisible(false);
                 break;
             case "paneBackupData":
                 paneMain.setVisible(false);
                 paneBackupData.setVisible(true);
                 paneEmailServer.setVisible(false);
+                paneHelp.setVisible(false);
+                break;
+            case "paneHelp":
+                paneMain.setVisible(false);
+                paneBackupData.setVisible(false);
+                paneEmailServer.setVisible(false);
+                paneHelp.setVisible(true);
                 break;
         }
     }

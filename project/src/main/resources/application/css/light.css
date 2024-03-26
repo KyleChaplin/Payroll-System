@@ -275,3 +275,10 @@
     -fx-border-color: #3498DB; /* Light blue border */
     -fx-border-radius: 15;
 }
+
+.help-pane {
+    -fx-background-color: #ffffff; /* Default background color */
+    -fx-padding: 5px; /* Adjust padding as needed */
+    -fx-border-color: #cccccc; /* Border color */
+    -fx-border-width: 1px; /* Border width */
+}

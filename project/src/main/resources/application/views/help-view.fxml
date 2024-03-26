@@ -39,8 +39,7 @@
                         </Label>
                         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="5.0">
                            <children>
-                              <TextField fx:id="txtHelp" prefHeight="25.0" prefWidth="792.0" promptText="Search for help..." />
-                              <Button mnemonicParsing="false" text="Search" />
+                              <TextField fx:id="txtSearch" onKeyTyped="#searchForHelp" prefHeight="25.0" prefWidth="792.0" promptText="Search for help..." />
                            </children>
                         </HBox>
                      </children>
@@ -75,8 +74,13 @@
                         <Label text="Add help info" />
                         <TextField fx:id="txtErrorCode" prefHeight="25.0" prefWidth="308.0" promptText="Error Code" />
                         <TextField fx:id="txtTitle" prefWidth="308.0" promptText="Title" />
-                        <TextArea fx:id="txtDescription" prefHeight="183.0" prefWidth="308.0" promptText="Description" VBox.vgrow="NEVER" />
-                        <Button fx:id="btnGreen" mnemonicParsing="false" onAction="#addHelpInfoToDB" text="ADD" />
+                        <TextArea fx:id="txtDescription" prefHeight="183.0" prefWidth="308.0" promptText="Description" style="-fx-border-width: 0;" VBox.vgrow="NEVER" />
+                        <HBox alignment="CENTER" prefHeight="29.0" prefWidth="200.0" spacing="15.0">
+                           <children>
+                              <Button fx:id="btnRed" mnemonicParsing="false" onAction="#closeAddPane" prefHeight="25.0" prefWidth="50.0" text="Close" />
+                              <Button fx:id="btnGreen" mnemonicParsing="false" onAction="#addHelpInfoToDB" prefWidth="50.0" text="Add" />
+                           </children>
+                        </HBox>
                      </children>
                   </VBox>
                </children>

@@ -3,6 +3,8 @@ package application.help;
 import application.DatabaseController;
 import application.SceneController;
 import application.ThemeManager;
+import application.schedule.Schedule;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,13 +21,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import static application.DatabaseController.getScheduleData;
+
 public class HelpController implements Initializable {
 
     private Stage stage;
     private Scene scene;
 
     @FXML
-    private TextField txtHelp;
+    private TextField txtSearch;
     @FXML
     private ScrollPane scrollHelp;
     @FXML
@@ -56,27 +60,7 @@ public class HelpController implements Initializable {
 
         // For loop to create the labels and text
         for (HelpInfo info : helpInfo) {
-
-            Label errorCode = new Label();
-            errorCode.setText(info.getErrorCode());
-
-            Label title = new Label();
-            title.setText(info.getTitle());
-
-            Label description = new Label();
-            description.setText(info.getDescription());
-
-            VBox vbox = new VBox();
-            vbox.setStyle("-fx-padding: 20px; -fx-spacing: 10px;");
-            vbox.getChildren().add(errorCode);
-            vbox.getChildren().add(title);
-            vbox.getChildren().add(description);
-
-            pane = new Pane();
-            pane.setStyle("-fx-background-color: #2b2b2b; -fx-padding: 20px; -fx-border-color: #3c3c3c; -fx-border-width: 1px;");
-
-            pane.getChildren().add(vbox);
-
+            Pane pane = createHelpPane(info);
             helpVbox.getChildren().add(pane);
         }
 
@@ -89,10 +73,63 @@ public class HelpController implements Initializable {
     }
 
     public void addHelpInfoToDB(ActionEvent event) throws IOException {
-        DatabaseController.addHelp(txtErrorCode.getText(), txtTitle.getText(), txtDescription.getText());
+        DatabaseController.addHelp(txtErrorCode.getText(), txtTitle.getText(), txtDescription.getText(),
+                DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()));
 
         addPane.setVisible(false);
         addPane.setDisable(true);
+    }
+
+    @FXML
+    public void closeAddPane() {
+        txtErrorCode.clear();
+        txtTitle.clear();
+        txtDescription.clear();
+
+        addPane.setVisible(false);
+        addPane.setDisable(true);
+    }
+
+    @FXML
+    private void searchForHelp() {
+        //ObservableList<Schedule> filteredData = FXCollections.observableArrayList();
+        // Get help information from the database
+        ObservableList<HelpInfo> helpInfo = DatabaseController.getHelpInfo();
+
+        // Clear existing panes before adding filtered ones
+        VBox helpVbox = new VBox();
+
+        String searchQuery = txtSearch.getText();
+
+        // Filter the help information based on the search query
+        for (HelpInfo info : helpInfo) {
+            if (info.getErrorCode().toLowerCase().contains(searchQuery) ||
+                    info.getTitle().toLowerCase().contains(searchQuery) ||
+                    info.getDescription().toLowerCase().contains(searchQuery)) {
+
+                // Create and add a pane for each matching help item
+                Pane pane = createHelpPane(info);
+                helpVbox.getChildren().add(pane);
+            }
+        }
+
+
+        // Update the scroll pane content with the filtered panes
+        scrollHelp.setContent(helpVbox);
+    }
+
+    private Pane createHelpPane(HelpInfo info) {
+        Label errorCode = new Label(info.getErrorCode());
+        Label title = new Label(info.getTitle());
+        Label description = new Label(info.getDescription());
+
+        VBox vbox = new VBox(errorCode, title, description);
+        vbox.setStyle("-fx-padding: 20px; -fx-spacing: 10px;");
+
+        Pane pane = new Pane(vbox);
+        pane.getStyleClass().add("help-pane");
+
+        return pane;
     }
 
     public void openDashboard(ActionEvent event) throws IOException {

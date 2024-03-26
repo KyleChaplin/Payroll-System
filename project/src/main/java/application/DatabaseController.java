@@ -280,7 +280,8 @@ public class DatabaseController {
                             "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
                             "TITLE VARCHAR2(250) NOT NULL, " +
                             "DESCRIPTION VARCHAR2(1000) NOT NULL," +
-                            "ERROR_CODE VARCHAR2(25) NOT NULL" +
+                            "ERROR_CODE VARCHAR2(25) NOT NULL," +
+                            "ADDED_BY VARCHAR2(100) NOT NULL" +
                             ")");
                 } catch (SQLException e) {
                     logger.error("Failed to create " + tableName + " ", e);
@@ -393,8 +394,6 @@ public class DatabaseController {
             // Add cases for other tables...
         }
     }
-
-
 
     public static void updateEmployeeProfile(String employeeId, String firstName, String lastName, String email,
                                              String phone, String niNumber, String address1, String address2,
@@ -931,13 +930,14 @@ public class DatabaseController {
     }
 
     // Method to add help info
-    public static void addHelp(String errorCode, String Title, String Description) {
+    public static void addHelp(String errorCode, String Title, String Description, String addedBy) {
         // Add record
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "INSERT INTO NPS_HELP_INFO (ERROR_CODE, TITLE, DESCRIPTION) VALUES (?, ?, ?)")) {
+                "INSERT INTO NPS_HELP_INFO (ERROR_CODE, TITLE, DESCRIPTION, ADDED_BY) VALUES (?, ?, ?, ?)")) {
             preparedStatement.setString(1, errorCode);
             preparedStatement.setString(2, Title);
             preparedStatement.setString(3, Description);
+            preparedStatement.setString(4, addedBy);
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
@@ -947,6 +947,26 @@ public class DatabaseController {
             }
         } catch (SQLException e) {
             logger.error("Failure during SQL query - adding help", e);
+        }
+    }
+
+    // Method to update help info
+    public static void updateHelp(String errorCode, String title, String description, String addedBy) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "UPDATE NPS_HELP_INFO SET TITLE = ?, DESCRIPTION = ?, ADDED_BY = ? WHERE ERROR_CODE = ?")) {
+            preparedStatement.setString(1, title);
+            preparedStatement.setString(2, description);
+            preparedStatement.setString(3, addedBy);
+            preparedStatement.setString(4, errorCode);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                logger.info("Help info updated successfully.");
+            } else {
+                logger.info("No records updated. Help info with error code '" + errorCode + "' not found.");
+            }
+        } catch (SQLException e) {
+            logger.error("Failure during SQL query - updating help", e);
         }
     }
 
@@ -1431,8 +1451,9 @@ public class DatabaseController {
                 String title = resultSet.getString("TITLE");
                 String description = resultSet.getString("DESCRIPTION");
                 String errorCode = resultSet.getString("ERROR_CODE");
+                String addedBy = resultSet.getString("ADDED_BY");
 
-                HelpInfo info = new HelpInfo(errorCode, title, description);
+                HelpInfo info = new HelpInfo(errorCode, title, description, addedBy);
 
                 data.add(info);
             }
