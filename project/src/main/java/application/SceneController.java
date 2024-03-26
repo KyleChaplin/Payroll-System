@@ -49,11 +49,6 @@ public class SceneController {
         }
     }
 
-    public void closeApplication(ActionEvent event) {
-        Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        stage.close();
-    }
-
     public int checkLoginDetails() {
         int loginStatus;
 
@@ -87,7 +82,5 @@ public class SceneController {
         stg.setTitle("Payroll - " + name);
         stg.setScene(scn);
         stg.show();
-
-        //System.out.println("Opening " + name);
     }
 }

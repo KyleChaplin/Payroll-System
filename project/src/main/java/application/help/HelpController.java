@@ -115,7 +115,7 @@ public class HelpController implements Initializable {
         SceneController.openScene(event, "profile", stage, scene);
     }
 
-    public void openTimeoff(ActionEvent event) throws IOException {
+    public void openAdmin(ActionEvent event) throws IOException {
         SceneController.openScene(event, "admin", stage, scene);
     }
 

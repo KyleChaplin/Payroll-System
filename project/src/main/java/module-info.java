@@ -24,6 +24,7 @@ module org.example.project {
     exports application.profile;
     opens application.profile to javafx.fxml;
     exports application.admin;
+    opens application.admin to javafx.fxml;
     exports application.help;
     opens application.help to javafx.fxml;
 }

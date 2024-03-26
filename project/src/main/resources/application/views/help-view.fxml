@@ -198,7 +198,7 @@
                   </Button>
                </children>
             </VBox>
-            <Button fx:id="btnAdmin" alignment="CENTER" contentDisplay="RIGHT" layoutY="709.0" mnemonicParsing="false" onAction="#openTimeoff" prefHeight="60.0" prefWidth="63.0" textAlignment="CENTER" textFill="WHITE">
+            <Button fx:id="btnAdmin" alignment="CENTER" contentDisplay="RIGHT" layoutY="709.0" mnemonicParsing="false" onAction="#openAdmin" prefHeight="60.0" prefWidth="63.0" textAlignment="CENTER" textFill="WHITE" visible="false">
                <font>
                   <Font size="18.0" />
                </font>
