@@ -11,9 +11,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 
 import application.DatabaseController;
-import application.employees.Person;
 import application.payroll.DetailedPayroll;
-import javafx.scene.chart.PieChart;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;

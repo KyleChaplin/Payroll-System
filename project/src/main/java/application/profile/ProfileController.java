@@ -9,14 +9,26 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.time.format.TextStyle;
+import java.time.LocalDate;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static application.DatabaseController.getEmployeeInfo;
 
@@ -79,6 +91,11 @@ public class ProfileController implements Initializable {
     private Button btnGreen; // This button will either be "Edit" or "Update"
     @FXML
     private Button btnAdmin;
+    @FXML
+    private VBox vBoxDownload;
+    @FXML
+    private AnchorPane anchorPane;
+
     private String id;
 
     @Override
@@ -125,6 +142,103 @@ public class ProfileController implements Initializable {
         txtELastName.setText(person.getELastName());
         txtEMobile.setText(person.getEMobile());
         txtERelationship.setText(person.getERelationship());
+
+        // Generate download links for payroll
+        generateDownloadLinks();
+    }
+
+    // Method to generate download links for payroll PDFs
+    public void generateDownloadLinks() {
+        // Get the past 6 months and years
+        String[][] pastSixMonths = getPastSixMonths();
+
+        // Directory
+        String savePath = "src/main/resources/PDF/";
+        String employeeDirectory = savePath + "/" + DatabaseController.getCurrentLoggedInEmployeeId();
+
+        // Create a VBox to hold the download links
+        VBox vbox = new VBox();
+
+        // Iterate over the past 6 months
+        for (String[] monthAndYear : pastSixMonths) {
+            // Extract month and year
+            String month = monthAndYear[0];
+            String year = monthAndYear[1];
+
+            // Construct the PDF path
+            String pdfPath = employeeDirectory + "/" + month + "_" + year + ".pdf";
+
+            // Check if the PDF file exists
+            Path path = Paths.get(pdfPath);
+            if (Files.exists(path)) {
+                // Create a download link for the PDF
+                Hyperlink downloadLink = new Hyperlink(month + " " + year);
+                downloadLink.setOnAction(this::handleDownload);
+
+                // Add the download link to the VBox
+                vBoxDownload.getChildren().add(downloadLink);
+            }
+        }
+    }
+
+    // Method to handle download action when a download link is clicked
+    private void handleDownload(ActionEvent event) {
+        // Get the clicked hyperlink
+        Hyperlink clickedLink = (Hyperlink) event.getSource();
+
+        // Extract month and year from the hyperlink text
+        String text = clickedLink.getText();
+        String[] parts = text.split(" ");
+        String month = parts[0];
+        String year = parts[1];
+
+        // Construct the PDF path
+        String savePath = "src/main/resources/PDF/";
+        String employeeDirectory = savePath + "/" + DatabaseController.getCurrentLoggedInEmployeeId();
+        String pdfPath = employeeDirectory + "/" + month + "_" + year + ".pdf";
+
+        // Prompt the user to select a download location
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Select Download Location");
+
+        File selectedDirectory = directoryChooser.showDialog(stage);
+
+        // If a valid directory is selected
+        if (selectedDirectory != null) {
+            // Construct the destination file path
+            String destinationPath = selectedDirectory.getAbsolutePath() + File.separator + month + "_" + year + ".pdf";
+
+            // Copy the PDF file to the selected directory
+            try {
+                Files.copy(Paths.get(pdfPath), Paths.get(destinationPath), StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("File downloaded successfully to: " + destinationPath);
+            } catch (Exception e) {
+                System.out.println("Error downloading file: " + e.getMessage());
+            }
+        }
+    }
+
+    // Method to get the past 6 months
+    private static String[][] getPastSixMonths() {
+        String[][] pastSixMonths = new String[6][2];
+
+        // Get the current date
+        LocalDate currentDate = LocalDate.now();
+
+        // Iterate for the past 6 months
+        for (int i = 0; i < 6; i++) {
+            // Subtract i months from the current date
+            LocalDate pastDate = currentDate.minusMonths(i);
+
+            // Extract the month and year
+            String month = pastDate.getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault()).toLowerCase();
+            int year = pastDate.getYear();
+
+            pastSixMonths[i][0] = month;
+            pastSixMonths[i][1] = Integer.toString(year);
+        }
+
+        return pastSixMonths;
     }
 
     public void btnToggleUpdate() {
