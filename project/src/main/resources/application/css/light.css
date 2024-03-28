@@ -282,3 +282,70 @@
     -fx-border-color: #cccccc; /* Border color */
     -fx-border-width: 1px; /* Border width */
 }
+
+/* Date picker */
+.date-picker {
+    -fx-background-color: #FFFFFF; /* White background */
+}
+
+.date-picker > .arrow-button {
+    -fx-background-color: #FFFFFF; /* White background */
+}
+
+.date-picker > .arrow-button:hover {
+    -fx-background-color: #E6E6E6; /* Light gray on hover */
+}
+
+.date-picker > .arrow-button:pressed {
+    -fx-background-color: #CCCCCC; /* Gray when pressed */
+}
+
+.date-picker > .text-field {
+    -fx-background-color: #FFFFFF; /* White background */
+    -fx-text-fill: #555555; /* Dark gray text color */
+    -fx-background-radius: 15;
+    -fx-border-width: 2;
+    -fx-border-radius: 15;
+    -fx-border-color: #3498DB; /* Light blue border */
+}
+
+.date-picker > .text-field:hover {
+    -fx-border-color: #2980B9; /* Darker blue on hover */
+}
+
+.date-picker > .text-field:focused {
+    -fx-border-color: #2980B9; /* Darker blue when focused */
+    -fx-border-width: 2;
+}
+
+.date-picker .day-cell {
+    -fx-background-color: #FFFFFF; /* White background */
+    -fx-text-fill: #555555; /* Dark gray text color */
+}
+
+.date-picker .day-cell:hover {
+    -fx-background-color: #D3D3D3; /* Light gray on hover */
+}
+
+.date-picker .day-cell:selected {
+    -fx-background-color: #3498DB; /* Light blue on selection */
+    -fx-text-fill: #FFFFFF; /* White text color */
+}
+
+.date-picker .date-picker-popup {
+    -fx-background-color: #FFFFFF; /* White background */
+}
+
+.date-picker .calendar-grid {
+    -fx-background-color: #FFFFFF; /* White background */
+}
+
+.date-picker-popup > .month-year-pane {
+    -fx-base: #FFFFFF; /* White background */
+    -fx-mark-highlight-color: -fx-light-text-color;
+}
+
+.date-picker .week-number-cell {
+    -fx-background-color: #FFFFFF; /* White background */
+    -fx-text-fill: #555555; /* Dark gray text color */
+}
