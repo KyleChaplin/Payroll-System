@@ -68,6 +68,8 @@ public class ProfileController implements Initializable {
     @FXML
     private TextField txtContractType;
     @FXML
+    private TextField txtContractHours;
+    @FXML
     private TextField txtLocation;
     @FXML
     private TextField txtAddress1;
@@ -129,6 +131,7 @@ public class ProfileController implements Initializable {
         txtJobTitle.setText(person.getJobTitle());
         txtDepartment.setText(person.getDepartment());
         txtContractType.setText(person.getContractType());
+        txtContractHours.setText(person.getContractedHours());
         txtLocation.setText(person.getLocation());
 
         // Populate the text fields with the address information

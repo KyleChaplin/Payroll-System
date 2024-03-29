@@ -9,16 +9,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.net.URL;
-import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
@@ -94,6 +91,7 @@ public class AdminController implements Initializable {
     public void showEmailPane() {
         changePane("paneEmailServer");
 
+        
         txtEmail.setText(DatabaseController.getEmailInfo());
         txtPassword.setText(DatabaseController.getPasswordInfo());
         dateEmailDate.setValue(formatDate(DatabaseController.getEmailDateInfo()));

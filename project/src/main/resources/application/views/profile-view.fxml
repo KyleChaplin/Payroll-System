@@ -210,6 +210,11 @@
                                                 <Font size="16.0" />
                                              </font>
                                           </Label>
+                                          <Label text="Hours:">
+                                             <font>
+                                                <Font size="16.0" />
+                                             </font>
+                                          </Label>
                                           <Label text="Location:">
                                              <font>
                                                 <Font size="16.0" />
@@ -222,6 +227,7 @@
                                           <TextField fx:id="txtJobTitle" editable="false" />
                                           <TextField fx:id="txtDepartment" editable="false" />
                                           <TextField fx:id="txtContractType" editable="false" />
+                                          <TextField fx:id="txtContractHours" editable="false" />
                                           <TextField fx:id="txtLocation" editable="false" />
                                        </children>
                                     </VBox>

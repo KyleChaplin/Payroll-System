@@ -112,7 +112,12 @@ public class DatabaseController {
             currentLoggedInEmployeeId = "1";
 
             addEmployee("admin", "admin", "admin", "-", "0.0", "-",
-                    0, "admin", "delete me", "IT", "admin", true);
+                    0, "admin", "delete me", "-1", "IT",
+                    "admin", true);
+        }
+
+        // Check if emailInfo exists
+        if (!checkEmailInfo()) {
             // Create base email info
             // Get current date and time
             java.util.Date date = new java.util.Date();
@@ -120,6 +125,8 @@ public class DatabaseController {
             String formattedDate = new java.text.SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(timestamp);
 
             addEmailInfo("your_email", "your_password", formattedDate);
+
+            logger.info("Email info generated.");
         }
 
         // Close connection to Oracle Database
@@ -193,6 +200,7 @@ public class DatabaseController {
                             "NI_NUMBER VARCHAR2(20) NOT NULL," +
                             "LOCATION VARCHAR2(100) NOT NULL," +
                             "CONTRACT_TYPE VARCHAR2(50) NOT NULL," +
+                            "CONTRACT_HOURS DECIMAL (10, 2) NOT NULL," +
                             "DEPARTMENT VARCHAR2(20) NOT NULL," +
                             "JOB_TITLE VARCHAR2(20) NOT NULL" +
                             ")");
@@ -558,7 +566,7 @@ public class DatabaseController {
     // Method to update employee records
     public static void updateEmployee(String employeeId, String firstName, String lastName, String email, String phone,
                                       String salary, String niNumber, int accessLevel, String location,
-                                      String contractType, String department, String jobTitle) {
+                                      String contractType, String contractHours, String department, String jobTitle) {
         // Check if the access level is being updated
         String oldAccessLevel = getAccessLevel(email); // Retrieve the old access level from the database
         boolean accessLevelUpdated = String.valueOf(accessLevel) != oldAccessLevel;
@@ -608,7 +616,8 @@ public class DatabaseController {
         // Update the employee record
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "UPDATE NPS_EMPLOYEE SET FIRST_NAME = ?, LAST_NAME = ?, EMAIL = ?, PHONE = ?, SALARY = ?, " +
-                        "NI_NUMBER = ?, LOCATION = ?, CONTRACT_TYPE = ?, DEPARTMENT = ?, JOB_TITLE = ? WHERE ID = ?")) {
+                        "NI_NUMBER = ?, LOCATION = ?, CONTRACT_TYPE = ?, CONTRACT_HOURS = ?, DEPARTMENT = ?, J" +
+                        "OB_TITLE = ? WHERE ID = ?")) {
             BigDecimal salaryDecimal = new BigDecimal(salary);
 
             preparedStatement.setString(1, firstName);
@@ -619,9 +628,10 @@ public class DatabaseController {
             preparedStatement.setString(6, niNumber);
             preparedStatement.setString(7, location);
             preparedStatement.setString(8, contractType);
-            preparedStatement.setString(9, department);
-            preparedStatement.setString(10, jobTitle);
-            preparedStatement.setString(11, employeeId);
+            preparedStatement.setString(9, contractHours);
+            preparedStatement.setString(10, department);
+            preparedStatement.setString(11, jobTitle);
+            preparedStatement.setString(12, employeeId);
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
@@ -775,14 +785,14 @@ public class DatabaseController {
     // Method to add an employee record
     public static void addEmployee(String firstName, String lastName, String email, String phone, String salary,
                                    String niNumber, int accessLevel, String location, String contractType,
-                                   String department, String jobTitle, boolean firstLogin) {
+                                   String contactHours, String department, String jobTitle, boolean firstLogin) {
         // Establish the database connection
         getConnectionToDB();
 
         // Add employee record
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO NPS_EMPLOYEE (FIRST_NAME, LAST_NAME, EMAIL, PHONE, SALARY, NI_NUMBER, LOCATION," +
-                        "CONTRACT_TYPE, DEPARTMENT, JOB_TITLE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                        "CONTRACT_TYPE, CONTRACT_HOURS, DEPARTMENT, JOB_TITLE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
             preparedStatement.setString(1, firstName);
             preparedStatement.setString(2, lastName);
             preparedStatement.setString(3, email);
@@ -791,8 +801,9 @@ public class DatabaseController {
             preparedStatement.setString(6, niNumber);
             preparedStatement.setString(7, location);
             preparedStatement.setString(8, contractType);
-            preparedStatement.setString(9, department);
-            preparedStatement.setString(10, jobTitle);
+            preparedStatement.setString(9, contactHours);
+            preparedStatement.setString(10, department);
+            preparedStatement.setString(11, jobTitle);
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
@@ -808,7 +819,8 @@ public class DatabaseController {
 
                 // Add payroll info for the employee
                 addPayrollInfo(String.valueOf(employeeId), "Date", "Month", "0",
-                        "0", "0", "0", "0", "0", "0");
+                        "0", "0", "0", "0", "0",
+                        "0", "0");
 
                 // Add emergency contact info for the employee
                 addEmergencyDetails("First Name", "Last Name", "Mobile", "Relationship");
@@ -816,8 +828,11 @@ public class DatabaseController {
                 // Add schedule info for the employee
                 initializeScheduleForAllEmployees();
 
+                if (!firstLogin)
+                {
+                    SingleEmail.sendAccountCreationEmail(email, firstName);
+                }
 
-                SingleEmail.sendAccountCreationEmail(email, firstName);
             } else {
                 logger.info("Failed to add employee.");
             }
@@ -879,22 +894,26 @@ public class DatabaseController {
     }
 
     // Method to add payroll info
-    public static void addPayrollInfo(String employeeId, String payDate, String month, String hoursWorked,
+    public static void addPayrollInfo(String employeeId, String payDate, String month, String year, String hoursWorked,
                                       String pension, String overtimeHours, String overtimePay, String grossPay,
                                       String taxes, String netPay) {
         // Add record
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "INSERT INTO NPS_PAYROLL (EMPLOYEE_ID, PAY_DATE, MONTH, HOURS_WORKED, PENSION, OVERTIME_HOURS, OVERTIME_PAY, GROSS_PAY, TAXES, NET_PAY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                "INSERT INTO NPS_PAYROLL (EMPLOYEE_ID, PAY_DATE, MONTH, YEAR, HOURS_WORKED, PENSION, " +
+                        "OVERTIME_HOURS, OVERTIME_PAY, GROSS_PAY, TAXES, NET_PAY) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+
             preparedStatement.setInt(1, Integer.parseInt(employeeId));
             preparedStatement.setString(2, payDate);
             preparedStatement.setString(3, month);
-            preparedStatement.setString(4, hoursWorked);
-            preparedStatement.setString(5, pension);
-            preparedStatement.setString(6, overtimeHours);
-            preparedStatement.setString(7, overtimePay);
-            preparedStatement.setString(8, grossPay);
-            preparedStatement.setString(9, taxes);
-            preparedStatement.setString(10, netPay);
+            preparedStatement.setString(4, year);
+            preparedStatement.setString(5, hoursWorked);
+            preparedStatement.setString(6, pension);
+            preparedStatement.setString(7, overtimeHours);
+            preparedStatement.setString(8, overtimePay);
+            preparedStatement.setString(9, grossPay);
+            preparedStatement.setString(10, taxes);
+            preparedStatement.setString(11, netPay);
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
@@ -1188,6 +1207,21 @@ public class DatabaseController {
         return loginExists;
     }
 
+    // Method to check if there is email info in the database
+    private static boolean checkEmailInfo() throws SQLException {
+        boolean emailExists = false;
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_EMAIL_INFO")) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            emailExists = resultSet.next();
+        } catch (SQLException e) {
+            logger.error("Failure during SQL query - checking if email info exists", e);
+        }
+
+        return emailExists;
+    }
+
     // Method to get all employees from the database and return an ObservableList for Employees table
     public static ObservableList<Person> getAllEmployees() {
         ObservableList<Person> data = FXCollections.observableArrayList();
@@ -1206,6 +1240,7 @@ public class DatabaseController {
                 String niNumber = resultSet.getString("NI_NUMBER");
                 String location = resultSet.getString("LOCATION");
                 String contractType = resultSet.getString("CONTRACT_TYPE");
+                String contractHours = resultSet.getString("CONTRACT_HOURS");
                 String department = resultSet.getString("DEPARTMENT");
                 String jobTitle = resultSet.getString("JOB_TITLE");
 
@@ -1213,7 +1248,7 @@ public class DatabaseController {
                 String accessLevel = getAccessLevel(email);
 
                 Person person = new Person(id, firstName, lastName, email, phone, salary, accessLevel, niNumber,
-                        location, contractType, department, jobTitle);
+                        location, contractType, contractHours, department, jobTitle);
 
                 data.add(person);
             }
@@ -1243,7 +1278,8 @@ public class DatabaseController {
                 String accessLevel = getAccessLevel(email);
 
                 Person person = new Person(id, firstName, lastName, email, null, null,
-                        null, niNumber, null, null, null, null);
+                        null, niNumber, null, null, null,
+                        null, null);
 
                 // Fetch additional details
                 fetchAdditionalDetails(person);
@@ -1287,6 +1323,7 @@ public class DatabaseController {
                 String niNumber = resultSet.getString("NI_NUMBER");
                 String location = resultSet.getString("LOCATION");
                 String contractType = resultSet.getString("CONTRACT_TYPE");
+                String contractHours = resultSet.getString("CONTRACT_HOURS");
                 String department = resultSet.getString("DEPARTMENT");
                 String jobTitle = resultSet.getString("JOB_TITLE");
 
@@ -1294,7 +1331,7 @@ public class DatabaseController {
                 String accessLevel = getAccessLevel(email);
 
                 person = new Person(id, firstName, lastName, email, phone, salary, accessLevel, niNumber,
-                        location, contractType, department, jobTitle);
+                        location, contractType, contractHours, department, jobTitle);
             }
         } catch (SQLException e) {
             logger.error("Failure during SQL query - getting employee data", e);
@@ -1561,8 +1598,26 @@ public class DatabaseController {
         return data;
     }
 
-    // Methods to read from payroll table
+    // Method to get only the contracted hours for an employee
+    public static double getContractedHours(String employeeID) {
+        double hours = -2.0;
 
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT CONTRACT_HOURS FROM NPS_EMPLOYEE WHERE ID = ?")) {
+            preparedStatement.setString(1, employeeID);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                hours = resultSet.getDouble("CONTRACT_HOURS");
+            }
+
+        } catch (SQLException e) {
+            logger.error("Failure during SQL query - getting contracted hours", e);
+        }
+        return hours;
+    }
+
+    // Methods to read from payroll table
     // Retrieve payroll overview data for a specific month
     public static ObservableList<PayrollOverview> getPayrollOverviewForMonth() {
         ObservableList<PayrollOverview> data = FXCollections.observableArrayList();

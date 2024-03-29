@@ -17,6 +17,8 @@ public class Person {
     private String department;
     private String location;
     private String contractType;
+    private String contractedHours;
+
     private String address1;
     private String address2;
     private String city;
@@ -33,8 +35,9 @@ public class Person {
     private String tax;
     private String netPay;
 
-    public Person(String employeeID, String firstName, String lastName, String email, String phone, String hourlySalary, String accessLevel,
-                  String niNumber, String location, String contractType, String department, String jobTitle) {
+    public Person(String employeeID, String firstName, String lastName, String email, String phone, String hourlySalary,
+                  String accessLevel, String niNumber, String location, String contractType, String contractedHours,
+                  String department, String jobTitle) {
         this.employeeID = employeeID;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -45,6 +48,7 @@ public class Person {
         this.hourlySalary = hourlySalary;
         this.location = location;
         this.contractType = contractType;
+        this.contractedHours = contractedHours;
         this.department = department;
         this.jobTitle = jobTitle;
 
@@ -134,6 +138,10 @@ public class Person {
 
     public String getContractType() {
         return contractType;
+    }
+
+    public String getContractedHours() {
+        return contractedHours;
     }
 
     public String getAddress1() {

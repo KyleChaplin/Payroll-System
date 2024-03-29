@@ -21,6 +21,9 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import static application.DatabaseController.getScheduleData;
@@ -32,12 +35,6 @@ public class ScheduleController implements Initializable {
 
     @FXML
     private TableView<Schedule> Week0Table;
-    @FXML
-    private TableView<Schedule> Week1Table;
-    @FXML
-    private TableView<Schedule> Week2Table;
-    @FXML
-    private TableView<Schedule> Week3Table;
     @FXML
     private Button btnDark;
     @FXML
@@ -226,7 +223,7 @@ public class ScheduleController implements Initializable {
         txtSatEnd.setText(schedule.getSaturdayEnd());
         txtSunStart.setText(schedule.getSundayStart());
         txtSunEnd.setText(schedule.getSundayEnd());
-        //txtContractHours.setText();   // TODO: Get contracted hours from database
+        txtContractHours.setText(String.valueOf(DatabaseController.getContractedHours(schedule.getEmployeeID())));
         txtPlannedHours.setText(String.valueOf(calculateTotalHoursWorked(schedule)));
     }
 
@@ -377,11 +374,97 @@ public class ScheduleController implements Initializable {
         Schedule schedule = createScheduleFromTextFields();
         DatabaseController.updateSchedule(schedule);
 
-        // TODO: Add payroll data for whole month when data is updated
-        //DatabaseController.addPayrollInfo();
-
         // Refresh the table
         loadTableData();
+
+        calculatePayroll(schedule);
+
+        // Clear all fields
+        btnClear();
+    }
+
+    private void calculatePayroll(Schedule schedule) {
+        // Update the payroll info for employees
+        // Payroll information for all 4 weeks combined
+        String employeeId = schedule.getEmployeeID();
+        String payDate = DatabaseController.getEmailDateInfo();
+        String month = getCurrentMonthString();
+        String year = String.valueOf(getCurrentYear());
+        double totalHoursWorked = 0.0;
+        double totalPension = 0.0;
+        double totalOvertimeHours = 0.0;
+        double totalOvertimePay = 0.0;
+        double totalGrossPay = 0.0;
+        double totalTaxes = 0.0;
+        double totalNetPay = 0.0;
+
+        // Iterate over each week to aggregate data
+        for (int i = 0; i <= 3; i++) {
+            ObservableList<Schedule> scheduleData = DatabaseController.getScheduleData(String.valueOf(i));
+            for (Schedule s : scheduleData) {
+                s.setTotalHoursWorked(s.getTotalHoursWorked() + calculateTotalHoursWorked(s));
+                totalHoursWorked += s.getTotalHoursWorked();
+
+                totalPension += s.getTotalPensionPaid();
+                totalOvertimeHours += s.getTotalOvertimeHours();
+                totalOvertimePay += s.getTotalOvertimePay();
+                totalGrossPay += s.getTotalGrossPay();
+            }
+        }
+
+        // Output accumulated values to console
+        System.out.println("Accumulated values:");
+        System.out.println("Total Hours Worked: " + totalHoursWorked);
+        System.out.println("Total Pension: " + totalPension);
+        System.out.println("Total Overtime Hours: " + totalOvertimeHours);
+        System.out.println("Total Overtime Pay: " + totalOvertimePay);
+        System.out.println("Total Gross Pay: " + totalGrossPay);
+
+        // Calculate taxes and net pay
+        double personalAllowance = 12570.0; // Personal allowance threshold
+        double basicRateThreshold = 50270.0; // Basic rate tax threshold
+        double higherRateThreshold = 125140.0; // Higher rate tax threshold
+
+        // Calculate taxable income
+        double taxableIncome = Math.max(totalGrossPay - personalAllowance, 0);
+
+        // Calculate tax based on different tax brackets
+        double basicRate = Math.min(Math.max(taxableIncome, 0), basicRateThreshold) * 0.20;
+        double higherRate = Math.min(Math.max(taxableIncome - basicRateThreshold, 0), higherRateThreshold - basicRateThreshold) * 0.40;
+        double additionalRate = Math.max(taxableIncome - higherRateThreshold, 0) * 0.45;
+
+        // Calculate total tax
+        totalTaxes = basicRate + higherRate + additionalRate;
+
+        // Calculate net pay after taxes
+        totalNetPay = totalGrossPay - totalTaxes;
+
+        // Add payroll info for all 4 weeks combined
+        /*DatabaseController.addPayrollInfo(employeeId, payDate, month, year,
+                String.valueOf(totalHoursWorked), String.valueOf(totalPension),
+                String.valueOf(totalOvertimeHours), String.valueOf(totalOvertimePay),
+                String.valueOf(totalGrossPay), String.valueOf(totalTaxes),
+                String.valueOf(totalNetPay));*/
+    }
+
+    private static String getCurrentMonthString() {
+        // Get the current date
+        LocalDate currentDate = LocalDate.now();
+
+        // Format the current date to get the month name
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM", Locale.ENGLISH);
+
+        return currentDate.format(formatter);
+    }
+
+    public static int getCurrentYear() {
+        // Get the current date
+        LocalDate currentDate = LocalDate.now();
+
+        // Extract the current year
+        int currentYear = currentDate.getYear();
+
+        return currentYear;
     }
 
     @FXML

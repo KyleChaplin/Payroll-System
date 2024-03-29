@@ -45,6 +45,8 @@ public class EmployeeController implements Initializable {
     @FXML
     private TableColumn<Person, String> ContractType;
     @FXML
+    private TableColumn<Person, String> ContractedHours;
+    @FXML
     private TableColumn<Person, String> Department;
     @FXML
     private TableColumn<Person, String> JobTitle;
@@ -66,6 +68,8 @@ public class EmployeeController implements Initializable {
     private TextField txtLocation;
     @FXML
     private TextField txtContractType;
+    @FXML
+    private TextField txtContractedHours;
     @FXML
     private TextField txtDepartment;
     @FXML
@@ -106,6 +110,7 @@ public class EmployeeController implements Initializable {
         NiNumber.setCellValueFactory(new PropertyValueFactory<Person, String>("NiNumber"));
         Location.setCellValueFactory(new PropertyValueFactory<Person, String>("Location"));
         ContractType.setCellValueFactory(new PropertyValueFactory<Person, String>("ContractType"));
+        ContractedHours.setCellValueFactory(new PropertyValueFactory<Person, String>("ContractedHours"));
         Department.setCellValueFactory(new PropertyValueFactory<Person, String>("Department"));
         JobTitle.setCellValueFactory(new PropertyValueFactory<Person, String>("JobTitle"));
 
@@ -132,7 +137,8 @@ public class EmployeeController implements Initializable {
                         txtPhone.getText().isEmpty() || txtNiNumber.getText().isEmpty() ||
                         cboAccessLevel.getSelectionModel().isEmpty() || txtHourlySalary.getText().isEmpty() ||
                         txtLocation.getText().isEmpty() || txtContractType.getText().isEmpty() ||
-                        txtDepartment.getText().isEmpty() || txtJobTitle.getText().isEmpty()) {
+                        txtContractedHours.getText().isEmpty() || txtDepartment.getText().isEmpty() ||
+                        txtJobTitle.getText().isEmpty()) {
                     // Show an error message
                     txtEmptyError.setText("Fields should not be empty!");
                 } else {
@@ -177,8 +183,8 @@ public class EmployeeController implements Initializable {
 
                 // Once input validation is passed, add the employee
                 addEmployee(txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(), txtPhone.getText(),
-                        txtHourlySalary.getText(), txtNiNumber.getText(),
-                        Integer.parseInt((String)cboAccessLevel.getValue()), txtLocation.getText(), txtContractType.getText(),
+                        txtHourlySalary.getText(), txtNiNumber.getText(), Integer.parseInt((String)cboAccessLevel.getValue()),
+                        txtLocation.getText(), txtContractType.getText(), txtContractedHours.getText(),
                         txtDepartment.getText(), txtJobTitle.getText(),false);
 
                 // Clear the text fields and refresh the table
@@ -199,7 +205,8 @@ public class EmployeeController implements Initializable {
                 txtPhone.getText().isEmpty() || txtNiNumber.getText().isEmpty() ||
                 cboAccessLevel.getSelectionModel().isEmpty() || txtHourlySalary.getText().isEmpty() ||
                 txtLocation.getText().isEmpty() || txtContractType.getText().isEmpty() ||
-                txtDepartment.getText().isEmpty() || txtJobTitle.getText().isEmpty()) {
+                txtContractedHours.getText().isEmpty() || txtDepartment.getText().isEmpty()
+                || txtJobTitle.getText().isEmpty()) {
             // Show an error message
             txtEmptyError.setText("Fields should not be empty!");
         } else {
@@ -208,6 +215,7 @@ public class EmployeeController implements Initializable {
             String phone = txtPhone.getText();
             String niNumber = txtNiNumber.getText();
             String hourlySalary = txtHourlySalary.getText();
+            double contractedHours = Double.parseDouble(txtContractedHours.getText());
 
             if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
                 txtEmptyError.setText("Invalid email address!");
@@ -241,12 +249,19 @@ public class EmployeeController implements Initializable {
                 return;
             }
 
+            // Checks if contracted hours is negative
+            if (contractedHours < 0) {
+                txtEmptyError.setText("Contracted hours cannot be negative!");
+                return;
+            }
+
             // Once input validation is passed, update the employee
             // Update the employee
             updateEmployee(txtID.getText(), txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(),
                     txtPhone.getText(), txtHourlySalary.getText(), txtNiNumber.getText(),
                     Integer.parseInt((String)cboAccessLevel.getValue()), txtLocation.getText(),
-                    txtContractType.getText(), txtDepartment.getText(), txtJobTitle.getText());
+                    txtContractType.getText(), txtContractedHours.getText(), txtDepartment.getText(),
+                    txtJobTitle.getText());
 
             btnClear();
             btnRefresh();
@@ -284,6 +299,7 @@ public class EmployeeController implements Initializable {
         cboAccessLevel.setValue(null);
         txtLocation.clear();
         txtContractType.clear();
+        txtContractedHours.clear();
         txtDepartment.clear();
         txtJobTitle.clear();
         txtSearch.clear();
@@ -324,6 +340,7 @@ public class EmployeeController implements Initializable {
             txtNiNumber.setText(person.getNiNumber());
             txtLocation.setText(person.getLocation());
             txtContractType.setText(person.getContractType());
+            txtContractedHours.setText(person.getContractedHours());
             txtDepartment.setText(person.getDepartment());
             txtJobTitle.setText(person.getJobTitle());
         }

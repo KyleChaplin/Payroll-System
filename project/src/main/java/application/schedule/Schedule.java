@@ -20,6 +20,13 @@ public class Schedule {
     private String saturdayEnd;
     private String sundayStart;
     private String sundayEnd;
+    private double totalHoursWorked;
+    private double totalPensionPaid;
+    private double totalOvertimeHours;
+    private double totalOvertimePay;
+    private double totalGrossPay;
+    private double totalTaxesPaid;
+    private double totalNetEarned;
 
     public Schedule(String name, String employeeID) {
         this.name = name;
@@ -183,5 +190,64 @@ public class Schedule {
 
     public String getSundayEnd() {
         return sundayEnd;
+    }
+
+
+    // Setters and getters for total
+
+    public double getTotalHoursWorked() {
+        return totalHoursWorked;
+    }
+
+    public void setTotalHoursWorked(double totalHoursWorked) {
+        this.totalHoursWorked = totalHoursWorked;
+    }
+
+    public double getTotalPensionPaid() {
+        return totalPensionPaid;
+    }
+
+    public void setTotalPensionPaid(double totalPensionPaid) {
+        this.totalPensionPaid = totalPensionPaid;
+    }
+
+    public double getTotalOvertimeHours() {
+        return totalOvertimeHours;
+    }
+
+    public void setTotalOvertimeHours(double totalOvertimeHours) {
+        this.totalOvertimeHours = totalOvertimeHours;
+    }
+
+    public double getTotalOvertimePay() {
+        return totalOvertimePay;
+    }
+
+    public void setTotalOvertimePay(double totalOvertimePay) {
+        this.totalOvertimePay = totalOvertimePay;
+    }
+
+    public double getTotalGrossPay() {
+        return totalGrossPay;
+    }
+
+    public void setTotalGrossPay(double totalGrossPay) {
+        this.totalGrossPay = totalGrossPay;
+    }
+
+    public double getTotalTaxesPaid() {
+        return totalTaxesPaid;
+    }
+
+    public void setTotalTaxesPaid(double totalTaxesPaid) {
+        this.totalTaxesPaid = totalTaxesPaid;
+    }
+
+    public double getTotalNetEarned() {
+        return totalNetEarned;
+    }
+
+    public void setTotalNetEarned(double totalNetEarned) {
+        this.totalNetEarned = totalNetEarned;
     }
 }
