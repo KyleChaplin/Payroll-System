@@ -3,14 +3,16 @@ package application.payroll;
 public class PayrollOverview {
     private String payDay;
     private String month;
-    private String total;
-    private String noEmployees;
+    private double total;
+    private int noEmployees;
+    private int year;
 
-    public PayrollOverview(String payDay, String month, String total, String noEmployees) {
+    public PayrollOverview(String month, int year, String payDay, double total, int noEmployees) {
         this.payDay = payDay;
         this.month = month;
         this.total = total;
         this.noEmployees = noEmployees;
+        this.year = year;
     }
 
     public String getPayDay() {
@@ -21,12 +23,16 @@ public class PayrollOverview {
         return month;
     }
 
-    public String getTotal() {
+    public double getTotal() {
         return total;
     }
 
-    public String getNoEmployees() {
+    public int getNoEmployees() {
         return noEmployees;
+    }
+
+    public int getYear() {
+        return year;
     }
 
 }

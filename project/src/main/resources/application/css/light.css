@@ -349,3 +349,9 @@
     -fx-background-color: #FFFFFF; /* White background */
     -fx-text-fill: #555555; /* Dark gray text color */
 }
+
+/* Error borders */
+.error-border {
+    -fx-border-color: red;
+    -fx-border-width: 2px;
+}

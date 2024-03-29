@@ -391,3 +391,9 @@
     -fx-background-color: #434443;
     -fx-text-fill: #ffffff;
 }
+
+/* Error borders */
+.error-border {
+    -fx-border-color: red;
+    -fx-border-width: 2px;
+}

@@ -15,11 +15,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import application.email.Email;
@@ -226,9 +226,9 @@ public class DatabaseController {
                     statement.executeUpdate("CREATE TABLE NPS_PAYROLL (" +
                             "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
                             "EMPLOYEE_ID NUMBER NOT NULL, " +
-                            "PAY_DATE DATE NOT NULL, " +
-                            "MONTH VARCHAR(8) NOT NULL, " +
-                            "YEAR NUMBER NOT NULL, " +
+                            "PAY_DATE VARCHAR2(30) NOT NULL, " +
+                            "PAY_MONTH VARCHAR2(10) NOT NULL, " +
+                            "YEAR NUMBER(4) NOT NULL, " +
                             "HOURS_WORKED DECIMAL(10, 2) NOT NULL, " +
                             "PENSION DECIMAL(10, 2) NOT NULL, " +
                             "OVERTIME_HOURS DECIMAL(10, 2) NOT NULL, " +
@@ -405,9 +405,10 @@ public class DatabaseController {
 
     public static void updateEmployeeProfile(String employeeId, String firstName, String lastName, String email,
                                              String phone, String niNumber, String address1, String address2,
-                                             String city, String postcode, String bankName, String accountNumber,
+                                             String postcode, String city, String bankName, String accountNumber,
                                              String sortCode, String emergencyContactFName, String emergencyContactLName,
-                                             String emergencyContactMobile, String emergencyContactRelationship) {
+                                             String emergencyContactMobile, String emergencyContactRelationship,
+                                             String pensionCon) {
 
         // Check if the email is being updated
         String oldEmail = getEmailById(employeeId); // Retrieve the old email from the database
@@ -458,8 +459,8 @@ public class DatabaseController {
                 "UPDATE NPS_ADDRESSES SET ADDRESS_LINE_1 = ?, ADDRESS_LINE_2 = ?, CITY = ?, POSTCODE = ? WHERE EMPLOYEE_ID = ?")) {
             preparedStatement.setString(1, address1);
             preparedStatement.setString(2, address2);
-            preparedStatement.setString(3, postcode);
-            preparedStatement.setString(4, city);
+            preparedStatement.setString(3, city);
+            preparedStatement.setString(4, postcode);
             preparedStatement.setString(5, employeeId);
 
             int rowsAffected = preparedStatement.executeUpdate();
@@ -560,6 +561,20 @@ public class DatabaseController {
             }
         } catch (SQLException e) {
             logger.error("Failure during SQL query - updating emergency contact", e);
+        }
+
+        if (payrollExists(employeeId)) {
+            // Update the payroll - specifically the pension contribution
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    "UPDATE NPS_PAYROLL SET PENSION = ? WHERE EMPLOYEE_ID = ?")) {
+                preparedStatement.setString(1, pensionCon);
+                preparedStatement.setString(2, employeeId);
+            } catch (SQLException e) {
+                logger.error("Failure during SQL query - updating payroll, pension");
+            }
+        } else {
+            addPayrollInfo(employeeId, getEmailDateInfo(), getCurrentMonthString(), 0, "0",
+                    "0", "0", "0", "0", "0", "0");
         }
     }
 
@@ -768,20 +783,6 @@ public class DatabaseController {
         }
     }
 
-    // Method to check if a schedule record exists
-    private static boolean scheduleRecordExists(String employeeId, String weekID) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT * FROM NPS_SCHEDULE_" + weekID + " WHERE EMPLOYEE_ID = ?")) {
-            preparedStatement.setInt(1, Integer.parseInt(employeeId));
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-            return resultSet.next();
-        } catch (SQLException e) {
-            logger.error("Failure during SQL query - checking if schedule exists", e);
-            return false;
-        }
-    }
-
     // Method to add an employee record
     public static void addEmployee(String firstName, String lastName, String email, String phone, String salary,
                                    String niNumber, int accessLevel, String location, String contractType,
@@ -818,7 +819,7 @@ public class DatabaseController {
                         "Sort Code");
 
                 // Add payroll info for the employee
-                addPayrollInfo(String.valueOf(employeeId), "Date", "Month", "0",
+                addPayrollInfo(String.valueOf(employeeId), "Date", getCurrentMonthString(), 0,
                         "0", "0", "0", "0", "0",
                         "0", "0");
 
@@ -894,19 +895,23 @@ public class DatabaseController {
     }
 
     // Method to add payroll info
-    public static void addPayrollInfo(String employeeId, String payDate, String month, String year, String hoursWorked,
+    public static void addPayrollInfo(String employeeId, String payDate, String month, int year, String hoursWorked,
                                       String pension, String overtimeHours, String overtimePay, String grossPay,
                                       String taxes, String netPay) {
+
+
+        payDate = payDate.substring(0, 10);
+
         // Add record
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "INSERT INTO NPS_PAYROLL (EMPLOYEE_ID, PAY_DATE, MONTH, YEAR, HOURS_WORKED, PENSION, " +
+                "INSERT INTO NPS_PAYROLL (EMPLOYEE_ID, PAY_DATE, PAY_MONTH, YEAR, HOURS_WORKED, PENSION, " +
                         "OVERTIME_HOURS, OVERTIME_PAY, GROSS_PAY, TAXES, NET_PAY) " +
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
 
             preparedStatement.setInt(1, Integer.parseInt(employeeId));
             preparedStatement.setString(2, payDate);
             preparedStatement.setString(3, month);
-            preparedStatement.setString(4, year);
+            preparedStatement.setInt(4, year);
             preparedStatement.setString(5, hoursWorked);
             preparedStatement.setString(6, pension);
             preparedStatement.setString(7, overtimeHours);
@@ -925,6 +930,7 @@ public class DatabaseController {
             logger.error("Failure during SQL query - adding payroll info", e);
         }
     }
+
 
     // Method to add emergency contact info
     public static void addEmergencyDetails(String fName, String lName, String mobile, String relationship) {
@@ -1208,7 +1214,7 @@ public class DatabaseController {
     }
 
     // Method to check if there is email info in the database
-    private static boolean checkEmailInfo() throws SQLException {
+    private static boolean checkEmailInfo() {
         boolean emailExists = false;
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -1220,6 +1226,34 @@ public class DatabaseController {
         }
 
         return emailExists;
+    }
+
+    // Method to check if a schedule record exists
+    private static boolean scheduleRecordExists(String employeeId, String weekID) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_SCHEDULE_" + weekID + " WHERE EMPLOYEE_ID = ?")) {
+            preparedStatement.setInt(1, Integer.parseInt(employeeId));
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSet.next();
+        } catch (SQLException e) {
+            logger.error("Failure during SQL query - checking if schedule exists", e);
+            return false;
+        }
+    }
+
+    // Method to check payroll exists for an employee
+    private static boolean payrollExists(String employeeId) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM NPS_PAYROLL WHERE EMPLOYEE_ID = ?")) {
+            preparedStatement.setInt(1, Integer.parseInt(employeeId));
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSet.next();
+        } catch (SQLException e) {
+            logger.error("Failure during SQL query - checking if payroll exists", e);
+            return false;
+        }
     }
 
     // Method to get all employees from the database and return an ObservableList for Employees table
@@ -1363,21 +1397,13 @@ public class DatabaseController {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                String hoursWorked = resultSet.getString("HOURS_WORKED");
-                String overtimeHours = resultSet.getString("OVERTIME_HOURS");
-                String overtimePay = resultSet.getString("OVERTIME_PAY");
-                String pension = resultSet.getString("PENSION");
-                String grossPay = resultSet.getString("GROSS_PAY");
-                String taxes = resultSet.getString("TAXES");
-                String netPay = resultSet.getString("NET_PAY");
-
-                person.setHoursWorked(hoursWorked);
-                person.setOvertimeHours(overtimeHours);
-                person.setOvertimePay(overtimePay);
-                person.setGrossPay(grossPay);
-                person.setTaxes(taxes);
-                person.setNetPay(netPay);
-                person.setPension(pension);
+                person.setHoursWorked(resultSet.getString("HOURS_WORKED"));
+                person.setOvertimeHours(resultSet.getString("OVERTIME_HOURS"));
+                person.setOvertimePay(resultSet.getString("OVERTIME_PAY"));
+                person.setGrossPay(resultSet.getString("GROSS_PAY"));
+                person.setTaxes(resultSet.getString("TAXES"));
+                person.setNetPay(resultSet.getString("NET_PAY"));
+                person.setPension(resultSet.getString("PENSION"));
             }
         } catch (SQLException e) {
             logger.error("Failure during SQL query - getting payroll data", e);
@@ -1623,18 +1649,22 @@ public class DatabaseController {
         ObservableList<PayrollOverview> data = FXCollections.observableArrayList();
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT MONTH, TO_CHAR(PAY_DATE, 'DD-MM-YYYY') AS PAY_DATE, SUM(GROSS_PAY) AS TOTAL_AMOUNT, COUNT(EMPLOYEE_ID) AS EMPLOYEE_COUNT FROM NPS_PAYROLL GROUP BY MONTH, TO_CHAR(PAY_DATE, 'DD-MM-YYYY')")) {
+                "SELECT PAY_MONTH, YEAR, PAY_DATE, " +
+                        "       SUM(GROSS_PAY) AS TOTAL_AMOUNT, " +
+                        "       COUNT(DISTINCT EMPLOYEE_ID) AS EMPLOYEE_COUNT " +
+                        "FROM NPS_PAYROLL " +
+                        "GROUP BY PAY_MONTH, YEAR, PAY_DATE")) {
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
+                String month = resultSet.getString("PAY_MONTH");
+                int year = resultSet.getInt("YEAR");
                 String payDate = resultSet.getString("PAY_DATE");
-                String month = resultSet.getString("MONTH");
-                String totalAmount = resultSet.getString("TOTAL_AMOUNT");
-                String employeeCount = resultSet.getString("EMPLOYEE_COUNT");
+                double totalAmount = resultSet.getDouble("TOTAL_AMOUNT");
+                int employeeCount = resultSet.getInt("EMPLOYEE_COUNT");
 
-                PayrollOverview payrollOverview = new PayrollOverview(payDate, month, totalAmount, employeeCount);
-
+                PayrollOverview payrollOverview = new PayrollOverview(month, year, payDate, totalAmount, employeeCount);
                 data.add(payrollOverview);
             }
         } catch (SQLException e) {
@@ -1644,13 +1674,16 @@ public class DatabaseController {
         return data;
     }
 
-    public static ObservableList<DetailedPayroll> getEmployeeDetailsForMonth(String selectedMonth) {
+    public static ObservableList<DetailedPayroll> getEmployeeDetailsForMonthAndYear(String selectedMonth, int selectedYear) {
         ObservableList<DetailedPayroll> data = FXCollections.observableArrayList();
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT EMPLOYEE_ID, HOURS_WORKED, OVERTIME_HOURS, OVERTIME_PAY, TAXES FROM NPS_PAYROLL WHERE MONTH = ?")) {
+                "SELECT EMPLOYEE_ID, HOURS_WORKED, OVERTIME_HOURS, OVERTIME_PAY, TAXES, GROSS_PAY " +
+                        "FROM NPS_PAYROLL " +
+                        "WHERE PAY_MONTH = ? AND YEAR = ?")) {
 
             preparedStatement.setString(1, selectedMonth);
+            preparedStatement.setInt(2, selectedYear);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -1668,10 +1701,10 @@ public class DatabaseController {
                     if (resultSet2.next()) {
                         employeeDetails.setFirstName(resultSet2.getString("FIRST_NAME"));
                         employeeDetails.setLastName(resultSet2.getString("LAST_NAME"));
-                        employeeDetails.setsalary(resultSet2.getInt("SALARY"));
+                        employeeDetails.setSalary(resultSet2.getInt("SALARY"));
                     }
                 } catch (SQLException e) {
-                    logger.error("Failure during SQL query - getting employee details for month - " +
+                    logger.error("Failure during SQL query - getting employee details for month and year - " +
                             "employee info", e);
                 }
 
@@ -1685,7 +1718,7 @@ public class DatabaseController {
                 data.add(employeeDetails);
             }
         } catch (SQLException e) {
-            logger.error("Failure during SQL query - getting employee details for month", e);
+            logger.error("Failure during SQL query - getting employee details for month and year", e);
         }
 
         return data;
@@ -1709,7 +1742,7 @@ public class DatabaseController {
                     if (resultSet2.next()) {
                         employeeDetails.setFirstName(resultSet2.getString("FIRST_NAME"));
                         employeeDetails.setLastName(resultSet2.getString("LAST_NAME"));
-                        employeeDetails.setsalary(resultSet2.getInt("SALARY"));
+                        employeeDetails.setSalary(resultSet2.getInt("SALARY"));
                     }
                 } catch (SQLException e) {
                     logger.error("Failure during SQL query - getting employee details for month - " +
@@ -1771,6 +1804,16 @@ public class DatabaseController {
 
 
         return encryptedString;
+    }
+
+    private static String getCurrentMonthString() {
+        // Get the current date
+        LocalDate currentDate = LocalDate.now();
+
+        // Format the current date to get the month name
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM", Locale.ENGLISH);
+
+        return currentDate.format(formatter);
     }
 
     public static String toLowerCase(String input) {

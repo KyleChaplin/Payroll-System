@@ -99,7 +99,7 @@ public class DetailedPayroll {
         this.netPay = netPay;
     }
 
-    public void setsalary(double salary) {
+    public void setSalary(double salary) {
         this.salary = salary;
     }
 }

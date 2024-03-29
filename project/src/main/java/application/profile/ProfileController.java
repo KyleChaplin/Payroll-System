@@ -8,14 +8,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +53,10 @@ public class ProfileController implements Initializable {
     private TextField txtSalaryHourly;
     @FXML
     private TextField txtPension;
+    @FXML
+    private ComboBox cboPension;
+    @FXML
+    private TextField txtBasePay;
     @FXML
     private TextField txtBankName;
     @FXML
@@ -123,7 +125,16 @@ public class ProfileController implements Initializable {
         // Populate the text fields with the payroll information
         txtSalaryHourly.setText(String.valueOf(person.getHourlySalary()));
         txtPension.setText(String.valueOf(person.getPension()));
+        cboPension.setValue(person.getPension() + "%");
+
+        cboPension.getItems().addAll(
+                "0",
+                "5",
+                "10"
+        );
+
         txtBankName.setText(person.getBankName());
+        txtBasePay.setText(String.valueOf((Double.parseDouble(person.getContractedHours()) * Double.parseDouble(person.getHourlySalary()) * 12)));
         txtAccountNumber.setText(person.getAccountNumber());
         txtSortCode.setText(person.getSortCode());
 
@@ -158,9 +169,6 @@ public class ProfileController implements Initializable {
         // Directory
         String savePath = "src/main/resources/PDF/";
         String employeeDirectory = savePath + "/" + DatabaseController.getCurrentLoggedInEmployeeId();
-
-        // Create a VBox to hold the download links
-        VBox vbox = new VBox();
 
         // Iterate over the past 6 months
         for (String[] monthAndYear : pastSixMonths) {
@@ -247,69 +255,85 @@ public class ProfileController implements Initializable {
     public void btnToggleUpdate() {
         // Check if the text fields are editable
         if (Objects.equals(btnGreen.getText(), "Save")) {
-            // Update the user's information
-            if (txtEFirstName.getText().isEmpty() || txtELastName.getText().isEmpty() ||
-                    txtEmail.getText().isEmpty() || txtPhone.getText().isEmpty() ||
-                    txtNiNumber.getText().isEmpty() || txtAddress1.getText().isEmpty() ||
-                    txtAddress2.getText().isEmpty() || txtCity.getText().isEmpty() ||
-                    txtPostcode.getText().isEmpty() || txtBankName.getText().isEmpty() ||
-                    txtAccountNumber.getText().isEmpty() || txtSortCode.getText().isEmpty() ||
-                    txtEMobile.getText().isEmpty() || txtERelationship.getText().isEmpty()) {
 
-                // Show an error message
+            TextField[] textFields = {
+                    txtfName, txtlName, txtEFirstName, txtELastName, txtEmail, txtPhone, txtNiNumber,
+                    txtAddress1, txtAddress2, txtCity, txtPostcode, txtBankName,
+                    txtAccountNumber, txtSortCode, txtEMobile, txtERelationship
+            };
+
+            boolean hasEmptyField = false;
+
+            // Remove highlight to every textfield
+            for (TextField textField : textFields) {
+                removeErrorHighlight(textField);
+            }
+
+            for (TextField textField : textFields) {
+                if (textField.getText().isEmpty()) {
+                    hasEmptyField = true;
+                    highlightError(textField); // Highlight only the empty fields
+                }
+            }
+
+            if (hasEmptyField) {
                 txtEmptyError.setText("Fields should not be empty!");
-                return;
             } else {
                 // Perform additional input validation
-                String email = txtEmail.getText();
-                String phone = txtPhone.getText();
-                String niNumber = txtNiNumber.getText();
-                String accountNumber = txtAccountNumber.getText();
-                String sortCode = txtSortCode.getText();
-                String mobile = txtEMobile.getText();
-                String postcode = txtPostcode.getText();
-
-                if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+                if (!txtEmail.getText().matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
                     txtEmptyError.setText("Invalid email address!");
+                    highlightError(txtEmail);
                     return;
                 }
 
-                if (!phone.matches("^[0-9]{11}$")) {
+                if (!txtPhone.getText().matches("^[0-9]{11}$")) {
                     txtEmptyError.setText("Invalid mobile number!");
+                    highlightError(txtPhone);
                     return;
                 }
 
-                if (!niNumber.matches("^[A-CEGHJ-PR-TW-Z]{1}[A-CEGHJ-NPR-TW-Z]{1}[0-9]{6}[A-D\\s]{1}$")) {
+                if (!txtNiNumber.getText().matches("^[A-CEGHJ-PR-TW-Z]{1}[A-CEGHJ-NPR-TW-Z]{1}[0-9]{6}[A-D\\s]{1}$")) {
                     txtEmptyError.setText("Invalid NI number!");
+                    highlightError(txtNiNumber);
                     return;
                 }
 
-                if (!accountNumber.matches("^[0-9]{8}$")) {
+                if (!txtAccountNumber.getText().matches("^[0-9]{8}$")) {
                     txtEmptyError.setText("Invalid account number!");
+                    highlightError(txtAccountNumber);
                     return;
                 }
 
-                if (!sortCode.matches("^[0-9]{6}$")) {
+                if (!txtSortCode.getText().matches("^[0-9]{6}$")) {
                     txtEmptyError.setText("Invalid sort code!");
+                    highlightError(txtSortCode);
                     return;
                 }
 
-                if (!mobile.matches("^[0-9]{11}$")) {
+                if (!txtPostcode.getText().matches("^([A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2})$")) {
+                    txtEmptyError.setText("Invalid postal code!");
+                    highlightError(txtPostcode);
+                    return;
+                }
+
+                if (!txtEMobile.getText().matches("^[0-9]{11}$")) {
                     txtEmptyError.setText("Invalid emergency contact mobile number!");
+                    highlightError(txtEMobile);
                     return;
                 }
 
-                if (!postcode.matches("^[A-Z]{1,2}[0-9]{1,2}[A-Z]?\\s[0-9][A-Z]{2}$")) {
+                /*if (!postcode.matches("^[A-Z]{1,2}[0-9]{1,2}[A-Z]?\\s[0-9][A-Z]{2}$")) {
                     txtEmptyError.setText("Invalid postcode!");
                     return;
-                }
+                }*/
 
                 // Once validation is passed, update the employee profile
                 DatabaseController.updateEmployeeProfile(id, txtlName.getText(), txtlName.getText(),
                         txtEmail.getText(), txtPhone.getText(), txtNiNumber.getText(), txtAddress1.getText(),
                         txtAddress2.getText(), txtPostcode.getText(), txtCity.getText(), txtBankName.getText(),
                         txtAccountNumber.getText(), txtSortCode.getText(), txtEFirstName.getText(),
-                        txtELastName.getText(), txtEMobile.getText(), txtERelationship.getText());
+                        txtELastName.getText(), txtEMobile.getText(), txtERelationship.getText(),
+                        cboPension.getSelectionModel().toString());
 
                 // Clear the error message
                 txtEmptyError.setText("");
@@ -342,9 +366,20 @@ public class ProfileController implements Initializable {
         txtEMobile.setEditable(!txtEMobile.isEditable());
         txtERelationship.setEditable(!txtERelationship.isEditable());
         txtPension.setEditable(!txtPension.isEditable());
+        cboPension.setEditable(!cboPension.isEditable());
         txtBankName.setEditable(!txtBankName.isEditable());
         txtAccountNumber.setEditable(!txtAccountNumber.isEditable());
         txtSortCode.setEditable(!txtSortCode.isEditable());
+    }
+
+    // Method to highlight the error border of the text field
+    private void highlightError(TextField textField) {
+        textField.getStyleClass().add("error-border");
+    }
+
+    // Method to remove the error border from the text field
+    private void removeErrorHighlight(TextField textField) {
+        textField.getStyleClass().remove("error-border");
     }
 
     public void openDashboard(ActionEvent event) throws IOException {

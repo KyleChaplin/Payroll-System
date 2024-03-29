@@ -33,6 +33,8 @@ public class PayrollController implements Initializable {
     @FXML
     private TableColumn<PayrollOverview, String> Month;
     @FXML
+    private TableColumn<PayrollOverview, String> Year;
+    @FXML
     private TableColumn<PayrollOverview, String> Total;
     @FXML
     private TableColumn<PayrollOverview, String> NoEmployees;
@@ -66,6 +68,7 @@ public class PayrollController implements Initializable {
         // Set up top table - displays general payroll information
         PayDate.setCellValueFactory(new PropertyValueFactory<PayrollOverview, String>("payDay"));
         Month.setCellValueFactory(new PropertyValueFactory<PayrollOverview, String>("month"));
+        Year.setCellValueFactory(new PropertyValueFactory<PayrollOverview, String>("year"));
         Total.setCellValueFactory(new PropertyValueFactory<PayrollOverview, String>("total"));
         NoEmployees.setCellValueFactory(new PropertyValueFactory<PayrollOverview, String>("noEmployees"));
 
@@ -80,7 +83,7 @@ public class PayrollController implements Initializable {
         if (selectedPayroll != null) {
             // Call the method to fetch detailed employee information for the selected month
             ObservableList<DetailedPayroll> employeeDetails =
-                    DatabaseController.getEmployeeDetailsForMonth(selectedPayroll.getMonth());
+                    DatabaseController.getEmployeeDetailsForMonthAndYear(selectedPayroll.getMonth(), selectedPayroll.getYear());
 
             // Update the employee details table with the fetched data
             EmployeeID.setCellValueFactory(new PropertyValueFactory<DetailedPayroll, String>("employeeID"));
