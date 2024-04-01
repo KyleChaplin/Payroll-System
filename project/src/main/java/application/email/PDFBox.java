@@ -67,6 +67,8 @@ public class PDFBox {
         String overTimeRate = String.valueOf(employee.getOvertimePay());
         String overAllPay = String.valueOf(employee.getBasePay());
         String tax = String.valueOf(employee.getTaxPaid());
+        String pension = employee.getPension();
+        String pensionPaid = String.valueOf(employee.getPensionPaid());
         String payAfterSacrifice = String.valueOf(employee.getNetPay());
         // ****************Employee details***************
 
@@ -106,12 +108,12 @@ public class PDFBox {
         int[] columnWidths2 = {115, 115, 115, 115, 115};
         tableClass table2 = new tableClass(doc, contentStream, columnWidths2, 25, pageHeight - 245, 20, 0, 20, 15, font);
         // Add the table headers
-        String[] tableHeaders2 = {"Tax", "Pension", "Other", "Other", "Pay"};
+        String[] tableHeaders2 = {"Tax", "Pension", "Pension Paid", "Other", "Pay"};
         for (String header : tableHeaders2) {
             table2.addCell(header);
         }
         // Add the table data
-        String[] tableData2 = {tax, "0", "0", "0", payAfterSacrifice};
+        String[] tableData2 = {tax, pension, pensionPaid, "0", payAfterSacrifice};
         for (String data : tableData2) {
             table2.addCell(data);
         }

@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import static application.DatabaseController.getScheduleData;
@@ -377,74 +379,81 @@ public class ScheduleController implements Initializable {
         // Refresh the table
         loadTableData();
 
-        calculatePayroll(schedule);
+        calculatePayroll();
 
         // Clear all fields
         btnClear();
     }
 
-    private void calculatePayroll(Schedule schedule) {
+    private void calculatePayroll() {
         // Update the payroll info for employees
-        // Payroll information for all 4 weeks combined
-        String employeeId = schedule.getEmployeeID();
-        String payDate = DatabaseController.getEmailDateInfo();
-        String month = getCurrentMonthString();
-        String year = String.valueOf(getCurrentYear());
-        double totalHoursWorked = 0.0;
-        double totalPension = 0.0;
-        double totalOvertimeHours = 0.0;
-        double totalOvertimePay = 0.0;
-        double totalGrossPay = 0.0;
-        double totalTaxes = 0.0;
-        double totalNetPay = 0.0;
+
+        Map<String, Map<String, Double>> employeePayrollMap = new HashMap<>();
 
         // Iterate over each week to aggregate data
         for (int i = 0; i <= 3; i++) {
             ObservableList<Schedule> scheduleData = DatabaseController.getScheduleData(String.valueOf(i));
             for (Schedule s : scheduleData) {
-                s.setTotalHoursWorked(s.getTotalHoursWorked() + calculateTotalHoursWorked(s));
-                totalHoursWorked += s.getTotalHoursWorked();
+                // Get employee ID for the current schedule
+                String employeeId = s.getEmployeeID();
 
-                totalPension += s.getTotalPensionPaid();
-                totalOvertimeHours += s.getTotalOvertimeHours();
-                totalOvertimePay += s.getTotalOvertimePay();
-                totalGrossPay += s.getTotalGrossPay();
+                // Get or initialize payroll info for the employee
+                Map<String, Double> payrollInfo = employeePayrollMap.getOrDefault(employeeId, new HashMap<>());
+
+                // Update payroll info with data from the current schedule
+                payrollInfo.put("totalHoursWorked", payrollInfo.getOrDefault("totalHoursWorked", 0.0) + calculateTotalHoursWorked(s));
+                payrollInfo.put("totalPensionPaid", payrollInfo.getOrDefault("totalPensionPaid", 0.0) + s.getTotalPensionPaid());
+                payrollInfo.put("totalOvertimeHours", payrollInfo.getOrDefault("totalOvertimeHours", 0.0) + s.getTotalOvertimeHours());
+                payrollInfo.put("totalOvertimePay", payrollInfo.getOrDefault("totalOvertimePay", 0.0) + s.getTotalOvertimePay());
+                payrollInfo.put("totalGrossPay", payrollInfo.getOrDefault("totalGrossPay", 0.0) + s.getTotalGrossPay());
+
+                // Put updated payroll info back into the map
+                employeePayrollMap.put(employeeId, payrollInfo);
             }
         }
 
-        // Output accumulated values to console
-        System.out.println("Accumulated values:");
-        System.out.println("Total Hours Worked: " + totalHoursWorked);
-        System.out.println("Total Pension: " + totalPension);
-        System.out.println("Total Overtime Hours: " + totalOvertimeHours);
-        System.out.println("Total Overtime Pay: " + totalOvertimePay);
-        System.out.println("Total Gross Pay: " + totalGrossPay);
+        // Output accumulated values to console for each employee
+        for (Map.Entry<String, Map<String, Double>> entry : employeePayrollMap.entrySet()) {
+            String employeeId = entry.getKey();
+            Map<String, Double> payrollInfo = entry.getValue();
 
-        // Calculate taxes and net pay
-        double personalAllowance = 12570.0; // Personal allowance threshold
-        double basicRateThreshold = 50270.0; // Basic rate tax threshold
-        double higherRateThreshold = 125140.0; // Higher rate tax threshold
+            // Retrieve total gross pay for the current employee
+            double totalGrossPay = payrollInfo.getOrDefault("totalGrossPay", 0.0);
 
-        // Calculate taxable income
-        double taxableIncome = Math.max(totalGrossPay - personalAllowance, 0);
+            // Tax brackets and rates
+            double personalAllowance = 12570.0; // Personal allowance threshold
+            double basicRateThreshold = 50270.0; // Basic rate tax threshold
+            double higherRateThreshold = 125140.0; // Higher rate tax threshold
 
-        // Calculate tax based on different tax brackets
-        double basicRate = Math.min(Math.max(taxableIncome, 0), basicRateThreshold) * 0.20;
-        double higherRate = Math.min(Math.max(taxableIncome - basicRateThreshold, 0), higherRateThreshold - basicRateThreshold) * 0.40;
-        double additionalRate = Math.max(taxableIncome - higherRateThreshold, 0) * 0.45;
+            // Calculate taxable income
+            double taxableIncome = Math.max(totalGrossPay - personalAllowance, 0);
 
-        // Calculate total tax
-        totalTaxes = basicRate + higherRate + additionalRate;
+            // Calculate tax based on different tax brackets
+            double basicRate = Math.min(Math.max(taxableIncome, 0), basicRateThreshold) * 0.20;
+            double higherRate = Math.min(Math.max(taxableIncome - basicRateThreshold, 0), higherRateThreshold - basicRateThreshold) * 0.40;
+            double additionalRate = Math.max(taxableIncome - higherRateThreshold, 0) * 0.45;
 
-        // Calculate net pay after taxes
-        totalNetPay = totalGrossPay - totalTaxes;
+            // Calculate total tax
+            double totalTax = basicRate + higherRate + additionalRate;
 
-        // Add payroll info for all 4 weeks combined
-        /*DatabaseController.addPayrollInfo(employeeId, payDate, month, year,
-                String.valueOf(totalHoursWorked), String.valueOf(totalPension),
-                String.valueOf(totalOvertimeHours), String.valueOf(totalOvertimePay),
-                String.valueOf(totalGrossPay), String.valueOf(totalTaxes),
-                String.valueOf(totalNetPay));*/
+            // Calculate net pay after taxes
+            double netPay = totalGrossPay - totalTax;
+
+            // Update payroll information for the current employee
+            payrollInfo.put("totalTax", totalTax);
+            payrollInfo.put("netPay", netPay);
+
+            // Output accumulated values for the current employee
+            System.out.println("==============================");
+            System.out.println("Employee ID: " + employeeId);
+            System.out.println("Total Hours Worked: " + payrollInfo.getOrDefault("totalHoursWorked", 0.0));
+            System.out.println("Total Pension: " + payrollInfo.getOrDefault("totalPensionPaid", 0.0));
+            System.out.println("Total Overtime Hours: " + payrollInfo.getOrDefault("totalOvertimeHours", 0.0));
+            System.out.println("Total Overtime Pay: " + payrollInfo.getOrDefault("totalOvertimePay", 0.0));
+            System.out.println("Total Gross Pay: " + payrollInfo.getOrDefault("totalGrossPay", 0.0));
+            System.out.println("Total Tax: " + totalTax);
+            System.out.println("Net Pay: " + netPay);
+        }
     }
 
     private static String getCurrentMonthString() {
