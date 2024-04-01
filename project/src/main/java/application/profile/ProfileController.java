@@ -52,8 +52,6 @@ public class ProfileController implements Initializable {
     @FXML
     private TextField txtSalaryHourly;
     @FXML
-    private TextField txtPension;
-    @FXML
     private ComboBox cboPension;
     @FXML
     private TextField txtBasePay;
@@ -124,13 +122,12 @@ public class ProfileController implements Initializable {
 
         // Populate the text fields with the payroll information
         txtSalaryHourly.setText(String.valueOf(person.getHourlySalary()));
-        txtPension.setText(String.valueOf(person.getPension()));
-        cboPension.setValue(person.getPension() + "%");
+        cboPension.setValue(person.getPension());
 
         cboPension.getItems().addAll(
-                "0",
-                "5",
-                "10"
+                "0%",
+                "5%",
+                "10%"
         );
 
         txtBankName.setText(person.getBankName());
@@ -159,6 +156,11 @@ public class ProfileController implements Initializable {
 
         // Generate download links for payroll
         generateDownloadLinks();
+
+        // Initialize the ComboBox as non-editable
+        cboPension.setEditable(false);
+        cboPension.setFocusTraversable(false);
+        cboPension.setMouseTransparent(true);
     }
 
     // Method to generate download links for payroll PDFs
@@ -322,18 +324,13 @@ public class ProfileController implements Initializable {
                     return;
                 }
 
-                /*if (!postcode.matches("^[A-Z]{1,2}[0-9]{1,2}[A-Z]?\\s[0-9][A-Z]{2}$")) {
-                    txtEmptyError.setText("Invalid postcode!");
-                    return;
-                }*/
-
                 // Once validation is passed, update the employee profile
                 DatabaseController.updateEmployeeProfile(id, txtlName.getText(), txtlName.getText(),
                         txtEmail.getText(), txtPhone.getText(), txtNiNumber.getText(), txtAddress1.getText(),
                         txtAddress2.getText(), txtPostcode.getText(), txtCity.getText(), txtBankName.getText(),
                         txtAccountNumber.getText(), txtSortCode.getText(), txtEFirstName.getText(),
                         txtELastName.getText(), txtEMobile.getText(), txtERelationship.getText(),
-                        cboPension.getSelectionModel().toString());
+                        cboPension.getValue().toString());
 
                 // Clear the error message
                 txtEmptyError.setText("");
@@ -351,25 +348,19 @@ public class ProfileController implements Initializable {
     }
 
     private void setEditable() {
-        // Toggle the text fields to be editable or not
-        txtfName.setEditable(!txtfName.isEditable());
-        txtlName.setEditable(!txtlName.isEditable());
-        txtEmail.setEditable(!txtEmail.isEditable());
-        txtPhone.setEditable(!txtPhone.isEditable());
-        txtNiNumber.setEditable(!txtNiNumber.isEditable());
-        txtAddress1.setEditable(!txtAddress1.isEditable());
-        txtAddress2.setEditable(!txtAddress2.isEditable());
-        txtCity.setEditable(!txtCity.isEditable());
-        txtPostcode.setEditable(!txtPostcode.isEditable());
-        txtEFirstName.setEditable(!txtEFirstName.isEditable());
-        txtELastName.setEditable(!txtELastName.isEditable());
-        txtEMobile.setEditable(!txtEMobile.isEditable());
-        txtERelationship.setEditable(!txtERelationship.isEditable());
-        txtPension.setEditable(!txtPension.isEditable());
+        TextField[] textFields = {
+                txtfName, txtlName, txtEFirstName, txtELastName, txtEmail, txtPhone, txtNiNumber,
+                txtAddress1, txtAddress2, txtCity, txtPostcode, txtBankName,
+                txtAccountNumber, txtSortCode, txtEMobile, txtERelationship
+        };
+
+        for (TextField textField : textFields) {
+            textField.setEditable(!textField.isEditable());
+        }
+
+        // Toggle the editability of the ComboBox
         cboPension.setEditable(!cboPension.isEditable());
-        txtBankName.setEditable(!txtBankName.isEditable());
-        txtAccountNumber.setEditable(!txtAccountNumber.isEditable());
-        txtSortCode.setEditable(!txtSortCode.isEditable());
+        cboPension.setMouseTransparent(!cboPension.isEditable());
     }
 
     // Method to highlight the error border of the text field

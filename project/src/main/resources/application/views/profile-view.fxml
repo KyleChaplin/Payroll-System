@@ -188,7 +188,7 @@
                                        <children>
                                           <TextField fx:id="txtSalaryHourly" editable="false" />
                                           <TextField fx:id="txtBasePay" editable="false" />
-                                          <TextField fx:id="txtPension" editable="false" />
+                                          <ComboBox fx:id="cboPension" focusTraversable="false" prefHeight="25.0" prefWidth="443.0" />
                                           <TextField fx:id="txtBankName" editable="false" />
                                           <TextField fx:id="txtAccountNumber" editable="false" />
                                           <TextField fx:id="txtSortCode" editable="false" />
@@ -318,7 +318,6 @@
                   <Font size="18.0" />
                </font>
             </Label>
-            <ComboBox fx:id="cboPension" layoutX="444.0" layoutY="27.0" prefWidth="150.0" />
          </children></AnchorPane>
    </center>
    <left>

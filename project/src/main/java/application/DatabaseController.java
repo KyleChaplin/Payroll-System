@@ -230,7 +230,7 @@ public class DatabaseController {
                             "PAY_MONTH VARCHAR2(10) NOT NULL, " +
                             "YEAR NUMBER(4) NOT NULL, " +
                             "HOURS_WORKED DECIMAL(10, 2) NOT NULL, " +
-                            "PENSION DECIMAL(10, 2) NOT NULL, " +
+                            "PENSION VARCHAR(3) NOT NULL, " +
                             "OVERTIME_HOURS DECIMAL(10, 2) NOT NULL, " +
                             "OVERTIME_PAY DECIMAL(10, 2) NOT NULL, " +
                             "GROSS_PAY DECIMAL(10, 2) NOT NULL, " +
@@ -563,19 +563,24 @@ public class DatabaseController {
             logger.error("Failure during SQL query - updating emergency contact", e);
         }
 
-        if (payrollExists(employeeId)) {
+        //if (payrollExists(employeeId)) {
             // Update the payroll - specifically the pension contribution
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "UPDATE NPS_PAYROLL SET PENSION = ? WHERE EMPLOYEE_ID = ?")) {
                 preparedStatement.setString(1, pensionCon);
                 preparedStatement.setString(2, employeeId);
+                int rowsAffected = preparedStatement.executeUpdate();
+                if (rowsAffected > 0) {
+                    logger.info("Employee pension updated successfully.");
+                }
+                else {
+                    logger.info("No payroll for employee found - creating payroll info.");
+                    addPayrollInfo(employeeId, getEmailDateInfo(), getCurrentMonthString(), 0, "0",
+                            pensionCon, "0", "0", "0", "0", "0");
+                }
             } catch (SQLException e) {
-                logger.error("Failure during SQL query - updating payroll, pension");
+                logger.error("Failure during SQL query - updating payroll", e);
             }
-        } else {
-            addPayrollInfo(employeeId, getEmailDateInfo(), getCurrentMonthString(), 0, "0",
-                    "0", "0", "0", "0", "0", "0");
-        }
     }
 
     // Method to update employee records
