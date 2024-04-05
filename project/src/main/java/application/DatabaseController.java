@@ -1595,6 +1595,7 @@ public class DatabaseController {
                 Schedule schedule = scheduleMap.getOrDefault(key, new Schedule(firstName + " " + lastName, employeeId));
 
                 // Set start and end times
+                schedule.setWeekID(weekId);
                 schedule.setMonday(resultSet.getString("MON_START_TIME"), resultSet.getString("MON_END_TIME"));
                 schedule.setTuesday(resultSet.getString("TUE_START_TIME"), resultSet.getString("TUE_END_TIME"));
                 schedule.setWednesday(resultSet.getString("WED_START_TIME"), resultSet.getString("WED_END_TIME"));
@@ -1641,8 +1642,7 @@ public class DatabaseController {
                 "SELECT PAY_MONTH, YEAR, PAY_DATE, " +
                         "       SUM(GROSS_PAY) AS TOTAL_AMOUNT, " +
                         "       COUNT(DISTINCT EMPLOYEE_ID) AS EMPLOYEE_COUNT " +
-                        "FROM NPS_PAYROLL " +
-                        "GROUP BY PAY_MONTH, YEAR, PAY_DATE")) {
+                        "FROM NPS_PAYROLL GROUP BY PAY_MONTH, YEAR, PAY_DATE")) {
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -1668,8 +1668,7 @@ public class DatabaseController {
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "SELECT EMPLOYEE_ID, HOURS_WORKED, OVERTIME_HOURS, OVERTIME_PAY, TAXES, GROSS_PAY " +
-                        "FROM NPS_PAYROLL " +
-                        "WHERE PAY_MONTH = ? AND YEAR = ?")) {
+                        "FROM NPS_PAYROLL WHERE PAY_MONTH = ? AND YEAR = ?")) {
 
             preparedStatement.setString(1, selectedMonth);
             preparedStatement.setInt(2, selectedYear);
@@ -1717,9 +1716,8 @@ public class DatabaseController {
         DetailedPayroll employeeDetails = new DetailedPayroll();
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT * FROM NPS_PAYROLL WHERE EMPLOYEE_ID = ?")) {
+                "SELECT * FROM NPS_PAYROLL WHERE EMPLOYEE_ID = ?")) {
             preparedStatement.setString(1, employeeID);
-
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
@@ -1731,7 +1729,7 @@ public class DatabaseController {
                     if (resultSet2.next()) {
                         employeeDetails.setFirstName(resultSet2.getString("FIRST_NAME"));
                         employeeDetails.setLastName(resultSet2.getString("LAST_NAME"));
-                        employeeDetails.setSalary(resultSet2.getInt("SALARY"));
+                        employeeDetails.setSalary(resultSet2.getDouble("SALARY"));
                     }
                 } catch (SQLException e) {
                     logger.error("Failure during SQL query - getting employee details for month - " +

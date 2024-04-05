@@ -3,6 +3,7 @@ package application.schedule;
 import application.DatabaseController;
 import application.SceneController;
 import application.ThemeManager;
+import application.payroll.DetailedPayroll;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -23,10 +24,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static application.DatabaseController.getScheduleData;
 
@@ -393,19 +391,28 @@ public class ScheduleController implements Initializable {
         // Iterate over each week to aggregate data
         for (int i = 0; i <= 3; i++) {
             ObservableList<Schedule> scheduleData = DatabaseController.getScheduleData(String.valueOf(i));
+
+            for (Schedule s : scheduleData) {
+                System.out.println("Employee ID:" + s.getEmployeeID());
+                System.out.println("Name: " + s.getName());
+                System.out.println("Week ID: " + s.getWeekId());
+            }
+
+
             for (Schedule s : scheduleData) {
                 // Get employee ID for the current schedule
                 String employeeId = s.getEmployeeID();
 
                 // Get or initialize payroll info for the employee
                 Map<String, Double> payrollInfo = employeePayrollMap.getOrDefault(employeeId, new HashMap<>());
+                DetailedPayroll employeePayroll = DatabaseController.getSpecificEmployeePayroll(employeeId);
 
                 // Update payroll info with data from the current schedule
-                payrollInfo.put("totalHoursWorked", payrollInfo.getOrDefault("totalHoursWorked", 0.0) + calculateTotalHoursWorked(s));
-                payrollInfo.put("totalPensionPaid", payrollInfo.getOrDefault("totalPensionPaid", 0.0) + s.getTotalPensionPaid());
-                payrollInfo.put("totalOvertimeHours", payrollInfo.getOrDefault("totalOvertimeHours", 0.0) + s.getTotalOvertimeHours());
-                payrollInfo.put("totalOvertimePay", payrollInfo.getOrDefault("totalOvertimePay", 0.0) + s.getTotalOvertimePay());
-                payrollInfo.put("totalGrossPay", payrollInfo.getOrDefault("totalGrossPay", 0.0) + s.getTotalGrossPay());
+                payrollInfo.put("totalHoursWorked", employeePayroll.getHoursWorked() + s.getTotalHoursWorked());
+                payrollInfo.put("totalPensionPaid", employeePayroll.getPensionPaid() + s.getTotalPensionPaid());
+                payrollInfo.put("totalOvertimeHours", employeePayroll.getOvertimeHours() + s.getTotalOvertimeHours());
+                payrollInfo.put("totalOvertimePay", employeePayroll.getOvertimePay() + s.getTotalOvertimePay());
+                payrollInfo.put("totalGrossPay", payrollInfo.get("totalHoursWorked") * employeePayroll.getsalary() + s.getTotalGrossPay());
 
                 // Put updated payroll info back into the map
                 employeePayrollMap.put(employeeId, payrollInfo);
@@ -418,7 +425,7 @@ public class ScheduleController implements Initializable {
             Map<String, Double> payrollInfo = entry.getValue();
 
             // Retrieve total gross pay for the current employee
-            double totalGrossPay = payrollInfo.getOrDefault("totalGrossPay", 0.0);
+            double totalGrossPay = payrollInfo.get("totalGrossPay");
 
             // Tax brackets and rates
             double personalAllowance = 12570.0; // Personal allowance threshold
@@ -442,18 +449,24 @@ public class ScheduleController implements Initializable {
             // Update payroll information for the current employee
             payrollInfo.put("totalTax", totalTax);
             payrollInfo.put("netPay", netPay);
+        }
+
+        for (Map.Entry<String, Map<String, Double>> entry : employeePayrollMap.entrySet()) {
+            String employeeId = entry.getKey();
+            Map<String, Double> payrollInfo = entry.getValue();
 
             // Output accumulated values for the current employee
             System.out.println("==============================");
             System.out.println("Employee ID: " + employeeId);
-            System.out.println("Total Hours Worked: " + payrollInfo.getOrDefault("totalHoursWorked", 0.0));
-            System.out.println("Total Pension: " + payrollInfo.getOrDefault("totalPensionPaid", 0.0));
-            System.out.println("Total Overtime Hours: " + payrollInfo.getOrDefault("totalOvertimeHours", 0.0));
-            System.out.println("Total Overtime Pay: " + payrollInfo.getOrDefault("totalOvertimePay", 0.0));
-            System.out.println("Total Gross Pay: " + payrollInfo.getOrDefault("totalGrossPay", 0.0));
-            System.out.println("Total Tax: " + totalTax);
-            System.out.println("Net Pay: " + netPay);
+            System.out.println("Total Hours Worked: " + payrollInfo.get("totalHoursWorked"));
+            System.out.println("Total Pension: " + payrollInfo.get("totalPensionPaid"));
+            System.out.println("Total Overtime Hours: " + payrollInfo.get("totalOvertimeHours"));
+            System.out.println("Total Overtime Pay: " + payrollInfo.get("totalOvertimePay"));
+            System.out.println("Total Gross Pay: " + payrollInfo.get("totalGrossPay"));
+            System.out.println("Total Tax: " + payrollInfo.get("totalTax"));
+            System.out.println("Net Pay: " + payrollInfo.get("netPay"));
         }
+
     }
 
     private static String getCurrentMonthString() {
