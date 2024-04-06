@@ -16,6 +16,7 @@ import java.io.FileWriter;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Date;
@@ -575,7 +576,7 @@ public class DatabaseController {
             }
             else {
                 logger.info("No payroll for employee found - creating payroll info.");
-                addPayrollInfo(employeeId, getEmailDateInfo(), getCurrentMonthString(), 0, 0.0,
+                addPayrollInfo(employeeId, getEmailDateInfo(), getCurrentMonthString(), getCurrentYear(), 0.0,
                         pensionCon, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
             }
         } catch (SQLException e) {
@@ -759,6 +760,32 @@ public class DatabaseController {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             logger.error("Failure during SQL query - updating email date", e);
+        }
+    }
+
+    public static void updatePayrollInfo(String employeeId, double hoursWorked, double pensionPaid,
+                                         double overtimePay, double grossPay, double taxes, double netPay) {
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "UPDATE NPS_PAYROLL SET HOURS_WORKED = ?, PENSION_PAID = ?, OVERTIME_PAY = ?, GROSS_PAY = ?, " +
+                        "TAXES = ?, NET_PAY = ? WHERE EMPLOYEE_ID = ?")) {
+
+            preparedStatement.setDouble(1, hoursWorked);
+            preparedStatement.setDouble(2, pensionPaid);
+            preparedStatement.setDouble(3, overtimePay);
+            preparedStatement.setDouble(4, grossPay);
+            preparedStatement.setDouble(5, taxes);
+            preparedStatement.setDouble(6, netPay);
+            preparedStatement.setString(7, employeeId);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                logger.info("Payroll info updated successfully for employee ID: " + employeeId);
+            } else {
+                logger.info("No records to update for employee ID: " + employeeId);
+            }
+        } catch (SQLException e) {
+            logger.error("Failure during SQL query - updating payroll info", e);
         }
     }
 
@@ -1802,6 +1829,12 @@ public class DatabaseController {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM", Locale.ENGLISH);
 
         return currentDate.format(formatter);
+    }
+
+    private static int getCurrentYear() {
+        // Get the current year
+        Year currentYear = Year.now();
+        return currentYear.getValue();
     }
 
     public static String toLowerCase(String input) {

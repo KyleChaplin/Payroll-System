@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static application.DatabaseController.addPayrollInfo;
 import static application.DatabaseController.getScheduleData;
 
 public class ScheduleController implements Initializable {
@@ -407,8 +408,13 @@ public class ScheduleController implements Initializable {
                 Map<String, Double> payrollInfo = employeePayrollMap.getOrDefault(employeeId, new HashMap<>());
                 DetailedPayroll employeePayroll = DatabaseController.getSpecificEmployeePayroll(employeeId);
 
+                String pensionString = employeePayroll.getPension();
+                // Parse the percentage value from the pension string
+                double pensionPercentage = Double.parseDouble(pensionString.replaceAll("[^0-9]", "")) / 100.0;
+
                 // Update payroll info with data from the current schedule
                 payrollInfo.put("totalHoursWorked", employeePayroll.getHoursWorked() + s.getTotalHoursWorked());
+                payrollInfo.put("pensionCon", pensionPercentage);
                 payrollInfo.put("totalPensionPaid", employeePayroll.getPensionPaid() + s.getTotalPensionPaid());
                 payrollInfo.put("totalOvertimeHours", employeePayroll.getOvertimeHours() + s.getTotalOvertimeHours());
                 payrollInfo.put("totalOvertimePay", employeePayroll.getOvertimePay() + s.getTotalOvertimePay());
@@ -419,7 +425,29 @@ public class ScheduleController implements Initializable {
             }
         }
 
-        // Output accumulated values to console for each employee
+        // Loop for pension
+        for (Map.Entry<String, Map<String, Double>> entry : employeePayrollMap.entrySet()) {
+            Map<String, Double> payrollInfo = entry.getValue();
+
+            // Retrieve total gross pay for the current employee
+            double totalGrossPay = payrollInfo.get("totalGrossPay");
+
+            // Fetch pension information for the current employee
+            double pensionPercentage = payrollInfo.get("pensionCon");
+
+            // Calculate pension deduction from gross pay
+            double pensionDeduction = totalGrossPay * pensionPercentage;
+
+            // Update payroll information for the current employee
+            //payrollInfo.put("totalPensionDeduction", pensionDeduction);
+
+            // Calculate net pay after pension deduction
+            double netPay = totalGrossPay - pensionDeduction;
+
+            payrollInfo.put("netPay", netPay);
+        }
+
+        // Loop for tax
         for (Map.Entry<String, Map<String, Double>> entry : employeePayrollMap.entrySet()) {
             String employeeId = entry.getKey();
             Map<String, Double> payrollInfo = entry.getValue();
@@ -444,13 +472,14 @@ public class ScheduleController implements Initializable {
             double totalTax = basicRate + higherRate + additionalRate;
 
             // Calculate net pay after taxes
-            double netPay = totalGrossPay - totalTax;
+            double netPay = payrollInfo.get("netPay") - (totalGrossPay - totalTax);
 
             // Update payroll information for the current employee
             payrollInfo.put("totalTax", totalTax);
-            payrollInfo.put("netPay", netPay);
+            payrollInfo.replace("netPay", netPay);
         }
 
+        // Loop to update payroll info
         for (Map.Entry<String, Map<String, Double>> entry : employeePayrollMap.entrySet()) {
             String employeeId = entry.getKey();
             Map<String, Double> payrollInfo = entry.getValue();
@@ -465,8 +494,12 @@ public class ScheduleController implements Initializable {
             System.out.println("Total Gross Pay: " + payrollInfo.get("totalGrossPay"));
             System.out.println("Total Tax: " + payrollInfo.get("totalTax"));
             System.out.println("Net Pay: " + payrollInfo.get("netPay"));
-        }
 
+            // Update payroll information in the database
+            DatabaseController.updatePayrollInfo(employeeId, payrollInfo.get("totalHoursWorked"),
+                    payrollInfo.get("totalPensionPaid"), payrollInfo.get("totalOvertimePay"),
+                    payrollInfo.get("totalGrossPay"), payrollInfo.get("totalTax"), payrollInfo.get("netPay"));
+        }
     }
 
     private static String getCurrentMonthString() {
