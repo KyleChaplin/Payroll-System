@@ -394,13 +394,6 @@ public class ScheduleController implements Initializable {
             ObservableList<Schedule> scheduleData = DatabaseController.getScheduleData(String.valueOf(i));
 
             for (Schedule s : scheduleData) {
-                System.out.println("Employee ID:" + s.getEmployeeID());
-                System.out.println("Name: " + s.getName());
-                System.out.println("Week ID: " + s.getWeekId());
-            }
-
-
-            for (Schedule s : scheduleData) {
                 // Get employee ID for the current schedule
                 String employeeId = s.getEmployeeID();
 
@@ -409,8 +402,11 @@ public class ScheduleController implements Initializable {
                 DetailedPayroll employeePayroll = DatabaseController.getSpecificEmployeePayroll(employeeId);
 
                 String pensionString = employeePayroll.getPension();
+
                 // Parse the percentage value from the pension string
-                double pensionPercentage = Double.parseDouble(pensionString.replaceAll("[^0-9]", "")) / 100.0;
+                double pensionPercentage = Double.parseDouble(pensionString.substring(0, pensionString.length() - 1)) / 100.0;
+
+                System.out.println(pensionPercentage);
 
                 // Update payroll info with data from the current schedule
                 payrollInfo.put("totalHoursWorked", employeePayroll.getHoursWorked() + s.getTotalHoursWorked());
@@ -423,61 +419,65 @@ public class ScheduleController implements Initializable {
                 // Put updated payroll info back into the map
                 employeePayrollMap.put(employeeId, payrollInfo);
             }
+
+            // Loop for pension
+            for (Map.Entry<String, Map<String, Double>> entry : employeePayrollMap.entrySet()) {
+                Map<String, Double> payrollInfo = entry.getValue();
+
+                // Retrieve total gross pay for the current employee
+                double totalGrossPay = payrollInfo.get("totalGrossPay");
+
+                // Fetch pension information for the current employee
+                double pensionPercentage = payrollInfo.get("pensionCon");
+
+                // Calculate pension deduction from gross pay
+                double pensionDeduction = totalGrossPay * pensionPercentage;
+
+                // Update payroll information for the current employee
+                //payrollInfo.put("totalPensionDeduction", pensionDeduction);
+
+                // Calculate net pay after pension deduction
+                double netPay = totalGrossPay - pensionDeduction;
+
+                payrollInfo.put("netPay", netPay);
+            }
+
+            // Loop for tax
+            for (Map.Entry<String, Map<String, Double>> entry : employeePayrollMap.entrySet()) {
+                String employeeId = entry.getKey();
+                Map<String, Double> payrollInfo = entry.getValue();
+
+                // Retrieve total gross pay for the current employee
+                double totalGrossPay = payrollInfo.get("totalGrossPay");
+                double currentNetPay = payrollInfo.get("netPay");
+
+                // Tax brackets and rates
+                double personalAllowance = 12570.0; // Personal allowance threshold
+                double basicRateThreshold = 50270.0; // Basic rate tax threshold
+                double higherRateThreshold = 125140.0; // Higher rate tax threshold
+
+                // Calculate taxable income
+                double taxableIncome = Math.max(currentNetPay - personalAllowance, 0);
+
+                // Calculate tax based on different tax brackets
+                double basicRate = Math.min(Math.max(taxableIncome, 0), basicRateThreshold) * 0.20;
+                double higherRate = Math.min(Math.max(taxableIncome - basicRateThreshold, 0), higherRateThreshold - basicRateThreshold) * 0.40;
+                double additionalRate = Math.max(taxableIncome - higherRateThreshold, 0) * 0.45;
+
+                // Calculate total tax
+                double totalTax = basicRate + higherRate + additionalRate;
+
+                // Calculate net pay after taxes
+
+                double netPay = currentNetPay - totalTax;
+
+                // Update payroll information for the current employee
+                payrollInfo.put("totalTax", totalTax);
+                payrollInfo.put("netPay", netPay);
+            }
         }
 
-        // Loop for pension
-        for (Map.Entry<String, Map<String, Double>> entry : employeePayrollMap.entrySet()) {
-            Map<String, Double> payrollInfo = entry.getValue();
 
-            // Retrieve total gross pay for the current employee
-            double totalGrossPay = payrollInfo.get("totalGrossPay");
-
-            // Fetch pension information for the current employee
-            double pensionPercentage = payrollInfo.get("pensionCon");
-
-            // Calculate pension deduction from gross pay
-            double pensionDeduction = totalGrossPay * pensionPercentage;
-
-            // Update payroll information for the current employee
-            //payrollInfo.put("totalPensionDeduction", pensionDeduction);
-
-            // Calculate net pay after pension deduction
-            double netPay = totalGrossPay - pensionDeduction;
-
-            payrollInfo.put("netPay", netPay);
-        }
-
-        // Loop for tax
-        for (Map.Entry<String, Map<String, Double>> entry : employeePayrollMap.entrySet()) {
-            String employeeId = entry.getKey();
-            Map<String, Double> payrollInfo = entry.getValue();
-
-            // Retrieve total gross pay for the current employee
-            double totalGrossPay = payrollInfo.get("totalGrossPay");
-
-            // Tax brackets and rates
-            double personalAllowance = 12570.0; // Personal allowance threshold
-            double basicRateThreshold = 50270.0; // Basic rate tax threshold
-            double higherRateThreshold = 125140.0; // Higher rate tax threshold
-
-            // Calculate taxable income
-            double taxableIncome = Math.max(totalGrossPay - personalAllowance, 0);
-
-            // Calculate tax based on different tax brackets
-            double basicRate = Math.min(Math.max(taxableIncome, 0), basicRateThreshold) * 0.20;
-            double higherRate = Math.min(Math.max(taxableIncome - basicRateThreshold, 0), higherRateThreshold - basicRateThreshold) * 0.40;
-            double additionalRate = Math.max(taxableIncome - higherRateThreshold, 0) * 0.45;
-
-            // Calculate total tax
-            double totalTax = basicRate + higherRate + additionalRate;
-
-            // Calculate net pay after taxes
-            double netPay = payrollInfo.get("netPay") - (totalGrossPay - totalTax);
-
-            // Update payroll information for the current employee
-            payrollInfo.put("totalTax", totalTax);
-            payrollInfo.replace("netPay", netPay);
-        }
 
         // Loop to update payroll info
         for (Map.Entry<String, Map<String, Double>> entry : employeePayrollMap.entrySet()) {
