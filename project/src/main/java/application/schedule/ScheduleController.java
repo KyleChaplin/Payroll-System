@@ -406,15 +406,19 @@ public class ScheduleController implements Initializable {
                 // Parse the percentage value from the pension string
                 double pensionPercentage = Double.parseDouble(pensionString.substring(0, pensionString.length() - 1)) / 100.0;
 
-                System.out.println(pensionPercentage);
-
                 // Update payroll info with data from the current schedule
-                payrollInfo.put("totalHoursWorked", employeePayroll.getHoursWorked() + s.getTotalHoursWorked());
+                payrollInfo.put("totalHoursWorked", calculateTotalHoursWorked(s) + s.getTotalHoursWorked());
                 payrollInfo.put("pensionCon", pensionPercentage);
                 payrollInfo.put("totalPensionPaid", employeePayroll.getPensionPaid() + s.getTotalPensionPaid());
                 payrollInfo.put("totalOvertimeHours", employeePayroll.getOvertimeHours() + s.getTotalOvertimeHours());
                 payrollInfo.put("totalOvertimePay", employeePayroll.getOvertimePay() + s.getTotalOvertimePay());
                 payrollInfo.put("totalGrossPay", payrollInfo.get("totalHoursWorked") * employeePayroll.getsalary() + s.getTotalGrossPay());
+
+                s.setTotalHoursWorked(payrollInfo.get("totalHoursWorked"));
+                s.setTotalPensionPaid(payrollInfo.get("totalPensionPaid"));
+                s.setTotalOvertimeHours(payrollInfo.get("totalOvertimeHours"));
+                s.setTotalOvertimePay(payrollInfo.get("totalOvertimePay"));
+                s.setTotalGrossPay(payrollInfo.get("totalGrossPay"));
 
                 // Put updated payroll info back into the map
                 employeePayrollMap.put(employeeId, payrollInfo);
@@ -484,16 +488,16 @@ public class ScheduleController implements Initializable {
             String employeeId = entry.getKey();
             Map<String, Double> payrollInfo = entry.getValue();
 
-            // Output accumulated values for the current employee
-            System.out.println("==============================");
-            System.out.println("Employee ID: " + employeeId);
-            System.out.println("Total Hours Worked: " + payrollInfo.get("totalHoursWorked"));
-            System.out.println("Total Pension: " + payrollInfo.get("totalPensionPaid"));
-            System.out.println("Total Overtime Hours: " + payrollInfo.get("totalOvertimeHours"));
-            System.out.println("Total Overtime Pay: " + payrollInfo.get("totalOvertimePay"));
-            System.out.println("Total Gross Pay: " + payrollInfo.get("totalGrossPay"));
-            System.out.println("Total Tax: " + payrollInfo.get("totalTax"));
-            System.out.println("Net Pay: " + payrollInfo.get("netPay"));
+//            // Output accumulated values for the current employee
+//            System.out.println("==============================");
+//            System.out.println("Employee ID: " + employeeId);
+//            System.out.println("Total Hours Worked: " + payrollInfo.get("totalHoursWorked"));
+//            System.out.println("Total Pension: " + payrollInfo.get("totalPensionPaid"));
+//            System.out.println("Total Overtime Hours: " + payrollInfo.get("totalOvertimeHours"));
+//            System.out.println("Total Overtime Pay: " + payrollInfo.get("totalOvertimePay"));
+//            System.out.println("Total Gross Pay: " + payrollInfo.get("totalGrossPay"));
+//            System.out.println("Total Tax: " + payrollInfo.get("totalTax"));
+//            System.out.println("Net Pay: " + payrollInfo.get("netPay"));
 
             // Update payroll information in the database
             DatabaseController.updatePayrollInfo(employeeId, payrollInfo.get("totalHoursWorked"),
