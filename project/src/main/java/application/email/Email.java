@@ -50,14 +50,11 @@ public class Email {
                     setupServerProperties();
 
                     // Draft an email
-                    System.out.println("Drafting emails...");
                     draftEmail();
 
                     // Send the email
-                    System.out.println("Sending emails...");
                     sendEmail();
 
-                    System.out.println("Updating database...");
                     updateEmailDateInDatabase();
                 }
             } catch (MessagingException | IOException | ParseException e) {
@@ -66,6 +63,8 @@ public class Email {
         }
 
         private void updateEmailDateInDatabase() {
+            System.out.println("Updating database...");
+
             try {
                 // Update the email date in the database
                 String newEmailDate = calculateNextExecutionDate();
@@ -92,6 +91,8 @@ public class Email {
         }
 
         private static void sendEmail() throws MessagingException {
+            System.out.println("Sending emails...");
+
             String fromUser = DatabaseController.getEmailInfo();
             String fromUserPassword = DatabaseController.getPasswordInfo();
             String emailHost = "smtp.gmail.com";
@@ -109,6 +110,8 @@ public class Email {
         }
 
         private static void draftEmail() throws MessagingException, IOException {
+            System.out.println("Drafting emails...");
+
             String emailSubject;
             String emailBody;
 

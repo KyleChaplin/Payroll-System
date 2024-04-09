@@ -10,7 +10,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
@@ -19,14 +18,13 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.EventHandler;
 import javafx.util.Duration;
-
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static application.DatabaseController.addPayrollInfo;
+import static application.DatabaseController.addOrUpdatePayrollInfo;
 import static application.DatabaseController.getScheduleData;
 
 public class ScheduleController implements Initializable {
@@ -405,17 +403,27 @@ public class ScheduleController implements Initializable {
                 // Parse the percentage value from the pension string
                 double pensionPercentage = Double.parseDouble(pensionString.substring(0, pensionString.length() - 1)) / 100.0;
 
+                // Get the employees hourly salary
+                payrollInfo.put("hourlySalary", employeePayroll.getsalary());
+
+                // Calculate overtime worked over the 4 weeks
+                double contractedHours = DatabaseController.getContractedHours(s.getEmployeeID());
+                payrollInfo.put("contractedHours", (contractedHours));
+                double plannedHours = calculateTotalHoursWorked(s);
+                payrollInfo.put("plannedHours", payrollInfo.getOrDefault("plannedHours", 0.0) + plannedHours);
+
+                double overTimeWorked = Math.max(plannedHours - contractedHours, 0.0);
+                s.setTotalOvertimeHours(s.getTotalOvertimeHours() + overTimeWorked);
+                payrollInfo.put("totalOvertimeHours", payrollInfo.getOrDefault("totalOvertimeHours", 0.0) + overTimeWorked);
+
+
                 // Update payroll info with data from the current schedule
                 payrollInfo.put("totalHoursWorked", payrollInfo.getOrDefault("totalHoursWorked", 0.0) + calculateTotalHoursWorked(s));
                 payrollInfo.put("pensionCon", pensionPercentage);
-                //payrollInfo.put("totalPensionPaid", payrollInfo.get("totalPensionPaid") * employeePayroll.getsalary() + s.getTotalPensionPaid());
-                payrollInfo.put("totalOvertimeHours", payrollInfo.getOrDefault("totalOvertimeHours", 0.0) + s.getTotalOvertimeHours());
-                payrollInfo.put("totalOvertimePay", payrollInfo.getOrDefault("totalOvertimePay", 0.0) + s.getTotalOvertimePay());
-                payrollInfo.put("totalGrossPay", payrollInfo.get("totalHoursWorked") * employeePayroll.getsalary() + s.getTotalGrossPay());
+                payrollInfo.put("totalOvertimePay", payrollInfo.getOrDefault("totalOvertimeHours", 0.0) * payrollInfo.get("hourlySalary") + s.getTotalOvertimePay());
+                payrollInfo.put("totalGrossPay", payrollInfo.get("totalHoursWorked") * payrollInfo.get("hourlySalary") + s.getTotalGrossPay());
 
                 s.setTotalHoursWorked(payrollInfo.get("totalHoursWorked"));
-                //s.setTotalPensionPaid(payrollInfo.get("totalPensionPaid"));
-                s.setTotalOvertimeHours(payrollInfo.get("totalOvertimeHours"));
                 s.setTotalOvertimePay(payrollInfo.get("totalOvertimePay"));
                 s.setTotalGrossPay(payrollInfo.get("totalGrossPay"));
 
@@ -429,7 +437,6 @@ public class ScheduleController implements Initializable {
 
                 // Retrieve total gross pay for the current employee
                 double totalGrossPay = payrollInfo.get("totalGrossPay");
-                double initialNetPay = payrollInfo.getOrDefault("netPay", 0.0);
 
                 // Fetch pension information for the current employee
                 double pensionPercentage = payrollInfo.get("pensionCon");
@@ -490,21 +497,11 @@ public class ScheduleController implements Initializable {
             String employeeId = entry.getKey();
             Map<String, Double> payrollInfo = entry.getValue();
 
-            // Output accumulated values for the current employee
-            System.out.println("==============================");
-            System.out.println("Employee ID: " + employeeId);
-            System.out.println("Total Hours Worked: " + payrollInfo.get("totalHoursWorked"));
-            System.out.println("Total Pension: " + payrollInfo.get("totalPensionPaid"));
-            System.out.println("Total Overtime Hours: " + payrollInfo.get("totalOvertimeHours"));
-            System.out.println("Total Overtime Pay: " + payrollInfo.get("totalOvertimePay"));
-            System.out.println("Total Gross Pay: " + payrollInfo.get("totalGrossPay"));
-            System.out.println("Total Tax: " + payrollInfo.get("totalTax"));
-            System.out.println("Net Pay: " + payrollInfo.get("netPay"));
-
-            // Update payroll information in the database
-            DatabaseController.updatePayrollInfo(employeeId, payrollInfo.get("totalHoursWorked"),
-                    payrollInfo.get("totalPensionPaid"), payrollInfo.get("totalOvertimePay"),
-                    payrollInfo.get("totalGrossPay"), payrollInfo.get("totalTax"), payrollInfo.get("netPay"));
+            DatabaseController.addOrUpdatePayrollInfo(employeeId, DatabaseController.getEmailDateInfo(),
+            getCurrentMonthString(), getCurrentYear(), payrollInfo.get("totalHoursWorked"),
+            String.format("%.0f%%", payrollInfo.get("pensionCon") * 100), payrollInfo.get("totalPensionPaid"),
+            payrollInfo.get("totalOvertimeHours"), payrollInfo.get("totalOvertimePay"),
+            payrollInfo.get("totalGrossPay"), payrollInfo.get("totalTax"), payrollInfo.get("netPay"));
         }
     }
 

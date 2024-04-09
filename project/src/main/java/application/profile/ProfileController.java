@@ -13,8 +13,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import org.w3c.dom.Text;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -131,7 +129,7 @@ public class ProfileController implements Initializable {
         );
 
         txtBankName.setText(person.getBankName());
-        txtBasePay.setText(String.valueOf((Double.parseDouble(person.getContractedHours()) * Double.parseDouble(person.getHourlySalary()) * 12)));
+        txtBasePay.setText(String.valueOf(((Double.parseDouble(person.getContractedHours()) * Double.parseDouble(person.getHourlySalary()) * 4) * 12)));
         txtAccountNumber.setText(person.getAccountNumber());
         txtSortCode.setText(person.getSortCode());
 
@@ -191,6 +189,11 @@ public class ProfileController implements Initializable {
                 // Add the download link to the VBox
                 vBoxDownload.getChildren().add(downloadLink);
             }
+        }
+
+        if (vBoxDownload.getChildren().isEmpty()) {
+            Label label = new Label("No payslips available");
+            vBoxDownload.getChildren().add(label);
         }
     }
 
@@ -269,6 +272,7 @@ public class ProfileController implements Initializable {
             // Remove highlight to every textfield
             for (TextField textField : textFields) {
                 removeErrorHighlight(textField);
+                removeEditableHighlight(textField);
             }
 
             for (TextField textField : textFields) {
@@ -343,6 +347,16 @@ public class ProfileController implements Initializable {
         } else {
             setEditable();
 
+            TextField[] textFields = {
+                    txtfName, txtlName, txtEFirstName, txtELastName, txtEmail, txtPhone, txtNiNumber,
+                    txtAddress1, txtAddress2, txtCity, txtPostcode, txtBankName,
+                    txtAccountNumber, txtSortCode, txtEMobile, txtERelationship
+            };
+
+            for (TextField textField : textFields) {
+                highlightEditable(textField);
+            }
+
             btnGreen.setText("Save");
         }
     }
@@ -373,6 +387,14 @@ public class ProfileController implements Initializable {
         textField.getStyleClass().remove("error-border");
     }
 
+    private void highlightEditable(TextField textField) {
+        textField.getStyleClass().add("edit-border");
+    }
+
+    private void removeEditableHighlight(TextField textField) {
+        textField.getStyleClass().remove("edit-border");
+    }
+
     public void openDashboard(ActionEvent event) throws IOException {
         SceneController.openScene(event, "home", stage, scene);
     }
@@ -401,7 +423,7 @@ public class ProfileController implements Initializable {
         SceneController.openScene(event, "help", stage, scene);
     }
 
-    public void toggleTheme(ActionEvent event) throws IOException {
+    public void toggleTheme() throws IOException {
         ThemeManager.toggleMode();
     }
 }

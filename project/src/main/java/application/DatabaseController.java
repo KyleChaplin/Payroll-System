@@ -567,9 +567,11 @@ public class DatabaseController {
 
         // Update the payroll - specifically the pension contribution
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "UPDATE NPS_PAYROLL SET PENSION = ? WHERE EMPLOYEE_ID = ?")) {
+                "UPDATE NPS_PAYROLL SET PENSION = ? WHERE EMPLOYEE_ID = ? AND PAY_MONTH = ?")) {
             preparedStatement.setString(1, pensionCon);
             preparedStatement.setString(2, employeeId);
+            preparedStatement.setString(3, getCurrentMonthString());
+
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
                 logger.info("Employee pension updated successfully.");
@@ -764,19 +766,22 @@ public class DatabaseController {
     }
 
     public static void updatePayrollInfo(String employeeId, double hoursWorked, double pensionPaid,
-                                         double overtimePay, double grossPay, double taxes, double netPay) {
+                                         double overTimeWorked, double overtimePay, double grossPay, double taxes,
+                                         double netPay) {
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "UPDATE NPS_PAYROLL SET HOURS_WORKED = ?, PENSION_PAID = ?, OVERTIME_PAY = ?, GROSS_PAY = ?, " +
-                        "TAXES = ?, NET_PAY = ? WHERE EMPLOYEE_ID = ?")) {
+                "UPDATE NPS_PAYROLL SET HOURS_WORKED = ?, PENSION_PAID = ?, OVERTIME_HOURS = ?, OVERTIME_PAY = ?, " +
+                        "GROSS_PAY = ?, TAXES = ?, NET_PAY = ? WHERE EMPLOYEE_ID = ? AND PAY_MONTH = ?")) {
 
             preparedStatement.setDouble(1, hoursWorked);
             preparedStatement.setDouble(2, pensionPaid);
-            preparedStatement.setDouble(3, overtimePay);
-            preparedStatement.setDouble(4, grossPay);
-            preparedStatement.setDouble(5, taxes);
-            preparedStatement.setDouble(6, netPay);
-            preparedStatement.setString(7, employeeId);
+            preparedStatement.setDouble(3, overTimeWorked);
+            preparedStatement.setDouble(4, overtimePay);
+            preparedStatement.setDouble(5, grossPay);
+            preparedStatement.setDouble(6, taxes);
+            preparedStatement.setDouble(7, netPay);
+            preparedStatement.setString(8, employeeId);
+            preparedStatement.setString(9, getCurrentMonthString());
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
@@ -851,7 +856,7 @@ public class DatabaseController {
                         "Sort Code");
 
                 // Add payroll info for the employee
-                addPayrollInfo(String.valueOf(employeeId), "Date", getCurrentMonthString(), 0,
+                addPayrollInfo(String.valueOf(employeeId), getEmailDateInfo(), getCurrentMonthString(), 0,
                         0.0, "0%", 0.0, 0.0, 0.0, 0.0,
                         0.0, 0.0);
 
@@ -924,6 +929,40 @@ public class DatabaseController {
         } catch (SQLException e) {
             logger.error("Failure during SQL query - adding bank details", e);
         }
+    }
+
+    // Methods that will decide whether to add or update a payroll record - depends if we're in the same month currently
+    public static void addOrUpdatePayrollInfo(String employeeId, String payDate, String month, int year, double hoursWorked,
+                                              String pension,double pensionPaid, double overtimeHours, double overtimePay, double grossPay,
+                                              double taxes, double netPay) {
+        // Check if payroll info already exists for the given month and year
+        boolean payrollExists = checkPayrollExists(employeeId, month, year);
+        if (payrollExists) {
+            // Update existing payroll info
+            updatePayrollInfo(employeeId, hoursWorked, pensionPaid, overtimeHours, overtimePay, grossPay, taxes, netPay);
+        } else {
+            // Add new payroll info
+            addPayrollInfo(employeeId, payDate, month, year, hoursWorked, pension, pensionPaid, overtimeHours, overtimePay, grossPay, taxes, netPay);
+        }
+    }
+
+    private static boolean checkPayrollExists(String employeeId, String month, int year) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT COUNT(*) FROM NPS_PAYROLL WHERE EMPLOYEE_ID = ? AND PAY_MONTH = ? AND YEAR = ?")) {
+            preparedStatement.setInt(1, Integer.parseInt(employeeId));
+            preparedStatement.setString(2, month);
+            preparedStatement.setInt(3, year);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    int rowCount = resultSet.getInt(1);
+                    return rowCount > 0;
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Failure during SQL query - checking payroll existence", e);
+        }
+        return false;
     }
 
     // Method to add payroll info
