@@ -46,7 +46,6 @@ public class Email {
                 // Check if the scheduled date has passed
                 if (scheduledDate.before(new Date())) {
                     // Setup mail server properties
-                    System.out.println("Setting up email server properties...");
                     setupServerProperties();
 
                     // Draft an email
@@ -150,6 +149,8 @@ public class Email {
         }
 
         private static void setupServerProperties() {
+            System.out.println("Setting up email server properties...");
+
             Properties properties = System.getProperties();
             properties.put("mail.smtp.host", "smtp.gmail.com");
             properties.put("mail.smtp.port", "587");

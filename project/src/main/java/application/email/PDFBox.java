@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import java.util.Date;
+import java.util.List;
 
 import application.DatabaseController;
 import application.payroll.DetailedPayroll;
@@ -91,7 +92,7 @@ public class PDFBox {
         int[] columnWidths = {115, 115, 115, 115, 115};
         tableClass table = new tableClass(doc, contentStream, columnWidths, 25, pageHeight - 145, 20, 0, 20, 15, font);
         // Add the table headers
-        String[] tableHeaders = {"Hours", "Hourly Rate", "Overtime", "Overtime Rate", "Overall Pay"};
+        String[] tableHeaders = {"Hours", "Hourly Rate", "Overtime", "Overtime Rate", "Gross Pay"};
         for (String header : tableHeaders) {
             table.addCell(header);
         }
@@ -108,7 +109,7 @@ public class PDFBox {
         int[] columnWidths2 = {115, 115, 115, 115, 115};
         tableClass table2 = new tableClass(doc, contentStream, columnWidths2, 25, pageHeight - 245, 20, 0, 20, 15, font);
         // Add the table headers
-        String[] tableHeaders2 = {"Tax", "Pension", "Pension Paid", "Other", "Pay"};
+        String[] tableHeaders2 = {"Tax", "Pension", "Pension Paid", "Other", "Net Pay"};
         for (String header : tableHeaders2) {
             table2.addCell(header);
         }
@@ -127,7 +128,6 @@ public class PDFBox {
         String lastFourDigits = niNo.substring(niNo.length() - 4);
         encryptPDF(doc, pdfFilePath, lastFourDigits);
 
-        System.out.println("PDF created: " + pdfFilePath);
         doc.close();
 
         return pdfFilePath;
