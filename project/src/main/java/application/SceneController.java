@@ -28,14 +28,16 @@ public class SceneController {
     private TextField passwordTextField;
 
     public void loginButtonOnAction(ActionEvent event) throws IOException {
+        removeErrorHighlight(usernameTextField);
+        removeErrorHighlight(passwordTextField);
 
-        int loginCheck = checkLoginDetails();
-
-        //loginCheck = 1;
-
-        switch (loginCheck) {
+        switch (checkLoginDetails()) {
             case 0:
                 loginMessageLabel.setText("Please enter username and password.");
+
+                highlightError(usernameTextField);
+                highlightError(passwordTextField);
+
                 break;
             case 1:
                 loginMessageLabel.setText("Login Successful");
@@ -82,5 +84,23 @@ public class SceneController {
         stg.setTitle("Payroll - " + name);
         stg.setScene(scn);
         stg.show();
+    }
+
+    // Method to highlight the error border of the text field
+    public static void highlightError(TextField textField) {
+        textField.getStyleClass().add("error-border");
+    }
+
+    // Method to remove the error border from the text field
+    public static void removeErrorHighlight(TextField textField) {
+        textField.getStyleClass().remove("error-border");
+    }
+
+    public static void highlightEditable(TextField textField) {
+        textField.getStyleClass().add("edit-border");
+    }
+
+    public static void removeEditableHighlight(TextField textField) {
+        textField.getStyleClass().remove("edit-border");
     }
 }

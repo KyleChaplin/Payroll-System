@@ -201,6 +201,7 @@ public class ScheduleController implements Initializable {
             Schedule schedule = Week0Table.getSelectionModel().getSelectedItem();
 
             setTextFields(schedule);
+            changeBorder(true);
         }
     }
 
@@ -306,6 +307,7 @@ public class ScheduleController implements Initializable {
             } else if ((startField.getText() != null && endField.getText() != null) &&
                     (!isValidTime(startField.getText()) || !isValidTime(endField.getText()))) {
                 txtEmptyError.setText("Please check " + daysOfWeek[i] + "'s times and try again!");
+
                 // Set up a timeline to clear the error message after 5 seconds
                 setupErrorTimer();
             }
@@ -569,8 +571,34 @@ public class ScheduleController implements Initializable {
                 textField.clear();
             }
         }
+        changeBorder(false);
         txtEmptyError.setText("");
         txtSearch.setText("");
+    }
+
+    private void changeBorder(boolean choice) {
+        TextField[] startFields = {txtMonStart, txtTueStart, txtWedStart, txtThuStart, txtFriStart, txtSatStart, txtSunStart};
+        TextField[] endFields = {txtMonEnd, txtTueEnd, txtWedEnd, txtThuEnd, txtFriEnd, txtSatEnd, txtSunEnd};
+
+        List<TextField> TextFields = new ArrayList<>();
+
+        for (int i = 0; i < startFields.length; i++) {
+            TextField startField = startFields[i];
+            TextField endField = endFields[i];
+
+            TextFields.add(startField); // Add the start field to the list of error text fields
+            TextFields.add(endField); // Add the end field to the list of error text fields
+
+            if (choice) {
+                for (TextField textField : TextFields) {
+                    SceneController.highlightEditable(textField);
+                }
+            } else {
+                for (TextField textField : TextFields) {
+                    SceneController.removeEditableHighlight(textField);
+                }
+            }
+        }
     }
 
     public void openDashboard(ActionEvent event) throws IOException {

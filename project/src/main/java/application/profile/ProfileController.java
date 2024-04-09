@@ -271,14 +271,14 @@ public class ProfileController implements Initializable {
 
             // Remove highlight to every textfield
             for (TextField textField : textFields) {
-                removeErrorHighlight(textField);
-                removeEditableHighlight(textField);
+                SceneController.removeErrorHighlight(textField);
+                SceneController.removeEditableHighlight(textField);
             }
 
             for (TextField textField : textFields) {
                 if (textField.getText().isEmpty()) {
                     hasEmptyField = true;
-                    highlightError(textField); // Highlight only the empty fields
+                    SceneController.highlightError(textField); // Highlight only the empty fields
                 }
             }
 
@@ -288,43 +288,43 @@ public class ProfileController implements Initializable {
                 // Perform additional input validation
                 if (!txtEmail.getText().matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
                     txtEmptyError.setText("Invalid email address!");
-                    highlightError(txtEmail);
+                    SceneController.highlightError(txtEmail);
                     return;
                 }
 
                 if (!txtPhone.getText().matches("^[0-9]{11}$")) {
                     txtEmptyError.setText("Invalid mobile number!");
-                    highlightError(txtPhone);
+                    SceneController.highlightError(txtPhone);
                     return;
                 }
 
                 if (!txtNiNumber.getText().matches("^[A-CEGHJ-PR-TW-Z]{1}[A-CEGHJ-NPR-TW-Z]{1}[0-9]{6}[A-D\\s]{1}$")) {
                     txtEmptyError.setText("Invalid NI number!");
-                    highlightError(txtNiNumber);
+                    SceneController.highlightError(txtNiNumber);
                     return;
                 }
 
                 if (!txtAccountNumber.getText().matches("^[0-9]{8}$")) {
                     txtEmptyError.setText("Invalid account number!");
-                    highlightError(txtAccountNumber);
+                    SceneController.highlightError(txtAccountNumber);
                     return;
                 }
 
                 if (!txtSortCode.getText().matches("^[0-9]{6}$")) {
                     txtEmptyError.setText("Invalid sort code!");
-                    highlightError(txtSortCode);
+                    SceneController.highlightError(txtSortCode);
                     return;
                 }
 
                 if (!txtPostcode.getText().matches("^([A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2})$")) {
                     txtEmptyError.setText("Invalid postal code!");
-                    highlightError(txtPostcode);
+                    SceneController.highlightError(txtPostcode);
                     return;
                 }
 
                 if (!txtEMobile.getText().matches("^[0-9]{11}$")) {
                     txtEmptyError.setText("Invalid emergency contact mobile number!");
-                    highlightError(txtEMobile);
+                    SceneController.highlightError(txtEMobile);
                     return;
                 }
 
@@ -354,7 +354,7 @@ public class ProfileController implements Initializable {
             };
 
             for (TextField textField : textFields) {
-                highlightEditable(textField);
+                SceneController.highlightEditable(textField);
             }
 
             btnGreen.setText("Save");
@@ -375,24 +375,6 @@ public class ProfileController implements Initializable {
         // Toggle the editability of the ComboBox
         cboPension.setEditable(!cboPension.isEditable());
         cboPension.setMouseTransparent(!cboPension.isEditable());
-    }
-
-    // Method to highlight the error border of the text field
-    private void highlightError(TextField textField) {
-        textField.getStyleClass().add("error-border");
-    }
-
-    // Method to remove the error border from the text field
-    private void removeErrorHighlight(TextField textField) {
-        textField.getStyleClass().remove("error-border");
-    }
-
-    private void highlightEditable(TextField textField) {
-        textField.getStyleClass().add("edit-border");
-    }
-
-    private void removeEditableHighlight(TextField textField) {
-        textField.getStyleClass().remove("edit-border");
     }
 
     public void openDashboard(ActionEvent event) throws IOException {
