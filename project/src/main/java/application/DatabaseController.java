@@ -12,14 +12,20 @@ import javafx.collections.ObservableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.*;
-import java.math.BigDecimal;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.*;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.Key;
+import java.util.Base64;
 
 public class DatabaseController {
     private static final Map<String, String> envVariables = new HashMap<>();
@@ -110,10 +116,11 @@ public class DatabaseController {
             } else {
                 logger.info("Admin account does not exist... creating one.\n");
                 // Set currently logged in employee ID to 1 (admin) for the first login
-                currentLoggedInEmployeeId = "1";
+                //currentLoggedInEmployeeId = "1";
 
-                AddTableData.addEmployee("admin", "admin", "admin", "-", "0.0", "-",
-                        0, "admin", "delete me", "-1", "IT",
+                AddTableData.addEmployee("admin", "admin", "admin", "0", "0.0",
+                        "0", 0, "admin", "delete me", "-1",
+                        "IT",
                         "admin", true);
             }
 
@@ -196,17 +203,17 @@ public class DatabaseController {
                     try (Statement statement = connection.createStatement()) {
                         statement.executeUpdate("CREATE TABLE NPS_EMPLOYEE (" +
                                 "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
-                                "FIRST_NAME VARCHAR2(50) NOT NULL, " +
-                                "LAST_NAME VARCHAR2(50) NOT NULL, " +
-                                "EMAIL VARCHAR2(100) UNIQUE NOT NULL, " +
-                                "PHONE VARCHAR2(20) NOT NULL," +
+                                "FIRST_NAME VARCHAR2(55) NOT NULL, " +
+                                "LAST_NAME VARCHAR2(55) NOT NULL, " +
+                                "EMAIL VARCHAR2(105) UNIQUE NOT NULL, " +
+                                "PHONE VARCHAR2(25) NOT NULL," +
                                 "SALARY DECIMAL (10, 2) NOT NULL," +
-                                "NI_NUMBER VARCHAR2(20) NOT NULL," +
-                                "LOCATION VARCHAR2(100) NOT NULL," +
-                                "CONTRACT_TYPE VARCHAR2(50) NOT NULL," +
+                                "NI_NUMBER VARCHAR2(25) NOT NULL," +
+                                "LOCATION VARCHAR2(105) NOT NULL," +
+                                "CONTRACT_TYPE VARCHAR2(55) NOT NULL," +
                                 "CONTRACT_HOURS DECIMAL (10, 2) NOT NULL," +
-                                "DEPARTMENT VARCHAR2(20) NOT NULL," +
-                                "JOB_TITLE VARCHAR2(20) NOT NULL" +
+                                "DEPARTMENT VARCHAR2(25) NOT NULL," +
+                                "JOB_TITLE VARCHAR2(25) NOT NULL" +
                                 ")");
                     } catch (SQLException e) {
                         logger.error("Failed to create " + tableName + " ", e);
@@ -217,9 +224,9 @@ public class DatabaseController {
                         statement.executeUpdate("CREATE TABLE NPS_BANK_DETAILS (" +
                                 "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
                                 "EMPLOYEE_ID NUMBER NOT NULL, " +
-                                "BANK_NAME VARCHAR2(50) NOT NULL, " +
-                                "ACCOUNT_NUMBER VARCHAR2(20) NOT NULL, " +
-                                "SORT_CODE VARCHAR2(20) NOT NULL" +
+                                "BANK_NAME VARCHAR2(55) NOT NULL, " +
+                                "ACCOUNT_NUMBER VARCHAR2(25) NOT NULL, " +
+                                "SORT_CODE VARCHAR2(25) NOT NULL" +
                                 ")");
                     } catch (SQLException e) {
                         logger.error("Failed to create " + tableName + " ", e);
@@ -252,8 +259,8 @@ public class DatabaseController {
                                 "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
                                 "EMPLOYEE_ID NUMBER NOT NULL, " +
                                 "ACCESS_LEVEL NUMBER NOT NULL, " +
-                                "USERNAME VARCHAR2(50) UNIQUE NOT NULL, " +
-                                "PASSWORD VARCHAR2(50) NOT NULL" +
+                                "USERNAME VARCHAR2(1000) UNIQUE NOT NULL, " +
+                                "PASSWORD VARCHAR2(1000) NOT NULL" +
                                 ")");
                     } catch (SQLException e) {
                         logger.error("Failed to create " + tableName + " ", e);
@@ -264,10 +271,10 @@ public class DatabaseController {
                         statement.executeUpdate("CREATE TABLE NPS_EMERGENCY_CONTACT (" +
                                 "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
                                 "EMPLOYEE_ID NUMBER NOT NULL, " +
-                                "FIRST_NAME VARCHAR2(50) NOT NULL, " +
-                                "LAST_NAME VARCHAR2(50) NOT NULL, " +
-                                "PHONE VARCHAR2(20) NOT NULL, " +
-                                "RELATIONSHIP VARCHAR2(50) NOT NULL" +
+                                "FIRST_NAME VARCHAR2(55) NOT NULL, " +
+                                "LAST_NAME VARCHAR2(55) NOT NULL, " +
+                                "PHONE VARCHAR2(25) NOT NULL, " +
+                                "RELATIONSHIP VARCHAR2(55) NOT NULL" +
                                 ")");
                     } catch (SQLException e) {
                         logger.error("Failed to create " + tableName + " ", e);
@@ -278,10 +285,10 @@ public class DatabaseController {
                         statement.executeUpdate("CREATE TABLE NPS_ADDRESSES (" +
                                 "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
                                 "EMPLOYEE_ID NUMBER NOT NULL, " +
-                                "ADDRESS_LINE_1 VARCHAR2(100) NOT NULL, " +
-                                "ADDRESS_LINE_2 VARCHAR2(100), " +
-                                "CITY VARCHAR2(50) NOT NULL, " +
-                                "POSTCODE VARCHAR2(10) NOT NULL" +
+                                "ADDRESS_LINE_1 VARCHAR2(125) NOT NULL, " +
+                                "ADDRESS_LINE_2 VARCHAR2(125), " +
+                                "CITY VARCHAR2(75) NOT NULL, " +
+                                "POSTCODE VARCHAR2(25) NOT NULL" +
                                 ")");
                     } catch (SQLException e) {
                         logger.error("Failed to create " + tableName + " ", e);
@@ -342,21 +349,21 @@ public class DatabaseController {
                     try (Statement statement = connection.createStatement()) {
                         statement.executeUpdate("CREATE TABLE NPS_DELETED_USERS (" +
                                 "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
-                                "ADDED_DATE VARCHAR2(30) NOT NULL, " +
-                                "DELETE_DATE VARCHAR2(30) NOT NULL, " +
-                                "DELETED_BY VARCHAR2(100) NOT NULL, " +
-                                "FIRST_NAME VARCHAR2(50) NOT NULL, " +
-                                "LAST_NAME VARCHAR2(50) NOT NULL, " +
-                                "EMAIL VARCHAR2(100) UNIQUE NOT NULL, " +
-                                "PHONE VARCHAR2(20) NOT NULL," +
-                                "NI_NUMBER VARCHAR2(20) NOT NULL," +
-                                "ADDRESS_LINE_1 VARCHAR2(100) NOT NULL, " +
-                                "ADDRESS_LINE_2 VARCHAR2(100), " +
-                                "CITY VARCHAR2(50) NOT NULL, " +
-                                "POSTCODE VARCHAR2(10) NOT NULL, " +
-                                "BANK_NAME VARCHAR2(50) NOT NULL, " +
-                                "ACCOUNT_NUMBER VARCHAR2(20) NOT NULL, " +
-                                "SORT_CODE VARCHAR2(20) NOT NULL" +
+                                "ADDED_DATE VARCHAR2(45) NOT NULL, " +
+                                "DELETE_DATE VARCHAR2(45) NOT NULL, " +
+                                "DELETED_BY VARCHAR2(105) NOT NULL, " +
+                                "FIRST_NAME VARCHAR2(55) NOT NULL, " +
+                                "LAST_NAME VARCHAR2(55) NOT NULL, " +
+                                "EMAIL VARCHAR2(105) UNIQUE NOT NULL, " +
+                                "PHONE VARCHAR2(25) NOT NULL," +
+                                "NI_NUMBER VARCHAR2(25) NOT NULL," +
+                                "ADDRESS_LINE_1 VARCHAR2(125) NOT NULL, " +
+                                "ADDRESS_LINE_2 VARCHAR2(125), " +
+                                "CITY VARCHAR2(75) NOT NULL, " +
+                                "POSTCODE VARCHAR2(25) NOT NULL, " +
+                                "BANK_NAME VARCHAR2(55) NOT NULL, " +
+                                "ACCOUNT_NUMBER VARCHAR2(25) NOT NULL, " +
+                                "SORT_CODE VARCHAR2(25) NOT NULL" +
                                 ")");
                     } catch (SQLException e) {
                         logger.error("Failed to create " + tableName + " ", e);
@@ -461,17 +468,17 @@ public class DatabaseController {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "INSERT INTO NPS_EMPLOYEE (FIRST_NAME, LAST_NAME, EMAIL, PHONE, SALARY, NI_NUMBER, LOCATION," +
                             "CONTRACT_TYPE, CONTRACT_HOURS, DEPARTMENT, JOB_TITLE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
-                preparedStatement.setString(1, firstName);
-                preparedStatement.setString(2, lastName);
-                preparedStatement.setString(3, email);
-                preparedStatement.setString(4, phone);
-                preparedStatement.setString(5, salary);
-                preparedStatement.setString(6, niNumber);
-                preparedStatement.setString(7, location);
-                preparedStatement.setString(8, contractType);
-                preparedStatement.setString(9, contactHours);
-                preparedStatement.setString(10, department);
-                preparedStatement.setString(11, jobTitle);
+                preparedStatement.setString(1, Encryption.encryptString(firstName));
+                preparedStatement.setString(2, Encryption.encryptString(lastName));
+                preparedStatement.setString(3, Encryption.encryptString(email));
+                preparedStatement.setString(4, Encryption.encryptString(phone));
+                preparedStatement.setDouble(5, Double.parseDouble(salary));
+                preparedStatement.setString(6, Encryption.encryptString(niNumber));
+                preparedStatement.setString(7, Encryption.encryptString(location));
+                preparedStatement.setString(8, Encryption.encryptString(contractType));
+                preparedStatement.setDouble(9, Double.parseDouble(contactHours));
+                preparedStatement.setString(10, Encryption.encryptString(department));
+                preparedStatement.setString(11, Encryption.encryptString(jobTitle));
 
                 int rowsAffected = preparedStatement.executeUpdate();
                 if (rowsAffected > 0) {
@@ -482,8 +489,8 @@ public class DatabaseController {
                     createLogin(employeeId, email, firstName, niNumber, accessLevel, firstLogin);
 
                     // Add bank details for the employee
-                    addBankDetails(String.valueOf(employeeId), "Bank Name", "Account Number",
-                            "Sort Code");
+                    addBankDetails(String.valueOf(employeeId), Encryption.encryptString("Bank Name"),
+                            Encryption.encryptString("Account Number"), Encryption.encryptString("Sort Code"));
 
                     // Add payroll info for the employee
                     AddTableData.addPayrollInfo(String.valueOf(employeeId), GetTableData.getEmailDateInfo(),
@@ -492,7 +499,9 @@ public class DatabaseController {
                             0.0, 0.0);
 
                     // Add emergency contact info for the employee
-                    addEmergencyDetails("email", "First Name", "Last Name", "Mobile", "Relationship");
+                    addEmergencyDetails(Encryption.encryptString("email"), Encryption.encryptString("First Name"),
+                            Encryption.encryptString("Last Name"), Encryption.encryptString("Mobile"),
+                            Encryption.encryptString("Relationship"), employeeId);
 
                     // Add schedule info for the employee
                     InitialiseTables.initialiseScheduleForAllEmployees();
@@ -519,15 +528,16 @@ public class DatabaseController {
 
                 // If first login, use default username and password
                 if (firstLogin) {
-                    preparedStatement.setString(3, "admin");
-                    preparedStatement.setString(4, "admin");
+                    preparedStatement.setString(3, Encryption.hash("admin"));
+                    preparedStatement.setString(4, Encryption.hash("admin"));
                 } else {
-                    preparedStatement.setString(3, email);
+                    preparedStatement.setString(3, Encryption.hash(email));
 
                     // Get last 4 character of NI number
                     niNumber = niNumber.substring(niNumber.length() - 4);
-                    // Sets the password to the employee's first name an _ and the last 4 characters of NIN
-                    preparedStatement.setString(4, firstName + "_" + niNumber);
+                    // Sets the password to the employee's first name an "_" and the last 4 characters of NIN
+                    String hashedPswd = Encryption.hash(firstName + "_" + niNumber);
+                    preparedStatement.setString(4, hashedPswd);
                 }
 
                 int rowsAffected = preparedStatement.executeUpdate();
@@ -617,15 +627,17 @@ public class DatabaseController {
 
 
         // Method to add emergency contact info
-        public static void addEmergencyDetails(String email, String fName, String lName, String mobile, String relationship) {
+        public static void addEmergencyDetails(String email, String fName, String lName, String mobile, String relationship, int employeeID) {
             // Add record
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    "INSERT INTO NPS_EMERGENCY_CONTACT (EMPLOYEE_ID, FIRST_NAME, LAST_NAME, PHONE, RELATIONSHIP) VALUES (?, ?, ?, ?, ?)")) {
+                    "INSERT INTO NPS_EMERGENCY_CONTACT (EMPLOYEE_ID, FIRST_NAME, LAST_NAME, PHONE, " +
+                            "RELATIONSHIP WHERE EMPLOYEE_ID) VALUES (?, ?, ?, ?, ?, ?)")) {
                 preparedStatement.setInt(1, DatabaseController.GetTableData.getEmployeeId(email));
                 preparedStatement.setString(2, fName);
                 preparedStatement.setString(3, lName);
                 preparedStatement.setString(4, mobile);
                 preparedStatement.setString(5, relationship);
+                preparedStatement.setInt(6, employeeID);
 
                 int rowsAffected = preparedStatement.executeUpdate();
                 if (rowsAffected > 0) {
@@ -664,8 +676,8 @@ public class DatabaseController {
             // Add record
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "INSERT INTO NPS_EMAIL_INFO (FROM_USER_EMAIL, FROM_USER_PASSWORD, EMAIL_DATE) VALUES (?, ?, ?)")) {
-                preparedStatement.setString(1, fromUserEmail);
-                preparedStatement.setString(2, fromUserPassword);
+                preparedStatement.setString(1, Encryption.encryptString(fromUserEmail));
+                preparedStatement.setString(2, Encryption.encryptString(fromUserPassword));
                 preparedStatement.setString(3, emailDate);
 
                 int rowsAffected = preparedStatement.executeUpdate();
@@ -697,21 +709,21 @@ public class DatabaseController {
                     "INSERT INTO NPS_DELETED_USERS (ADDED_DATE, DELETE_DATE, DELETED_BY, FIRST_NAME, LAST_NAME, " +
                             "EMAIL, PHONE, NI_NUMBER, ADDRESS_LINE_1, ADDRESS_LINE_2, CITY, POSTCODE, BANK_NAME," +
                             "ACCOUNT_NUMBER, SORT_CODE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
-                preparedStatement.setString(1, addedDate);
-                preparedStatement.setString(2, deleteDate);
-                preparedStatement.setString(3, deletedBy);
-                preparedStatement.setString(4, firstName);
-                preparedStatement.setString(5, lastName);
-                preparedStatement.setString(6, email);
-                preparedStatement.setString(7, phone);
-                preparedStatement.setString(8, niNumber);
-                preparedStatement.setString(9, addressLine1);
-                preparedStatement.setString(10, addressLine2);
-                preparedStatement.setString(11, city);
-                preparedStatement.setString(12, postcode);
-                preparedStatement.setString(13, bankName);
-                preparedStatement.setString(14, accountNumber);
-                preparedStatement.setString(15, sortCode);
+                preparedStatement.setString(1, Encryption.encryptString(addedDate));
+                preparedStatement.setString(2, Encryption.encryptString(deleteDate));
+                preparedStatement.setString(3, Encryption.encryptString(deletedBy));
+                preparedStatement.setString(4, Encryption.encryptString(firstName));
+                preparedStatement.setString(5, Encryption.encryptString(lastName));
+                preparedStatement.setString(6, Encryption.encryptString(email));
+                preparedStatement.setString(7, Encryption.encryptString(phone));
+                preparedStatement.setString(8, Encryption.encryptString(niNumber));
+                preparedStatement.setString(9, Encryption.encryptString(addressLine1));
+                preparedStatement.setString(10, Encryption.encryptString(addressLine2));
+                preparedStatement.setString(11, Encryption.encryptString(city));
+                preparedStatement.setString(12, Encryption.encryptString(postcode));
+                preparedStatement.setString(13, Encryption.encryptString(bankName));
+                preparedStatement.setString(14, Encryption.encryptString(accountNumber));
+                preparedStatement.setString(15, Encryption.encryptString(sortCode));
 
                 int rowsAffected = preparedStatement.executeUpdate();
 
@@ -743,14 +755,14 @@ public class DatabaseController {
 
             // Check if the email is being updated
             String oldEmail = GetTableData.getEmailById(employeeId); // Retrieve the old email from the database
-            boolean emailUpdated = !email.equals(oldEmail);
+            boolean emailUpdated = !Encryption.hash(email).equals(oldEmail);
 
             // Update the employee login if the email is being updated
             if (emailUpdated) {
                 // Update the login username
                 try (PreparedStatement preparedStatement = connection.prepareStatement(
                         "UPDATE NPS_LOGIN SET USERNAME = ? WHERE EMPLOYEE_ID = ?")) {
-                    preparedStatement.setString(1, email);
+                    preparedStatement.setString(1, Encryption.hash(email));
                     preparedStatement.setString(2, employeeId);
 
                     int rowsAffected = preparedStatement.executeUpdate();
@@ -768,11 +780,11 @@ public class DatabaseController {
             // Update the employee record
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "UPDATE NPS_EMPLOYEE SET FIRST_NAME = ?, LAST_NAME = ?, EMAIL = ?, PHONE = ?, NI_NUMBER = ? WHERE ID = ?")) {
-                preparedStatement.setString(1, firstName);
-                preparedStatement.setString(2, lastName);
-                preparedStatement.setString(3, email);
-                preparedStatement.setString(4, phone);
-                preparedStatement.setString(5, niNumber);
+                preparedStatement.setString(1, Encryption.encryptString(firstName));
+                preparedStatement.setString(2, Encryption.encryptString(lastName));
+                preparedStatement.setString(3, Encryption.encryptString(email));
+                preparedStatement.setString(4, Encryption.encryptString(phone));
+                preparedStatement.setString(5, Encryption.encryptString(niNumber));
                 preparedStatement.setString(6, employeeId);
 
                 int rowsAffected = preparedStatement.executeUpdate();
@@ -788,10 +800,10 @@ public class DatabaseController {
             // Update the employee address
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "UPDATE NPS_ADDRESSES SET ADDRESS_LINE_1 = ?, ADDRESS_LINE_2 = ?, CITY = ?, POSTCODE = ? WHERE EMPLOYEE_ID = ?")) {
-                preparedStatement.setString(1, address1);
-                preparedStatement.setString(2, address2);
-                preparedStatement.setString(3, city);
-                preparedStatement.setString(4, postcode);
+                preparedStatement.setString(1, Encryption.encryptString(address1));
+                preparedStatement.setString(2, Encryption.encryptString(address2));
+                preparedStatement.setString(3, Encryption.encryptString(city));
+                preparedStatement.setString(4, Encryption.encryptString(postcode));
                 preparedStatement.setString(5, employeeId);
 
                 int rowsAffected = preparedStatement.executeUpdate();
@@ -803,10 +815,10 @@ public class DatabaseController {
                     try (PreparedStatement preparedStatement2 = connection.prepareStatement(
                             "INSERT INTO NPS_ADDRESSES (EMPLOYEE_ID, ADDRESS_LINE_1, ADDRESS_LINE_2, CITY, POSTCODE) VALUES (?, ?, ?, ?, ?)")) {
                         preparedStatement2.setInt(1, Integer.parseInt(employeeId));
-                        preparedStatement2.setString(2, address1);
-                        preparedStatement2.setString(3, address2);
-                        preparedStatement2.setString(4, city);
-                        preparedStatement2.setString(5, postcode);
+                        preparedStatement2.setString(2, Encryption.encryptString(address1));
+                        preparedStatement2.setString(3, Encryption.encryptString(address2));
+                        preparedStatement2.setString(4, Encryption.encryptString(city));
+                        preparedStatement2.setString(5, Encryption.encryptString(postcode));
 
                         int rowsAffected2 = preparedStatement2.executeUpdate();
                         if (rowsAffected2 > 0) {
@@ -825,9 +837,9 @@ public class DatabaseController {
             // Update the employee bank details
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "UPDATE NPS_BANK_DETAILS SET BANK_NAME = ?, ACCOUNT_NUMBER = ?, SORT_CODE = ? WHERE EMPLOYEE_ID = ?")) {
-                preparedStatement.setString(1, bankName);
-                preparedStatement.setString(2, accountNumber);
-                preparedStatement.setString(3, sortCode);
+                preparedStatement.setString(1, Encryption.encryptString(bankName));
+                preparedStatement.setString(2, Encryption.encryptString(accountNumber));
+                preparedStatement.setString(3, Encryption.encryptString(sortCode));
                 preparedStatement.setString(4, employeeId);
 
                 int rowsAffected = preparedStatement.executeUpdate();
@@ -839,8 +851,8 @@ public class DatabaseController {
                     try (PreparedStatement preparedStatement2 = connection.prepareStatement(
                             "INSERT INTO NPS_BANK_DETAILS (EMPLOYEE_ID, BANK_NAME, ACCOUNT_NUMBER, SORT_CODE) VALUES (?, ?, ?, ?)")) {
                         preparedStatement2.setInt(1, Integer.parseInt(employeeId));
-                        preparedStatement2.setString(2, bankName);
-                        preparedStatement2.setString(3, accountNumber);
+                        preparedStatement2.setString(2, Encryption.encryptString(bankName));
+                        preparedStatement2.setString(3, Encryption.encryptString(accountNumber));
                         preparedStatement2.setString(4, sortCode);
 
                         int rowsAffected2 = preparedStatement2.executeUpdate();
@@ -860,10 +872,10 @@ public class DatabaseController {
             // Update the employee emergency contact details
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "UPDATE NPS_EMERGENCY_CONTACT SET FIRST_NAME = ?, LAST_NAME = ?, PHONE = ?, RELATIONSHIP = ? WHERE EMPLOYEE_ID = ?")) {
-                preparedStatement.setString(1, emergencyContactFName);
-                preparedStatement.setString(2, emergencyContactLName);
-                preparedStatement.setString(3, emergencyContactMobile);
-                preparedStatement.setString(4, emergencyContactRelationship);
+                preparedStatement.setString(1, Encryption.encryptString(emergencyContactFName));
+                preparedStatement.setString(2, Encryption.encryptString(emergencyContactLName));
+                preparedStatement.setString(3, Encryption.encryptString(emergencyContactMobile));
+                preparedStatement.setString(4, Encryption.encryptString(emergencyContactRelationship));
                 preparedStatement.setString(5, employeeId);
 
                 int rowsAffected = preparedStatement.executeUpdate();
@@ -875,10 +887,10 @@ public class DatabaseController {
                     try (PreparedStatement preparedStatement2 = connection.prepareStatement(
                             "INSERT INTO NPS_EMERGENCY_CONTACT (EMPLOYEE_ID, FIRST_NAME, LAST_NAME, PHONE, RELATIONSHIP) VALUES (?, ?, ?, ?, ?)")) {
                         preparedStatement2.setInt(1, Integer.parseInt(employeeId));
-                        preparedStatement2.setString(2, emergencyContactFName);
-                        preparedStatement2.setString(3, emergencyContactLName);
-                        preparedStatement2.setString(4, emergencyContactMobile);
-                        preparedStatement2.setString(5, emergencyContactRelationship);
+                        preparedStatement2.setString(2, Encryption.encryptString(emergencyContactFName));
+                        preparedStatement2.setString(3, Encryption.encryptString(emergencyContactLName));
+                        preparedStatement2.setString(4, Encryption.encryptString(emergencyContactMobile));
+                        preparedStatement2.setString(5, Encryption.encryptString(emergencyContactRelationship));
 
                         int rowsAffected2 = preparedStatement2.executeUpdate();
                         if (rowsAffected2 > 0) {
@@ -944,14 +956,14 @@ public class DatabaseController {
 
             // Check if the email is being updated
             String oldEmail = GetTableData.getEmailById(employeeId); // Retrieve the old email from the database
-            boolean emailUpdated = !email.equals(oldEmail);
+            boolean emailUpdated = ! Encryption.hash(email).equals(oldEmail);
 
             // Update the employee login if the email is being updated
             if (emailUpdated) {
                 // Update the login username
                 try (PreparedStatement preparedStatement = connection.prepareStatement(
                         "UPDATE NPS_LOGIN SET USERNAME = ? WHERE EMPLOYEE_ID = ?")) {
-                    preparedStatement.setString(1, email);
+                    preparedStatement.setString(1, Encryption.hash(email));
                     preparedStatement.setString(2, employeeId);
 
                     int rowsAffected = preparedStatement.executeUpdate();
@@ -970,19 +982,19 @@ public class DatabaseController {
                     "UPDATE NPS_EMPLOYEE SET FIRST_NAME = ?, LAST_NAME = ?, EMAIL = ?, PHONE = ?, SALARY = ?, " +
                             "NI_NUMBER = ?, LOCATION = ?, CONTRACT_TYPE = ?, CONTRACT_HOURS = ?, DEPARTMENT = ?, J" +
                             "OB_TITLE = ? WHERE ID = ?")) {
-                BigDecimal salaryDecimal = new BigDecimal(salary);
+                //BigDecimal salaryDecimal = new BigDecimal(salary);
 
-                preparedStatement.setString(1, firstName);
-                preparedStatement.setString(2, lastName);
-                preparedStatement.setString(3, email);
-                preparedStatement.setString(4, phone);
-                preparedStatement.setBigDecimal(5, salaryDecimal);
-                preparedStatement.setString(6, niNumber);
-                preparedStatement.setString(7, location);
-                preparedStatement.setString(8, contractType);
-                preparedStatement.setString(9, contractHours);
-                preparedStatement.setString(10, department);
-                preparedStatement.setString(11, jobTitle);
+                preparedStatement.setString(1, Encryption.encryptString(firstName));
+                preparedStatement.setString(2, Encryption.encryptString(lastName));
+                preparedStatement.setString(3, Encryption.encryptString(email));
+                preparedStatement.setString(4, Encryption.encryptString(phone));
+                preparedStatement.setDouble(5, Double.parseDouble(salary));
+                preparedStatement.setString(6, Encryption.encryptString(niNumber));
+                preparedStatement.setString(7, Encryption.encryptString(location));
+                preparedStatement.setString(8, Encryption.encryptString(contractType));
+                preparedStatement.setDouble(9, Double.parseDouble(contractHours));
+                preparedStatement.setString(10, Encryption.encryptString(department));
+                preparedStatement.setString(11, Encryption.encryptString(jobTitle));
                 preparedStatement.setString(12, employeeId);
 
                 int rowsAffected = preparedStatement.executeUpdate();
@@ -1001,8 +1013,8 @@ public class DatabaseController {
         public static void updateEmailInfo(String fromUserEmail, String fromUserPassword, String emailDate) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "UPDATE NPS_EMAIL_INFO SET FROM_USER_EMAIL = ?, FROM_USER_PASSWORD = ?, EMAIL_DATE = ?")) {
-                preparedStatement.setString(1, fromUserEmail);
-                preparedStatement.setString(2, fromUserPassword);
+                preparedStatement.setString(1, Encryption.encryptString(fromUserEmail));
+                preparedStatement.setString(2, Encryption.encryptString(fromUserPassword));
                 preparedStatement.setString(3, emailDate);
 
                 int rowsAffected = preparedStatement.executeUpdate();
@@ -1163,8 +1175,8 @@ public class DatabaseController {
                  PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
                 // Set parameters for the query
-                preparedStatement.setString(1, username);
-                preparedStatement.setString(2, password);
+                preparedStatement.setString(1, Encryption.hash(username));
+                preparedStatement.setString(2, Encryption.hash(password));
 
                 ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -1254,7 +1266,7 @@ public class DatabaseController {
             boolean employeeExists = false;
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "SELECT * FROM NPS_EMPLOYEE WHERE EMAIL = ?")) {
-                preparedStatement.setString(1, email);
+                preparedStatement.setString(1, Encryption.encryptString(email));
                 ResultSet resultSet = preparedStatement.executeQuery();
                 employeeExists = resultSet.next();
             } catch (SQLException e) {
@@ -1270,7 +1282,7 @@ public class DatabaseController {
             int employeeId = -1;
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "SELECT ID FROM NPS_EMPLOYEE WHERE EMAIL = ?")) {
-                preparedStatement.setString(1, email);
+                preparedStatement.setString(1, Encryption.encryptString(email));
 
                 ResultSet resultSet = preparedStatement.executeQuery();
                 if (resultSet.next()) {
@@ -1305,10 +1317,15 @@ public class DatabaseController {
                     String jobTitle = resultSet.getString("JOB_TITLE");
 
                     // Get access level
-                    String accessLevel = GetTableData.getAccessLevel(email);
+                    String accessLevel = GetTableData.getAccessLevel(Encryption.decryptString(email));
 
-                    Person person = new Person(id, firstName, lastName, email, phone, salary, accessLevel, niNumber,
-                            location, contractType, contractHours, department, jobTitle);
+
+
+                    Person person = new Person(id, Encryption.decryptString(firstName), Encryption.decryptString(lastName),
+                            Encryption.decryptString(email), Encryption.decryptString(phone),
+                            salary, accessLevel, Encryption.decryptString(niNumber),
+                            Encryption.decryptString(location), Encryption.decryptString(contractType),
+                            contractHours, Encryption.decryptString(department), Encryption.decryptString(jobTitle));
 
                     data.add(person);
                 }
@@ -1335,11 +1352,12 @@ public class DatabaseController {
                     String niNumber = resultSet.getString("NI_NUMBER");
 
                     // Get access level
-                    String accessLevel = GetTableData.getAccessLevel(email);
+                    //String accessLevel = GetTableData.getAccessLevel(email);
 
-                    Person person = new Person(id, firstName, lastName, email, null, null,
-                            null, niNumber, null, null, null,
-                            null, null);
+                    Person person = new Person(id, Encryption.decryptString(firstName), Encryption.decryptString(lastName),
+                            Encryption.decryptString(email), null, null,
+                            null, Encryption.decryptString(niNumber), null, null,
+                            null, null, null);
 
                     employees.add(person);
                 }
@@ -1378,10 +1396,14 @@ public class DatabaseController {
                     String jobTitle = resultSet.getString("JOB_TITLE");
 
                     // Get access level
-                    String accessLevel = GetTableData.getAccessLevel(email);
+                    String accessLevel = GetTableData.getAccessLevel(Encryption.decryptString(email));
 
-                    person = new Person(id, firstName, lastName, email, phone, salary, accessLevel, niNumber,
-                            location, contractType, contractHours, department, jobTitle);
+                    person = new Person(id, Encryption.decryptString(firstName), Encryption.decryptString(lastName),
+                            Encryption.decryptString(email), Encryption.decryptString(phone), salary,
+                            accessLevel, Encryption.decryptString(niNumber),
+                            Encryption.decryptString(location), Encryption.decryptString(contractType),
+                            contractHours, Encryption.decryptString(department),
+                            Encryption.decryptString(jobTitle));
                 }
             } catch (SQLException e) {
                 logger.error("Failure during SQL query - getting employee data", e);
@@ -1398,9 +1420,9 @@ public class DatabaseController {
                     String accountNumber = resultSet.getString("ACCOUNT_NUMBER");
                     String sortCode = resultSet.getString("SORT_CODE");
 
-                    person.setBankName(bankName);
-                    person.setAccountNumber(accountNumber);
-                    person.setSortCode(sortCode);
+                    person.setBankName(Encryption.decryptString(bankName));
+                    person.setAccountNumber(Encryption.decryptString(accountNumber));
+                    person.setSortCode(Encryption.decryptString(sortCode));
                 }
             } catch (SQLException e) {
                 logger.error("Failure during SQL query - getting bank details data", e);
@@ -1437,10 +1459,10 @@ public class DatabaseController {
                     String emergencyContactMobile = resultSet.getString("PHONE");
                     String emergencyContactRelationship = resultSet.getString("RELATIONSHIP");
 
-                    person.setEFirstName(emergencyContactFName);
-                    person.setELastName(emergencyContactLName);
-                    person.setEMobile(emergencyContactMobile);
-                    person.setERelationship(emergencyContactRelationship);
+                    person.setEFirstName(Encryption.decryptString(emergencyContactFName));
+                    person.setELastName(Encryption.decryptString(emergencyContactLName));
+                    person.setEMobile(Encryption.decryptString(emergencyContactMobile));
+                    person.setERelationship(Encryption.decryptString(emergencyContactRelationship));
                 }
             } catch (SQLException e) {
                 logger.error("Failure during SQL query - getting emergency contact data", e);
@@ -1458,10 +1480,10 @@ public class DatabaseController {
                     String city = resultSet.getString("CITY");
                     String postcode = resultSet.getString("POSTCODE");
 
-                    person.setAddressLine1(addressLine1);
-                    person.setAddressLine2(addressLine2);
-                    person.setCity(city);
-                    person.setPostcode(postcode);
+                    person.setAddressLine1(Encryption.decryptString(addressLine1));
+                    person.setAddressLine2(Encryption.decryptString(addressLine2));
+                    person.setCity(Encryption.decryptString(city));
+                    person.setPostcode(Encryption.decryptString(postcode));
                 }
             } catch (SQLException e) {
                 logger.error("Failure during SQL query - getting address table data", e);
@@ -1475,7 +1497,7 @@ public class DatabaseController {
             String accessLevel = "";
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "SELECT ACCESS_LEVEL FROM NPS_LOGIN WHERE USERNAME = ?")) {
-                preparedStatement.setString(1, email);
+                preparedStatement.setString(1, Encryption.hash(email));
 
                 ResultSet resultSet = preparedStatement.executeQuery();
                 if (resultSet.next()) {
@@ -1501,7 +1523,7 @@ public class DatabaseController {
             } catch (SQLException e) {
                 logger.error("Failure during SQL query - getting email by ID", e);
             }
-            return email;
+            return Encryption.decryptString(email);
         }
 
         // Method to get all help info
@@ -1541,7 +1563,7 @@ public class DatabaseController {
             } catch (SQLException e) {
                 logger.error("Failure during SQL query - getting email info", e);
             }
-            return email;
+            return Encryption.decryptString(email);
         }
 
         // Method to get password from email info table
@@ -1557,7 +1579,7 @@ public class DatabaseController {
                 logger.error("Failure during SQL query - getting password info", e);
             }
 
-            return password;
+            return Encryption.decryptString(password);
         }
 
         // Method to get email date from email info table
@@ -1605,7 +1627,8 @@ public class DatabaseController {
                     }
 
                     String key = employeeId; // Unique key for each employee
-                    Schedule schedule = scheduleMap.getOrDefault(key, new Schedule(firstName + " " + lastName, employeeId));
+                    Schedule schedule = scheduleMap.getOrDefault(key, new Schedule(Encryption.decryptString(firstName)
+                            + " " + Encryption.decryptString(lastName), employeeId));
 
                     // Set start and end times
                     schedule.setWeekID(weekId);
@@ -1700,8 +1723,8 @@ public class DatabaseController {
 
                         ResultSet resultSet2 = preparedStatement2.executeQuery();
                         if (resultSet2.next()) {
-                            employeeDetails.setFirstName(resultSet2.getString("FIRST_NAME"));
-                            employeeDetails.setLastName(resultSet2.getString("LAST_NAME"));
+                            employeeDetails.setFirstName(Encryption.decryptString(resultSet2.getString("FIRST_NAME")));
+                            employeeDetails.setLastName(Encryption.decryptString(resultSet2.getString("LAST_NAME")));
                             employeeDetails.setSalary(resultSet2.getInt("SALARY"));
                         }
                     } catch (SQLException e) {
@@ -1740,8 +1763,8 @@ public class DatabaseController {
 
                         ResultSet resultSet2 = preparedStatement2.executeQuery();
                         if (resultSet2.next()) {
-                            employeeDetails.setFirstName(resultSet2.getString("FIRST_NAME"));
-                            employeeDetails.setLastName(resultSet2.getString("LAST_NAME"));
+                            employeeDetails.setFirstName(Encryption.decryptString(resultSet2.getString("FIRST_NAME")));
+                            employeeDetails.setLastName(Encryption.decryptString(resultSet2.getString("LAST_NAME")));
                             employeeDetails.setSalary(resultSet2.getDouble("SALARY"));
                         }
                     } catch (SQLException e) {
@@ -1797,9 +1820,14 @@ public class DatabaseController {
                     String accountNumber = resultSet.getString("ACCOUNT_NUMBER");
                     String sortCode = resultSet.getString("SORT_CODE");
 
-                    DeletedUser deletedUser = new DeletedUser(addedDate, deleteDate, deletedBy, firstName, lastName,
-                            email, phone, niNumber, addressLine1, addressLine2, city, postcode, bankName,
-                            accountNumber, sortCode);
+                    DeletedUser deletedUser = new DeletedUser(Encryption.decryptString(addedDate),
+                            Encryption.decryptString(deleteDate), Encryption.decryptString(deletedBy),
+                            Encryption.decryptString(firstName), Encryption.decryptString(lastName),
+                            Encryption.decryptString(email), Encryption.decryptString(phone),
+                            Encryption.decryptString(niNumber), Encryption.decryptString(addressLine1),
+                            Encryption.decryptString(addressLine2), Encryption.decryptString(city),
+                            Encryption.decryptString(postcode), Encryption.decryptString(bankName),
+                            Encryption.decryptString(accountNumber), Encryption.decryptString(sortCode));
 
                     deletedUsers.add(deletedUser);
                 }
@@ -1880,8 +1908,8 @@ public class DatabaseController {
         public static void removeUserData(String email, String deletedBy) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "DELETE FROM NPS_DELETED_USERS WHERE EMAIL = ? AND DELETED_BY = ?")) {
-                preparedStatement.setString(1, email);
-                preparedStatement.setString(2, deletedBy);
+                preparedStatement.setString(1, Encryption.encryptString(email));
+                preparedStatement.setString(2, Encryption.encryptString(deletedBy));
 
                 int rowsAffected = preparedStatement.executeUpdate();
                 if (rowsAffected > 0) {
@@ -1940,12 +1968,55 @@ public class DatabaseController {
     }
 
     class Encryption {
-        // Method to encrypt a string << NOT IMPLEMENTED >>
-        private static String encryptString(String stringToEncrypt) {
-            String encryptedString = stringToEncrypt;
+        private static final String ALGORITHM = "AES";
+        private static final String SECRET_KEY = "1vFk4S1Q1cZalOES9J6hAt6w"; // 16, 24, or 32 bytes
 
+        public static String encryptString(String data) {
+            try {
+                if (data == null) {
+                    return null;
+                }
+                Key key = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
+                Cipher cipher = Cipher.getInstance(ALGORITHM);
+                cipher.init(Cipher.ENCRYPT_MODE, key);
+                byte[] encryptedBytes = cipher.doFinal(data.getBytes());
+                return Base64.getEncoder().encodeToString(encryptedBytes);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
 
-            return encryptedString;
+        public static String decryptString(String encryptedData) {
+            if (encryptedData == null) {
+                return null;
+            }
+            try {
+                Key key = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
+                Cipher cipher = Cipher.getInstance(ALGORITHM);
+                cipher.init(Cipher.DECRYPT_MODE, key);
+                byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedData));
+                return new String(decryptedBytes);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        public static String hash(String plaintext) {
+            try {
+                MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                byte[] hashBytes = digest.digest(plaintext.getBytes());
+                StringBuilder hexString = new StringBuilder();
+                for (byte hashByte : hashBytes) {
+                    String hex = Integer.toHexString(0xff & hashByte);
+                    if (hex.length() == 1) hexString.append('0');
+                    hexString.append(hex);
+                }
+                return hexString.toString();
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

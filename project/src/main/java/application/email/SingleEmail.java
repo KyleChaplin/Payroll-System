@@ -33,7 +33,7 @@ public class SingleEmail {
                 "Your account has been successfully created.<br>" +
                 "Your password is your first name an underscore and the last " +
                 "four characters of your national insurance number<br><br>" +
-                "Example: If your name is Bob and the last 4 digits of your " +
+                "Example: If your name is Bob and the last 4 characters of your " +
                 "NI number are 1234, your password is: Bob_1234<br><br>" +
                 "Please do not share your password with anyone and store " +
                 "it in a secure place i.e. a password manager" +
