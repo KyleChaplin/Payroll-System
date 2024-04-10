@@ -58,6 +58,38 @@ public class AdminController implements Initializable {
     private TextArea txtDesc;
     @FXML
     private TextField txtAddedBy;
+    @FXML
+    private TableView<DeletedUser> tblDeletedUsers;
+    @FXML
+    private TableColumn<DeletedUser, String> tblRAccountNum;
+    @FXML
+    private TableColumn<DeletedUser, String> tblRAddedDate;
+    @FXML
+    private TableColumn<DeletedUser, String> tblRAddress1;
+    @FXML
+    private TableColumn<DeletedUser, String> tblRAddress2;
+    @FXML
+    private TableColumn<DeletedUser, String> tblRBankName;
+    @FXML
+    private TableColumn<DeletedUser, String> tblRCity;
+    @FXML
+    private TableColumn<DeletedUser, String> tblRDeleteDate;
+    @FXML
+    private TableColumn<DeletedUser, String> tblRDeletedBy;
+    @FXML
+    private TableColumn<DeletedUser, String> tblREmail;
+    @FXML
+    private TableColumn<DeletedUser, String> tblRFirstName;
+    @FXML
+    private TableColumn<DeletedUser, String> tblRLastName;
+    @FXML
+    private TableColumn<DeletedUser, String> tblRNiNum;
+    @FXML
+    private TableColumn<DeletedUser, String> tblRPhone;
+    @FXML
+    private TableColumn<DeletedUser, String> tblRPostcode;
+    @FXML
+    private TableColumn<DeletedUser, String> tblRSortcode;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -70,6 +102,9 @@ public class AdminController implements Initializable {
         openMainPane();
     }
 
+    // *************
+    // Email methods
+    // *************
     @FXML
     public void updateDatabase() {
         DatabaseController.UpdateTableData.updateEmailInfo(txtEmail.getText(), txtPassword.getText(),
@@ -82,33 +117,51 @@ public class AdminController implements Initializable {
         return date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + " 23:00:00";
     }
 
-    @FXML
-    public void showBackupPane() {
-        changePane("paneBackupData");
-    }
-
-    @FXML
-    public void showEmailPane() {
-        changePane("paneEmailServer");
-
-        
-        txtEmail.setText(DatabaseController.GetTableData.getEmailInfo());
-        txtPassword.setText(DatabaseController.GetTableData.getPasswordInfo());
-        dateEmailDate.setValue(formatDate(DatabaseController.GetTableData.getEmailDateInfo()));
-    }
-
     private LocalDate formatDate(String dateString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
         return LocalDate.parse(dateString, formatter);
     }
 
-    @FXML
-    public void showHelpPane() {
-        changePane("paneHelp");
+    // ******************************
+    // Deleted users (backup) methods
+    // ******************************
+    private void loadDeletedUserData() {
+        ObservableList<DeletedUser> deletedUsersInfo = DatabaseController.GetTableData.getAllDeletedUserInfo();
 
-        loadHelpData();
+        tblRAddedDate.setCellValueFactory(new PropertyValueFactory<>("addedDate"));
+        tblRDeleteDate.setCellValueFactory(new PropertyValueFactory<>("deleteDate"));
+        tblRDeletedBy.setCellValueFactory(new PropertyValueFactory<>("deletedBy"));
+        tblRFirstName.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        tblRLastName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        tblREmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        tblRPhone.setCellValueFactory(new PropertyValueFactory<>("phone"));
+        tblRNiNum.setCellValueFactory(new PropertyValueFactory<>("niNumber"));
+        tblRAddress1.setCellValueFactory(new PropertyValueFactory<>("addressLine1"));
+        tblRAddress2.setCellValueFactory(new PropertyValueFactory<>("addressLine2"));
+        tblRCity.setCellValueFactory(new PropertyValueFactory<>("city"));
+        tblRPostcode.setCellValueFactory(new PropertyValueFactory<>("postcode"));
+        tblRAccountNum.setCellValueFactory(new PropertyValueFactory<>("accountNumber"));
+        tblRBankName.setCellValueFactory(new PropertyValueFactory<>("bankName"));
+        tblRSortcode.setCellValueFactory(new PropertyValueFactory<>("sortCode"));
+
+        tblDeletedUsers.setItems(deletedUsersInfo);
     }
 
+    @FXML
+    public void btnDeleteUser() {
+        // Get the selected item from the table view
+        DeletedUser selectedUser = tblDeletedUsers.getSelectionModel().getSelectedItem();
+        if (selectedUser != null) {
+            // Delete the user from the database
+            DatabaseController.DeleteTableData.removeUserData(selectedUser.getEmail(), selectedUser.getDeletedBy());
+            // Remove the user from the table view
+            tblDeletedUsers.getItems().remove(selectedUser);
+        }
+    }
+
+    // *****************
+    // Help pane methods
+    // *****************
     private void loadHelpData() {
         // Load data from database
         ObservableList<HelpInfo> helpInfo = DatabaseController.GetTableData.getHelpInfo();
@@ -143,6 +196,33 @@ public class AdminController implements Initializable {
         txtTitle.clear();
         txtDesc.clear();
         txtAddedBy.clear();
+    }
+
+    // ***********************
+    // Showing different panes
+    // ***********************
+    @FXML
+    public void showBackupPane() {
+        changePane("paneBackupData");
+
+        loadDeletedUserData();
+    }
+
+    @FXML
+    public void showEmailPane() {
+        changePane("paneEmailServer");
+
+
+        txtEmail.setText(DatabaseController.GetTableData.getEmailInfo());
+        txtPassword.setText(DatabaseController.GetTableData.getPasswordInfo());
+        dateEmailDate.setValue(formatDate(DatabaseController.GetTableData.getEmailDateInfo()));
+    }
+
+    @FXML
+    public void showHelpPane() {
+        changePane("paneHelp");
+
+        loadHelpData();
     }
 
     @FXML
@@ -207,7 +287,7 @@ public class AdminController implements Initializable {
         SceneController.openScene(event, "help", stage, scene);
     }
 
-    public void toggleTheme(ActionEvent event) throws IOException {
+    public void toggleTheme() throws IOException {
         ThemeManager.toggleMode();
     }
 }

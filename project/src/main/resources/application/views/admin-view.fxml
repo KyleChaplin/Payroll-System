@@ -58,7 +58,48 @@
                   </VBox>
                </children>
             </Pane>
-            <Pane fx:id="paneBackupData" prefHeight="830.0" prefWidth="1071.0" visible="false" />
+            <Pane fx:id="paneBackupData" prefHeight="830.0" prefWidth="1071.0">
+               <children>
+                  <VBox prefHeight="814.0" prefWidth="1054.0">
+                     <children>
+                        <TableView fx:id="tblDeletedUsers" prefHeight="756.0" prefWidth="1024.0">
+                           <columns>
+                              <TableColumn fx:id="tblRAddedDate" prefWidth="75.0" text="Added Date" />
+                              <TableColumn fx:id="tblRDeleteDate" prefWidth="75.0" text="Delete Date" />
+                              <TableColumn fx:id="tblRDeletedBy" prefWidth="75.0" text="Deleted By" />
+                              <TableColumn fx:id="tblRFirstName" prefWidth="75.0" text="First Name" />
+                              <TableColumn fx:id="tblRLastName" prefWidth="75.0" text="Last Name" />
+                              <TableColumn fx:id="tblREmail" prefWidth="75.0" text="Email" />
+                              <TableColumn fx:id="tblRPhone" prefWidth="75.0" text="Phone" />
+                              <TableColumn fx:id="tblRNiNum" prefWidth="75.0" text="NI Number" />
+                              <TableColumn fx:id="tblRAddress1" prefWidth="75.0" text="Address 1" />
+                              <TableColumn fx:id="tblRAddress2" prefWidth="75.0" text="Address 2" />
+                              <TableColumn fx:id="tblRCity" prefWidth="75.0" text="City" />
+                              <TableColumn fx:id="tblRPostcode" prefWidth="75.0" text="Postcode" />
+                              <TableColumn fx:id="tblRBankName" prefWidth="75.0" text="Bank Name" />
+                              <TableColumn fx:id="tblRAccountNum" prefWidth="75.0" text="Account number" />
+                              <TableColumn fx:id="tblRSortcode" prefWidth="75.0" text="Sort Code" />
+                           </columns>
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
+                        </TableView>
+                        <HBox alignment="CENTER_RIGHT" prefHeight="111.0" prefWidth="1024.0" spacing="15.0" VBox.vgrow="NEVER">
+                           <children>
+                              <Button fx:id="btnRed1" mnemonicParsing="false" onAction="#openMainPane" prefHeight="46.0" prefWidth="92.0" text="Cancel" />
+                              <Button fx:id="btnRed" mnemonicParsing="false" onAction="#btnDeleteUser" prefHeight="46.0" prefWidth="92.0" text="Delete" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="NEVER">
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                  </VBox>
+               </children></Pane>
             <Pane fx:id="paneHelp" layoutX="10.0" layoutY="10.0" prefHeight="830.0" prefWidth="1071.0" visible="false">
                <children>
                   <VBox prefHeight="814.0" prefWidth="1054.0">
@@ -122,7 +163,7 @@
                   </VBox>
                </children>
             </Pane>
-            <Pane fx:id="paneMain">
+            <Pane fx:id="paneMain" visible="false">
                <children>
                   <VBox prefHeight="830.0" prefWidth="1072.0">
                      <children>

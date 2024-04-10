@@ -1,5 +1,6 @@
 package application;
 
+import application.admin.DeletedUser;
 import application.email.SingleEmail;
 import application.employees.Person;
 import application.help.HelpInfo;
@@ -1265,7 +1266,7 @@ public class DatabaseController {
 
     public class GetTableData {
         // Method to get the employee ID by email
-        public static int getEmployeeId(String email) throws SQLException {
+        public static int getEmployeeId(String email) {
             int employeeId = -1;
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "SELECT ID FROM NPS_EMPLOYEE WHERE EMAIL = ?")) {
@@ -1771,6 +1772,43 @@ public class DatabaseController {
         public static String getCurrentLoggedInEmployeeId() {
             return currentLoggedInEmployeeId;
         }
+
+        public static ObservableList<DeletedUser> getAllDeletedUserInfo() {
+            ObservableList<DeletedUser> deletedUsers = FXCollections.observableArrayList();
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    "SELECT * FROM NPS_DELETED_USERS")) {
+                ResultSet resultSet = preparedStatement.executeQuery();
+
+                while (resultSet.next()) {
+                    String addedDate = resultSet.getString("ADDED_DATE");
+                    String deleteDate = resultSet.getString("DELETE_DATE");
+                    String deletedBy = resultSet.getString("DELETED_BY");
+                    String firstName = resultSet.getString("FIRST_NAME");
+                    String lastName = resultSet.getString("LAST_NAME");
+                    String email = resultSet.getString("EMAIL");
+                    String phone = resultSet.getString("PHONE");
+                    String niNumber = resultSet.getString("NI_NUMBER");
+                    String addressLine1 = resultSet.getString("ADDRESS_LINE_1");
+                    String addressLine2 = resultSet.getString("ADDRESS_LINE_2");
+                    String city = resultSet.getString("CITY");
+                    String postcode = resultSet.getString("POSTCODE");
+                    String bankName = resultSet.getString("BANK_NAME");
+                    String accountNumber = resultSet.getString("ACCOUNT_NUMBER");
+                    String sortCode = resultSet.getString("SORT_CODE");
+
+                    DeletedUser deletedUser = new DeletedUser(addedDate, deleteDate, deletedBy, firstName, lastName,
+                            email, phone, niNumber, addressLine1, addressLine2, city, postcode, bankName,
+                            accountNumber, sortCode);
+
+                    deletedUsers.add(deletedUser);
+                }
+            } catch (SQLException e) {
+                logger.error("Failure during SQL query - getting all deleted user data", e);
+            }
+
+            return deletedUsers;
+        }
     }
 
     // ********************************************
@@ -1839,10 +1877,11 @@ public class DatabaseController {
         }
 
         // Method that will perm delete employee data - removes it from the deleted users table - NPS_DELETED_USERS
-        public static void removeUserData(String ID) {
+        public static void removeUserData(String email, String deletedBy) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    "DELETE FROM NPS_DELETED_USERS WHERE ID = ?")) {
-                preparedStatement.setString(1, ID);
+                    "DELETE FROM NPS_DELETED_USERS WHERE EMAIL = ? AND DELETED_BY = ?")) {
+                preparedStatement.setString(1, email);
+                preparedStatement.setString(2, deletedBy);
 
                 int rowsAffected = preparedStatement.executeUpdate();
                 if (rowsAffected > 0) {
