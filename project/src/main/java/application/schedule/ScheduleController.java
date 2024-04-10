@@ -401,6 +401,8 @@ public class ScheduleController implements Initializable {
 
                 String pensionString = employeePayroll.getPension();
 
+                System.out.println(pensionString);
+
                 // Parse the percentage value from the pension string
                 double pensionPercentage = Double.parseDouble(pensionString.substring(0, pensionString.length() - 1)) / 100.0;
 

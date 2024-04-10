@@ -273,18 +273,23 @@ public class EmployeeController implements Initializable {
     public void btnDelete() {
         // Select the employee from the tableview and delete them
         TableView.TableViewSelectionModel<Person> selectionModel = EmployeeTable.getSelectionModel();
+
         if (selectionModel.isEmpty()) {
             // Show an error message
             txtEmptyError.setText("Please select an employee to delete!");
         } else {
             // Delete the employee
-            DatabaseController.DeleteTableData.deleteEmployee(selectionModel.getSelectedItem().getEmployeeID());
+            DatabaseController.DeleteTableData.deleteEmployee(selectionModel.getSelectedItem().getEmployeeID(),
+                    DatabaseController.GetTableData.getEmailById(
+                            DatabaseController.GetTableData.getCurrentLoggedInEmployeeId()));
 
             btnClear();
             btnRefresh();
         }
 
-        DatabaseController.DeleteTableData.deleteEmployee(txtID.getText());
+        DatabaseController.DeleteTableData.deleteEmployee(txtID.getText(),
+                DatabaseController.GetTableData.getEmailById(
+                        DatabaseController.GetTableData.getCurrentLoggedInEmployeeId()));
     }
 
     public void btnClear() {

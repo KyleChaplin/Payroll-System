@@ -14,6 +14,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -83,7 +84,8 @@ public class DatabaseController {
                     "NPS_SCHEDULE_0",
                     "NPS_SCHEDULE_1",
                     "NPS_SCHEDULE_2",
-                    "NPS_SCHEDULE_3"
+                    "NPS_SCHEDULE_3",
+                    "NPS_DELETED_USERS"
             };
 
             // Loop to check all tables
@@ -335,7 +337,30 @@ public class DatabaseController {
                 case "NPS_SCHEDULE_3":
                     createScheduleTable("3", tableName);
                     break;
-                // Add cases for other tables...
+                case "NPS_DELETED_USERS":
+                    try (Statement statement = connection.createStatement()) {
+                        statement.executeUpdate("CREATE TABLE NPS_DELETED_USERS (" +
+                                "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
+                                "ADDED_DATE VARCHAR2(30) NOT NULL, " +
+                                "DELETE_DATE VARCHAR2(30) NOT NULL, " +
+                                "DELETED_BY VARCHAR2(100) NOT NULL, " +
+                                "FIRST_NAME VARCHAR2(50) NOT NULL, " +
+                                "LAST_NAME VARCHAR2(50) NOT NULL, " +
+                                "EMAIL VARCHAR2(100) UNIQUE NOT NULL, " +
+                                "PHONE VARCHAR2(20) NOT NULL," +
+                                "NI_NUMBER VARCHAR2(20) NOT NULL," +
+                                "ADDRESS_LINE_1 VARCHAR2(100) NOT NULL, " +
+                                "ADDRESS_LINE_2 VARCHAR2(100), " +
+                                "CITY VARCHAR2(50) NOT NULL, " +
+                                "POSTCODE VARCHAR2(10) NOT NULL, " +
+                                "BANK_NAME VARCHAR2(50) NOT NULL, " +
+                                "ACCOUNT_NUMBER VARCHAR2(20) NOT NULL, " +
+                                "SORT_CODE VARCHAR2(20) NOT NULL" +
+                                ")");
+                    } catch (SQLException e) {
+                        logger.error("Failed to create " + tableName + " ", e);
+                    }
+                    break;
             }
         }
 
@@ -379,9 +404,9 @@ public class DatabaseController {
                 case "NPS_BANK_DETAILS":
                     employeeIDForeignKey(tableName, "fk_bank_employee");
                     break;
-                case "NPS_PAYROLL":
-                    employeeIDForeignKey(tableName, "fk_payroll_employee");
-                    break;
+                //case "NPS_PAYROLL":
+                    //employeeIDForeignKey(tableName, "fk_payroll_employee");
+                    //break;
                 case "NPS_LOGIN":
                     employeeIDForeignKey(tableName, "fk_login_employee");
                     break;
@@ -404,6 +429,8 @@ public class DatabaseController {
                     employeeIDForeignKey(tableName, "fk_schedule_3_employee");
                     break;
                 // Add cases for other tables...
+                default:
+                    logger.info("No constraints set for " + tableName);
             }
         }
 
@@ -458,12 +485,13 @@ public class DatabaseController {
                             "Sort Code");
 
                     // Add payroll info for the employee
-                    AddTableData.addPayrollInfo(String.valueOf(employeeId), GetTableData.getEmailDateInfo(), MiscMethod.getCurrentMonthString(), 0,
+                    AddTableData.addPayrollInfo(String.valueOf(employeeId), GetTableData.getEmailDateInfo(),
+                            MiscMethod.getCurrentMonthString(), MiscMethod.getCurrentYear(),
                             0.0, "0%", 0.0, 0.0, 0.0, 0.0,
                             0.0, 0.0);
 
                     // Add emergency contact info for the employee
-                    addEmergencyDetails("First Name", "Last Name", "Mobile", "Relationship");
+                    addEmergencyDetails("email", "First Name", "Last Name", "Mobile", "Relationship");
 
                     // Add schedule info for the employee
                     InitialiseTables.initialiseScheduleForAllEmployees();
@@ -588,11 +616,11 @@ public class DatabaseController {
 
 
         // Method to add emergency contact info
-        public static void addEmergencyDetails(String fName, String lName, String mobile, String relationship) {
+        public static void addEmergencyDetails(String email, String fName, String lName, String mobile, String relationship) {
             // Add record
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "INSERT INTO NPS_EMERGENCY_CONTACT (EMPLOYEE_ID, FIRST_NAME, LAST_NAME, PHONE, RELATIONSHIP) VALUES (?, ?, ?, ?, ?)")) {
-                preparedStatement.setString(1, currentLoggedInEmployeeId);
+                preparedStatement.setInt(1, DatabaseController.GetTableData.getEmployeeId(email));
                 preparedStatement.setString(2, fName);
                 preparedStatement.setString(3, lName);
                 preparedStatement.setString(4, mobile);
@@ -647,6 +675,55 @@ public class DatabaseController {
                 }
             } catch (SQLException e) {
                 logger.error("Failure during SQL query - adding email", e);
+            }
+        }
+
+        // Method to add the employees details to the deleted users table when they are removed - NPS_DELETED_USERS
+        public static boolean addEmployeeToDeletedUsersTable(String deletedBy, String firstName, String lastName, String email, String phone, String niNumber,
+                                                          String addressLine1, String addressLine2, String city, String postcode,
+                                                          String bankName, String accountNumber, String sortCode) {
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            // Get the current timestamp
+            LocalDateTime now = LocalDateTime.now();
+            String addedDate = now.format(formatter);
+            // Add 1 year to the current timestamp
+            LocalDateTime addedOnPlusOneYear  = now.plusYears(1);
+            String deleteDate = addedOnPlusOneYear.format(formatter);
+
+            // Add employee record
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    "INSERT INTO NPS_DELETED_USERS (ADDED_DATE, DELETE_DATE, DELETED_BY, FIRST_NAME, LAST_NAME, " +
+                            "EMAIL, PHONE, NI_NUMBER, ADDRESS_LINE_1, ADDRESS_LINE_2, CITY, POSTCODE, BANK_NAME," +
+                            "ACCOUNT_NUMBER, SORT_CODE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                preparedStatement.setString(1, addedDate);
+                preparedStatement.setString(2, deleteDate);
+                preparedStatement.setString(3, deletedBy);
+                preparedStatement.setString(4, firstName);
+                preparedStatement.setString(5, lastName);
+                preparedStatement.setString(6, email);
+                preparedStatement.setString(7, phone);
+                preparedStatement.setString(8, niNumber);
+                preparedStatement.setString(9, addressLine1);
+                preparedStatement.setString(10, addressLine2);
+                preparedStatement.setString(11, city);
+                preparedStatement.setString(12, postcode);
+                preparedStatement.setString(13, bankName);
+                preparedStatement.setString(14, accountNumber);
+                preparedStatement.setString(15, sortCode);
+
+                int rowsAffected = preparedStatement.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    logger.info("Employee added successfully.");
+                    return true;
+                } else {
+                    logger.info("Failed to add employee.");
+                    return false;
+                }
+            } catch (SQLException e) {
+                logger.error("Failure during SQL query - adding employee data", e);
+                return false;
             }
         }
     }
@@ -1702,89 +1779,79 @@ public class DatabaseController {
 
     public class DeleteTableData {
         // Method to delete an employee record
-        public static void deleteEmployee(String employeeId) {
+        public static void deleteEmployee(String employeeId, String deletedBy) {
+            Person employee = DatabaseController.GetTableData.getEmployeeInfoByID(employeeId);
+
             // Check that you're not trying to delete the current logged-in user
-            if (!employeeId.equals(currentLoggedInEmployeeId)) {
-                // Delete the login details
-                try (PreparedStatement preparedStatement = connection.prepareStatement(
-                        "DELETE FROM NPS_LOGIN WHERE EMPLOYEE_ID = ?")) {
-                    preparedStatement.setString(1, employeeId);
+            if (employeeId != currentLoggedInEmployeeId) {
+                if (AddTableData.addEmployeeToDeletedUsersTable(deletedBy, employee.getFirstName(), employee.getLastName(),
+                        employee.getEmail(), employee.getPhone(), employee.getNiNumber(), employee.getAddress1(),
+                        employee.getAddress2(), employee.getCity(), employee.getPostcode(), employee.getBankName(),
+                        employee.getAccountNumber(), employee.getSortCode())) {
 
-                    int rowsAffected = preparedStatement.executeUpdate();
-                    if (rowsAffected > 0) {
-                        logger.info("Login record deleted successfully.");
-                    } else {
-                        logger.info("No login found with the given ID.");
-                    }
-                } catch (SQLException e) {
-                    logger.error("Failure during SQL query - deleting login data by employee ID", e);
+                    // Remove the employees data from the other tables
+                    deleteFromTable("NPS_LOGIN", employeeId);
+                    deleteFromTable("NPS_BANK_DETAILS", employeeId);
+                    deleteFromTable("NPS_EMERGENCY_CONTACT", employeeId);
+                    deleteFromTable("NPS_ADDRESSES", employeeId);
+                    deleteFromTable("NPS_SCHEDULE_0", employeeId);
+                    deleteFromTable("NPS_SCHEDULE_1", employeeId);
+                    deleteFromTable("NPS_SCHEDULE_2", employeeId);
+                    deleteFromTable("NPS_SCHEDULE_3", employeeId);
+                    deleteEmployee(employeeId);
                 }
 
-                // Delete the bank details
-                try (PreparedStatement preparedStatement = connection.prepareStatement(
-                        "DELETE FROM NPS_BANK_DETAILS WHERE EMPLOYEE_ID = ?")) {
-                    preparedStatement.setString(1, employeeId);
-
-                    int rowsAffected = preparedStatement.executeUpdate();
-                    if (rowsAffected > 0) {
-                        logger.info("Bank details deleted successfully.");
-                    } else {
-                        logger.info("No bank details found with the given ID.");
-                    }
-                } catch (SQLException e) {
-                    logger.error("Failure during SQL query - deleting bank details by employee ID", e);
-                }
-
-                // Delete the emergency contact details
-                try (PreparedStatement preparedStatement = connection.prepareStatement(
-                        "DELETE FROM NPS_EMERGENCY_CONTACT WHERE EMPLOYEE_ID = ?")) {
-                    preparedStatement.setString(1, employeeId);
-
-                    int rowsAffected = preparedStatement.executeUpdate();
-                    if (rowsAffected > 0) {
-                        logger.info("Emergency contact details deleted successfully.");
-                    } else {
-                        logger.info("No emergency contact details found with the given ID.");
-                    }
-                } catch (SQLException e) {
-                    logger.error("Failure during SQL query - deleting emergency contact by employee ID", e);
-                }
-
-                // Delete the address details
-                try (PreparedStatement preparedStatement = connection.prepareStatement(
-                        "DELETE FROM NPS_ADDRESSES WHERE EMPLOYEE_ID = ?")) {
-                    preparedStatement.setString(1, employeeId);
-
-                    int rowsAffected = preparedStatement.executeUpdate();
-                    if (rowsAffected > 0) {
-                        logger.info("Address details deleted successfully.");
-                    } else {
-                        logger.info("No address details found with the given ID.");
-                    }
-                } catch (SQLException e) {
-                    logger.error("Failure during SQL query - deleting address by employee ID", e);
-                }
-
-                // Delete the employee details
-                try (PreparedStatement preparedStatement = connection.prepareStatement(
-                        "DELETE FROM NPS_EMPLOYEE WHERE ID = ?")) {
-                    preparedStatement.setString(1, employeeId);
-
-                    int rowsAffected = preparedStatement.executeUpdate();
-                    if (rowsAffected > 0) {
-                        logger.info("Employee record deleted successfully.");
-                    } else {
-                        logger.info("No employee found with the given ID.");
-                    }
-
-                } catch (SQLException e) {
-                    logger.error("Failure during SQL query - deleting employee by ID", e);
-                }
-
-                // Delete the schedule entries
-                //deleteSchedule(employeeId);
             } else {
                 logger.error("You cannot delete the currently logged-in user.");
+            }
+        }
+
+        private static void deleteFromTable(String tableName, String employeeId) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    "DELETE FROM " + tableName + " WHERE EMPLOYEE_ID = ?")) {
+                preparedStatement.setString(1, employeeId);
+
+                int rowsAffected = preparedStatement.executeUpdate();
+                if (rowsAffected > 0) {
+                    logger.info( "record deleted successfully for " + tableName);
+                } else {
+                    logger.info("No record found with the given ID in " + tableName);
+                }
+            } catch (SQLException e) {
+                logger.error("Failure during SQL query - deleting table - " + tableName, e);
+            }
+        }
+
+        private static void deleteEmployee(String ID) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    "DELETE FROM NPS_EMPLOYEE WHERE ID = ?")) {
+                preparedStatement.setString(1, ID);
+
+                int rowsAffected = preparedStatement.executeUpdate();
+                if (rowsAffected > 0) {
+                    logger.info("Schedule entries deleted successfully.");
+                } else {
+                    logger.info("No schedule entries found for the given employee ID.");
+                }
+            } catch (SQLException e) {
+                logger.error("Failure during SQL query - deleting schedule data for employee", e);
+            }
+        }
+
+        // Method that will perm delete employee data - removes it from the deleted users table - NPS_DELETED_USERS
+        public static void removeUserData(String ID) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    "DELETE FROM NPS_DELETED_USERS WHERE ID = ?")) {
+                preparedStatement.setString(1, ID);
+
+                int rowsAffected = preparedStatement.executeUpdate();
+                if (rowsAffected > 0) {
+                    logger.info("Schedule entries deleted successfully.");
+                } else {
+                    logger.info("No schedule entries found for the given employee ID.");
+                }
+            } catch (SQLException e) {
+                logger.error("Failure during SQL query - deleting schedule data for employee", e);
             }
         }
 
@@ -1802,23 +1869,6 @@ public class DatabaseController {
                 }
             } catch (SQLException e) {
                 logger.error("Failure during SQL query - deleting help by error code", e);
-            }
-        }
-
-        // Method to delete every schedule entry for an employee
-        public static void deleteSchedule(String employeeId) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    "DELETE FROM NPS_SCHEDULE WHERE EMPLOYEE_ID = ?")) {
-                preparedStatement.setString(1, employeeId);
-
-                int rowsAffected = preparedStatement.executeUpdate();
-                if (rowsAffected > 0) {
-                    logger.info("Schedule entries deleted successfully.");
-                } else {
-                    logger.info("No schedule entries found for the given employee ID.");
-                }
-            } catch (SQLException e) {
-                logger.error("Failure during SQL query - deleting schedule data for employee", e);
             }
         }
     }

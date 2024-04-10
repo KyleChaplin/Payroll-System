@@ -146,7 +146,7 @@
                                                       <Font size="16.0" />
                                                    </font>
                                                 </Label>
-                                                <TextField fx:id="txtDepartment" prefWidth="300.0" promptText="National Insurance Number" />
+                                                <TextField fx:id="txtDepartment" prefWidth="300.0" promptText="Department" />
                                                 <Label text="Job Title:">
                                                    <font>
                                                       <Font size="16.0" />
