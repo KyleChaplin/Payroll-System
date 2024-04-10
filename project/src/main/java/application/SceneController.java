@@ -56,7 +56,7 @@ public class SceneController {
 
         if (usernameTextField.getText().isBlank() && passwordTextField.getText().isBlank()) {
             loginStatus = 0;
-        } else if (DatabaseController.checkLogin(usernameTextField.getText(), passwordTextField.getText())) {
+        } else if (DatabaseController.CheckTableData.checkLogin(usernameTextField.getText(), passwordTextField.getText())) {
             loginStatus = 1;
         } else {
             loginStatus = -1;

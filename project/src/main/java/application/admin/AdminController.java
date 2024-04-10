@@ -13,7 +13,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
@@ -62,8 +61,9 @@ public class AdminController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        if (Integer.parseInt(DatabaseController.getAccessLevel(
-                DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()))) == 0) {
+        if (Integer.parseInt(DatabaseController.GetTableData.getAccessLevel(
+                DatabaseController.GetTableData.getEmailById(
+                        DatabaseController.GetTableData.getCurrentLoggedInEmployeeId()))) == 0) {
             btnAdmin.setVisible(true);
         }
 
@@ -72,7 +72,7 @@ public class AdminController implements Initializable {
 
     @FXML
     public void updateDatabase() {
-        DatabaseController.updateEmailInfo(txtEmail.getText(), txtPassword.getText(),
+        DatabaseController.UpdateTableData.updateEmailInfo(txtEmail.getText(), txtPassword.getText(),
                 formatDatabaseDate(dateEmailDate.getValue()));
         changePane("paneMain");
     }
@@ -92,9 +92,9 @@ public class AdminController implements Initializable {
         changePane("paneEmailServer");
 
         
-        txtEmail.setText(DatabaseController.getEmailInfo());
-        txtPassword.setText(DatabaseController.getPasswordInfo());
-        dateEmailDate.setValue(formatDate(DatabaseController.getEmailDateInfo()));
+        txtEmail.setText(DatabaseController.GetTableData.getEmailInfo());
+        txtPassword.setText(DatabaseController.GetTableData.getPasswordInfo());
+        dateEmailDate.setValue(formatDate(DatabaseController.GetTableData.getEmailDateInfo()));
     }
 
     private LocalDate formatDate(String dateString) {
@@ -111,7 +111,7 @@ public class AdminController implements Initializable {
 
     private void loadHelpData() {
         // Load data from database
-        ObservableList<HelpInfo> helpInfo = DatabaseController.getHelpInfo();
+        ObservableList<HelpInfo> helpInfo = DatabaseController.GetTableData.getHelpInfo();
 
         tblRErrorCode.setCellValueFactory(new PropertyValueFactory<>("errorCode"));
         tblRTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -133,8 +133,9 @@ public class AdminController implements Initializable {
 
     @FXML
     public void btnUpdateHelp() {
-        DatabaseController.updateHelp(txtErrorCode.getText(), txtTitle.getText(), txtDesc.getText(),
-                DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()));
+        DatabaseController.UpdateTableData.updateHelp(txtErrorCode.getText(), txtTitle.getText(), txtDesc.getText(),
+                DatabaseController.GetTableData.getEmailById(
+                        DatabaseController.GetTableData.getCurrentLoggedInEmployeeId()));
 
         loadHelpData();
 

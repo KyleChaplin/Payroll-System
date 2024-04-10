@@ -24,9 +24,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static application.DatabaseController.addOrUpdatePayrollInfo;
-import static application.DatabaseController.getScheduleData;
-
 public class ScheduleController implements Initializable {
 
     private Stage stage;
@@ -125,7 +122,9 @@ public class ScheduleController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        if (Integer.parseInt(DatabaseController.getAccessLevel(DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()))) == 0) {
+        if (Integer.parseInt(DatabaseController.GetTableData.getAccessLevel(
+                DatabaseController.GetTableData.getEmailById(
+                        DatabaseController.GetTableData.getCurrentLoggedInEmployeeId()))) == 0) {
             adminBox.setVisible(true);
             btnPurple.setVisible(true);
             btnGreen.setVisible(true);
@@ -133,7 +132,7 @@ public class ScheduleController implements Initializable {
             btnAdmin.setVisible(true);
         }
 
-        DatabaseController.initializeScheduleForAllEmployees();
+        DatabaseController.InitialiseTables.initialiseScheduleForAllEmployees();
 
         //initializeColumns();
         loadTableData();
@@ -164,7 +163,7 @@ public class ScheduleController implements Initializable {
     @FXML
     private void loadTableData() {
         // Get the data for the selected week
-        ObservableList<Schedule> scheduleData = getScheduleData(String.valueOf(selectedWeek));
+        ObservableList<Schedule> scheduleData = DatabaseController.GetTableData.getScheduleData(String.valueOf(selectedWeek));
 
         initializeColumns();
 
@@ -178,7 +177,7 @@ public class ScheduleController implements Initializable {
         String searchQuery = txtSearch.getText();
 
         // Iterate through your data and add matching rows to the filteredData
-        for (Schedule schedule : getScheduleData(String.valueOf(selectedWeek))) {
+        for (Schedule schedule : DatabaseController.GetTableData.getScheduleData(String.valueOf(selectedWeek))) {
             if (schedule.getEmployeeID().toLowerCase().contains(searchQuery.toLowerCase()) ||
                     schedule.getName().toLowerCase().contains(searchQuery.toLowerCase())) {
                 filteredData.add(schedule);
@@ -223,7 +222,7 @@ public class ScheduleController implements Initializable {
         txtSatEnd.setText(schedule.getSaturdayEnd());
         txtSunStart.setText(schedule.getSundayStart());
         txtSunEnd.setText(schedule.getSundayEnd());
-        txtContractHours.setText(String.valueOf(DatabaseController.getContractedHours(schedule.getEmployeeID())));
+        txtContractHours.setText(String.valueOf(DatabaseController.GetTableData.getContractedHours(schedule.getEmployeeID())));
         txtPlannedHours.setText(String.valueOf(calculateTotalHoursWorked(schedule)));
     }
 
@@ -373,7 +372,7 @@ public class ScheduleController implements Initializable {
     @FXML
     private void btnUpdate() {
         Schedule schedule = createScheduleFromTextFields();
-        DatabaseController.updateSchedule(schedule);
+        DatabaseController.UpdateTableData.updateSchedule(schedule);
 
         // Refresh the table
         loadTableData();
@@ -390,7 +389,7 @@ public class ScheduleController implements Initializable {
 
         // Iterate over each week to aggregate data
         for (int i = 0; i <= 3; i++) {
-            ObservableList<Schedule> scheduleData = DatabaseController.getScheduleData(String.valueOf(i));
+            ObservableList<Schedule> scheduleData = DatabaseController.GetTableData.getScheduleData(String.valueOf(i));
 
             for (Schedule s : scheduleData) {
                 // Get employee ID for the current schedule
@@ -398,7 +397,7 @@ public class ScheduleController implements Initializable {
 
                 // Get or initialize payroll info for the employee
                 Map<String, Double> payrollInfo = employeePayrollMap.getOrDefault(employeeId, new HashMap<>());
-                DetailedPayroll employeePayroll = DatabaseController.getSpecificEmployeePayroll(employeeId);
+                DetailedPayroll employeePayroll = DatabaseController.GetTableData.getSpecificEmployeePayroll(employeeId);
 
                 String pensionString = employeePayroll.getPension();
 
@@ -409,7 +408,7 @@ public class ScheduleController implements Initializable {
                 payrollInfo.put("hourlySalary", employeePayroll.getsalary());
 
                 // Calculate overtime worked over the 4 weeks
-                double contractedHours = DatabaseController.getContractedHours(s.getEmployeeID());
+                double contractedHours = DatabaseController.GetTableData.getContractedHours(s.getEmployeeID());
                 payrollInfo.put("contractedHours", (contractedHours));
                 double plannedHours = calculateTotalHoursWorked(s);
                 payrollInfo.put("plannedHours", payrollInfo.getOrDefault("plannedHours", 0.0) + plannedHours);
@@ -499,7 +498,7 @@ public class ScheduleController implements Initializable {
             String employeeId = entry.getKey();
             Map<String, Double> payrollInfo = entry.getValue();
 
-            DatabaseController.addOrUpdatePayrollInfo(employeeId, DatabaseController.getEmailDateInfo(),
+            DatabaseController.AddTableData.addOrUpdatePayrollInfo(employeeId, DatabaseController.GetTableData.getEmailDateInfo(),
             getCurrentMonthString(), getCurrentYear(), payrollInfo.get("totalHoursWorked"),
             String.format("%.0f%%", payrollInfo.get("pensionCon") * 100), payrollInfo.get("totalPensionPaid"),
             payrollInfo.get("totalOvertimeHours"), payrollInfo.get("totalOvertimePay"),

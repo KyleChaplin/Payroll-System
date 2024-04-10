@@ -2,8 +2,6 @@ package application.email;
 
 import application.DatabaseController;
 import application.employees.Person;
-import javafx.scene.chart.PieChart;
-
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
@@ -37,7 +35,7 @@ public class Email {
         public void run() {
             try {
                 // Fetch the next scheduled time from the database
-                String currentEmailDate = DatabaseController.getEmailDateInfo();
+                String currentEmailDate = DatabaseController.GetTableData.getEmailDateInfo();
 
                 // Parse the retrieved date and time
                 SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
@@ -67,7 +65,7 @@ public class Email {
             try {
                 // Update the email date in the database
                 String newEmailDate = calculateNextExecutionDate();
-                DatabaseController.updateEmailDate(newEmailDate);
+                DatabaseController.UpdateTableData.updateEmailDate(newEmailDate);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -75,7 +73,7 @@ public class Email {
 
         private String calculateNextExecutionDate() throws ParseException {
             // Fetch the next scheduled time from the database
-            String currentEmailDate = DatabaseController.getEmailDateInfo();
+            String currentEmailDate = DatabaseController.GetTableData.getEmailDateInfo();
 
             // Parse the retrieved date and time
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
@@ -92,8 +90,8 @@ public class Email {
         private static void sendEmail() throws MessagingException {
             System.out.println("Sending emails...");
 
-            String fromUser = DatabaseController.getEmailInfo();
-            String fromUserPassword = DatabaseController.getPasswordInfo();
+            String fromUser = DatabaseController.GetTableData.getEmailInfo();
+            String fromUserPassword = DatabaseController.GetTableData.getPasswordInfo();
             String emailHost = "smtp.gmail.com";
             Transport transport = newSession.getTransport("smtp");
             transport.connect(emailHost, fromUser, fromUserPassword);
@@ -114,7 +112,7 @@ public class Email {
             String emailSubject;
             String emailBody;
 
-            List<Person> employees = DatabaseController.getAllEmployeeInfo();
+            List<Person> employees = DatabaseController.GetTableData.getAllEmployeeInfo();
             mimeMessage = new MimeMessage[employees.size()];
             Calendar currentCalendar = Calendar.getInstance();
 

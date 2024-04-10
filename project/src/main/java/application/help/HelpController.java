@@ -3,25 +3,19 @@ package application.help;
 import application.DatabaseController;
 import application.SceneController;
 import application.ThemeManager;
-import application.schedule.Schedule;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-import static application.DatabaseController.getScheduleData;
 
 public class HelpController implements Initializable {
 
@@ -35,8 +29,6 @@ public class HelpController implements Initializable {
     @FXML
     private VBox vboxHelp;
     @FXML
-    private Pane pane;
-    @FXML
     private Pane addPane;
     @FXML
     private TextField txtErrorCode;
@@ -49,12 +41,14 @@ public class HelpController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        if (Integer.parseInt(DatabaseController.getAccessLevel(DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()))) == 0) {
+        if (Integer.parseInt(DatabaseController.GetTableData.getAccessLevel(
+                DatabaseController.GetTableData.getEmailById(
+                        DatabaseController.GetTableData.getCurrentLoggedInEmployeeId()))) == 0) {
             btnAdmin.setVisible(true);
         }
         // TODO: This currently only works with dark mode - Setup support for light mode
 
-        ObservableList<HelpInfo> helpInfo = (ObservableList<HelpInfo>) DatabaseController.getHelpInfo();
+        ObservableList<HelpInfo> helpInfo = (ObservableList<HelpInfo>) DatabaseController.GetTableData.getHelpInfo();
 
         VBox helpVbox = new VBox();
 
@@ -73,8 +67,8 @@ public class HelpController implements Initializable {
     }
 
     public void addHelpInfoToDB(ActionEvent event) throws IOException {
-        DatabaseController.addHelp(txtErrorCode.getText(), txtTitle.getText(), txtDescription.getText(),
-                DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()));
+        DatabaseController.AddTableData.addHelp(txtErrorCode.getText(), txtTitle.getText(), txtDescription.getText(),
+                DatabaseController.GetTableData.getEmailById(DatabaseController.GetTableData.getCurrentLoggedInEmployeeId()));
 
         addPane.setVisible(false);
         addPane.setDisable(true);
@@ -94,7 +88,7 @@ public class HelpController implements Initializable {
     private void searchForHelp() {
         //ObservableList<Schedule> filteredData = FXCollections.observableArrayList();
         // Get help information from the database
-        ObservableList<HelpInfo> helpInfo = DatabaseController.getHelpInfo();
+        ObservableList<HelpInfo> helpInfo = DatabaseController.GetTableData.getHelpInfo();
 
         // Clear existing panes before adding filtered ones
         VBox helpVbox = new VBox();
@@ -160,7 +154,7 @@ public class HelpController implements Initializable {
         SceneController.openScene(event, "help", stage, scene);
     }
 
-    public void toggleTheme(ActionEvent event) throws IOException {
+    public void toggleTheme() throws IOException {
         ThemeManager.toggleMode();
     }
 }

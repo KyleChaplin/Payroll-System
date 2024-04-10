@@ -1,16 +1,13 @@
 package application.email;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import java.util.Date;
-import java.util.List;
-
 import application.DatabaseController;
 import application.payroll.DetailedPayroll;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -59,7 +56,7 @@ public class PDFBox {
         PDFont italicFont = PDType1Font.HELVETICA_OBLIQUE;
 
         // ****************Employee details***************
-        DetailedPayroll employee = DatabaseController.getSpecificEmployeePayroll(employeeNumber); // Gets the employee info from the database using the employee ID
+        DetailedPayroll employee = DatabaseController.GetTableData.getSpecificEmployeePayroll(employeeNumber); // Gets the employee info from the database using the employee ID
         String employeeID = employee.getEmployeeID();
         String name = employee.getFirstName() + " " + employee.getLastName();
         String hoursWorked = String.valueOf(employee.getHoursWorked());

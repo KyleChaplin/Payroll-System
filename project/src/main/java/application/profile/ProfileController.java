@@ -26,8 +26,6 @@ import java.util.ResourceBundle;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static application.DatabaseController.getEmployeeInfo;
-
 public class ProfileController implements Initializable {
 
     private Stage stage;
@@ -100,12 +98,16 @@ public class ProfileController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        if (Integer.parseInt(DatabaseController.getAccessLevel(DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()))) == 0) {
+        if (Integer.parseInt(DatabaseController.GetTableData.getAccessLevel(
+                DatabaseController.GetTableData.getEmailById(
+                        DatabaseController.GetTableData.getCurrentLoggedInEmployeeId()))) == 0) {
             btnAdmin.setVisible(true);
         }
 
+
+
         // Populate the text fields with the current user's information
-        Person person = getEmployeeInfo();
+        Person person = DatabaseController.GetTableData.getEmployeeInfo();
 
         lblName.setText("Employee: " + person.getFirstName() + " " + person.getLastName());
         id = person.getEmployeeID();
@@ -168,7 +170,7 @@ public class ProfileController implements Initializable {
 
         // Directory
         String savePath = "src/main/resources/PDF/";
-        String employeeDirectory = savePath + "/" + DatabaseController.getCurrentLoggedInEmployeeId();
+        String employeeDirectory = savePath + "/" + DatabaseController.GetTableData.getCurrentLoggedInEmployeeId();
 
         // Iterate over the past 6 months
         for (String[] monthAndYear : pastSixMonths) {
@@ -210,7 +212,7 @@ public class ProfileController implements Initializable {
 
         // Construct the PDF path
         String savePath = "src/main/resources/PDF/";
-        String employeeDirectory = savePath + "/" + DatabaseController.getCurrentLoggedInEmployeeId();
+        String employeeDirectory = savePath + "/" + DatabaseController.GetTableData.getCurrentLoggedInEmployeeId();
         String pdfPath = employeeDirectory + "/" + month + "_" + year + ".pdf";
 
         // Prompt the user to select a download location
@@ -329,7 +331,7 @@ public class ProfileController implements Initializable {
                 }
 
                 // Once validation is passed, update the employee profile
-                DatabaseController.updateEmployeeProfile(id, txtlName.getText(), txtlName.getText(),
+                DatabaseController.UpdateTableData.updateEmployeeProfile(id, txtlName.getText(), txtlName.getText(),
                         txtEmail.getText(), txtPhone.getText(), txtNiNumber.getText(), txtAddress1.getText(),
                         txtAddress2.getText(), txtPostcode.getText(), txtCity.getText(), txtBankName.getText(),
                         txtAccountNumber.getText(), txtSortCode.getText(), txtEFirstName.getText(),

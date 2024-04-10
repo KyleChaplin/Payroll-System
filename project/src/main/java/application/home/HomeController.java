@@ -22,7 +22,9 @@ public class HomeController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        if (Integer.parseInt(DatabaseController.getAccessLevel(DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()))) == 0) {
+        if (Integer.parseInt(DatabaseController.GetTableData.getAccessLevel(
+                DatabaseController.GetTableData.getEmailById(
+                        DatabaseController.GetTableData.getCurrentLoggedInEmployeeId()))) == 0) {
             btnAdmin.setVisible(true);
         }
     }

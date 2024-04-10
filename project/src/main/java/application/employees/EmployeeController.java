@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import static application.DatabaseController.*;
-
 public class EmployeeController implements Initializable {
     private Stage stage;
     private Scene scene;
@@ -85,7 +83,9 @@ public class EmployeeController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        if (Integer.parseInt(DatabaseController.getAccessLevel(DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()))) == 0) {
+        if (Integer.parseInt(DatabaseController.GetTableData.getAccessLevel(
+                DatabaseController.GetTableData.getEmailById(
+                        DatabaseController.GetTableData.getCurrentLoggedInEmployeeId()))) == 0) {
             btnAdmin.setVisible(true);
         }
 
@@ -114,19 +114,19 @@ public class EmployeeController implements Initializable {
         Department.setCellValueFactory(new PropertyValueFactory<Person, String>("Department"));
         JobTitle.setCellValueFactory(new PropertyValueFactory<Person, String>("JobTitle"));
 
-        EmployeeTable.setItems(getAllEmployees());
+        EmployeeTable.setItems(DatabaseController.GetTableData.getAllEmployees());
     }
 
     @FXML
     private void btnRefresh() {
         // Refresh the table
-        EmployeeTable.setItems(getAllEmployees());
+        EmployeeTable.setItems(DatabaseController.GetTableData.getAllEmployees());
     }
 
     public void btnAdd() {
         try {
             // Check if the employee already exists
-            if (employeeExists(txtEmail.getText())) {
+            if (DatabaseController.CheckTableData.employeeExists(txtEmail.getText())) {
                 // Show an error message
                 txtEmptyError.setText("Employee already exists!");
             } else {
@@ -182,7 +182,7 @@ public class EmployeeController implements Initializable {
                 }
 
                 // Once input validation is passed, add the employee
-                addEmployee(txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(), txtPhone.getText(),
+                DatabaseController.AddTableData.addEmployee(txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(), txtPhone.getText(),
                         txtHourlySalary.getText(), txtNiNumber.getText(), Integer.parseInt((String)cboAccessLevel.getValue()),
                         txtLocation.getText(), txtContractType.getText(), txtContractedHours.getText(),
                         txtDepartment.getText(), txtJobTitle.getText(),false);
@@ -257,7 +257,7 @@ public class EmployeeController implements Initializable {
 
             // Once input validation is passed, update the employee
             // Update the employee
-            updateEmployee(txtID.getText(), txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(),
+            DatabaseController.UpdateTableData.updateEmployee(txtID.getText(), txtFirstName.getText(), txtLastName.getText(), txtEmail.getText(),
                     txtPhone.getText(), txtHourlySalary.getText(), txtNiNumber.getText(),
                     Integer.parseInt((String)cboAccessLevel.getValue()), txtLocation.getText(),
                     txtContractType.getText(), txtContractedHours.getText(), txtDepartment.getText(),
@@ -278,13 +278,13 @@ public class EmployeeController implements Initializable {
             txtEmptyError.setText("Please select an employee to delete!");
         } else {
             // Delete the employee
-            deleteEmployee(selectionModel.getSelectedItem().getEmployeeID());
+            DatabaseController.DeleteTableData.deleteEmployee(selectionModel.getSelectedItem().getEmployeeID());
 
             btnClear();
             btnRefresh();
         }
 
-        deleteEmployee(txtID.getText());
+        DatabaseController.DeleteTableData.deleteEmployee(txtID.getText());
     }
 
     public void btnClear() {
@@ -312,7 +312,7 @@ public class EmployeeController implements Initializable {
         String searchQuery = txtSearch.getText();
 
         // Iterate through your data and add matching rows to the filteredData
-        for (Person person : getAllEmployees()) {
+        for (Person person : DatabaseController.GetTableData.getAllEmployees()) {
             if (person.getEmployeeID().toLowerCase().contains(searchQuery.toLowerCase()) ||
                     person.getFirstName().toLowerCase().contains(searchQuery.toLowerCase()) ||
                     person.getLastName().toLowerCase().contains(searchQuery.toLowerCase())) {

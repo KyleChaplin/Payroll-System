@@ -53,8 +53,8 @@ public class SingleEmail {
     }
 
     private static void sendEmail() throws MessagingException {
-        String fromUser = DatabaseController.getEmailInfo();
-        String fromUserPassword = DatabaseController.getPasswordInfo();
+        String fromUser = DatabaseController.GetTableData.getEmailInfo();
+        String fromUserPassword = DatabaseController.GetTableData.getPasswordInfo();
         String emailHost = "smtp.gmail.com";
         Transport transport = newSession.getTransport("smtp");
         transport.connect(emailHost, fromUser, fromUserPassword);

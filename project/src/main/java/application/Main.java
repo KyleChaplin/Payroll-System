@@ -18,8 +18,8 @@ import java.util.Objects;
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException, SQLException {
-        DatabaseController.loadEnvVariables();
-        DatabaseController.databaseChecks();
+        DatabaseController.DatabaseChecks.loadEnvVariables();
+        DatabaseController.DatabaseChecks.databaseChecks();
 
         Email.sendEmailTask();    // Uncomment to enable emails sending
 

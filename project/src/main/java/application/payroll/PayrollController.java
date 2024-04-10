@@ -11,15 +11,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-
-import static application.DatabaseController.getAllEmployees;
 
 public class PayrollController implements Initializable {
 
@@ -61,7 +57,9 @@ public class PayrollController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        if (Integer.parseInt(DatabaseController.getAccessLevel(DatabaseController.getEmailById(DatabaseController.getCurrentLoggedInEmployeeId()))) == 0) {
+        if (Integer.parseInt(DatabaseController.GetTableData.getAccessLevel(
+                DatabaseController.GetTableData.getEmailById(
+                        DatabaseController.GetTableData.getCurrentLoggedInEmployeeId()))) == 0) {
             btnAdmin.setVisible(true);
         }
 
@@ -72,7 +70,7 @@ public class PayrollController implements Initializable {
         Total.setCellValueFactory(new PropertyValueFactory<PayrollOverview, String>("total"));
         NoEmployees.setCellValueFactory(new PropertyValueFactory<PayrollOverview, String>("noEmployees"));
 
-        tblPayroll.setItems(DatabaseController.getPayrollOverviewForMonth());
+        tblPayroll.setItems(DatabaseController.GetTableData.getPayrollOverviewForMonth());
 
         // Set up a listener for selection changes in the payroll overview table
         tblPayroll.getSelectionModel().selectedItemProperty().addListener(
@@ -83,7 +81,7 @@ public class PayrollController implements Initializable {
         if (selectedPayroll != null) {
             // Call the method to fetch detailed employee information for the selected month
             ObservableList<DetailedPayroll> employeeDetails =
-                    DatabaseController.getEmployeeDetailsForMonthAndYear(selectedPayroll.getMonth(), selectedPayroll.getYear());
+                    DatabaseController.GetTableData.getEmployeeDetailsForMonthAndYear(selectedPayroll.getMonth(), selectedPayroll.getYear());
 
             // Update the employee details table with the fetched data
             EmployeeID.setCellValueFactory(new PropertyValueFactory<DetailedPayroll, String>("employeeID"));
@@ -127,7 +125,7 @@ public class PayrollController implements Initializable {
         SceneController.openScene(event, "help", stage, scene);
     }
 
-    public void toggleTheme(ActionEvent event) throws IOException {
+    public void toggleTheme() throws IOException {
         ThemeManager.toggleMode();
     }
 
