@@ -198,6 +198,24 @@ public class AdminController implements Initializable {
         txtAddedBy.clear();
     }
 
+    @FXML
+    public void btnDeleteHelp() {
+        // Get the selected item from the table view
+        HelpInfo info = tblHelp.getSelectionModel().getSelectedItem();
+
+        if (info != null) {
+            // Delete the user from the database
+            DatabaseController.DeleteTableData.deleteHelp(info.getErrorCode());
+            // Remove the user from the table view
+            tblHelp.getItems().remove(info);
+
+            txtErrorCode.clear();
+            txtTitle.clear();
+            txtDesc.clear();
+            txtAddedBy.clear();
+        }
+    }
+
     // ***********************
     // Showing different panes
     // ***********************
