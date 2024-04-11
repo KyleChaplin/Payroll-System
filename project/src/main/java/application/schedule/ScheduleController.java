@@ -116,7 +116,6 @@ public class ScheduleController implements Initializable {
     @FXML
     private Button btnAdmin;
 
-
     private int selectedWeek = 0;
 
     @Override

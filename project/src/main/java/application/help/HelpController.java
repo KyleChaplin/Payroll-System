@@ -46,7 +46,6 @@ public class HelpController implements Initializable {
                         DatabaseController.GetTableData.getCurrentLoggedInEmployeeId()))) == 0) {
             btnAdmin.setVisible(true);
         }
-        // TODO: This currently only works with dark mode - Setup support for light mode
 
         ObservableList<HelpInfo> helpInfo = (ObservableList<HelpInfo>) DatabaseController.GetTableData.getHelpInfo();
 

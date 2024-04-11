@@ -18,6 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.control.Tooltip?>
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.admin.AdminController">
    <center>
       <AnchorPane minHeight="830.0" minWidth="1000.0" prefHeight="830.0" prefWidth="1071.0" BorderPane.alignment="CENTER">
@@ -217,6 +218,9 @@
                            </effect>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip opacity="0.75" text="Dashboard" />
+                     </tooltip>
                   </Button>
                   <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openSchedule" prefHeight="60.0" prefWidth="200.0" textAlignment="CENTER" textFill="WHITE">
                      <font>
@@ -235,42 +239,9 @@
                            </effect>
                         </ImageView>
                      </graphic>
-                  </Button>
-                  <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openPayroll" prefHeight="60.0" prefWidth="200.0" textAlignment="CENTER" textFill="WHITE">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                     <graphic>
-                        <ImageView fitHeight="40.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true" styleClass="image-view">
-                           <image>
-                              <Image url="@../../images/payroll.png" />
-                           </image>
-                           <effect>
-                              <ColorAdjust brightness="1.0" />
-                           </effect>
-                        </ImageView>
-                     </graphic>
-                  </Button>
-                  <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openPeople" prefHeight="60.0" prefWidth="200.0" textAlignment="CENTER" textFill="WHITE">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                     <graphic>
-                        <ImageView fitHeight="40.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true" styleClass="image-view">
-                           <image>
-                              <Image url="@../../images/people.png" />
-                           </image>
-                           <effect>
-                              <ColorAdjust brightness="1.0" />
-                           </effect>
-                        </ImageView>
-                     </graphic>
+                     <tooltip>
+                        <Tooltip opacity="0.75" text="Schedule" />
+                     </tooltip>
                   </Button>
                   <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openProfile" prefHeight="60.0" prefWidth="200.0" textAlignment="CENTER" textFill="WHITE">
                      <font>
@@ -289,6 +260,73 @@
                            </effect>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip opacity="0.75" text="Profile" />
+                     </tooltip>
+                  </Button>
+                  <Button fx:id="btnPayroll" alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openPayroll" prefHeight="60.0" prefWidth="200.0" textAlignment="CENTER" textFill="WHITE">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                     <graphic>
+                        <ImageView fitHeight="40.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true" styleClass="image-view">
+                           <image>
+                              <Image url="@../../images/payroll.png" />
+                           </image>
+                           <effect>
+                              <ColorAdjust brightness="1.0" />
+                           </effect>
+                        </ImageView>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip opacity="0.75" text="Payroll" />
+                     </tooltip>
+                  </Button>
+                  <Button fx:id="btnEmployees" alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openPeople" prefHeight="60.0" prefWidth="200.0" textAlignment="CENTER" textFill="WHITE">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                     <graphic>
+                        <ImageView fitHeight="40.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true" styleClass="image-view">
+                           <image>
+                              <Image url="@../../images/people.png" />
+                           </image>
+                           <effect>
+                              <ColorAdjust brightness="1.0" />
+                           </effect>
+                        </ImageView>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip opacity="0.75" text="Employees" />
+                     </tooltip>
+                  </Button>
+               </children>
+            </VBox>
+            <VBox alignment="BOTTOM_LEFT" layoutX="1.0" layoutY="460.0" prefHeight="368.0" prefWidth="63.0">
+               <children>
+                  <Button fx:id="btnAdmin" alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openAdmin" prefHeight="60.0" prefWidth="63.0" textAlignment="CENTER" textFill="WHITE" visible="false">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                     <graphic>
+                        <ImageView fitHeight="40.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true" styleClass="image-view">
+                           <image>
+                              <Image url="@../../images/admin.png" />
+                           </image>
+                           <effect>
+                              <ColorAdjust brightness="1.0" />
+                           </effect>
+                        </ImageView>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip opacity="0.75" text="Admin" />
+                     </tooltip>
                   </Button>
                   <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openHelp" prefHeight="60.0" prefWidth="200.0" textAlignment="CENTER" textFill="WHITE">
                      <font>
@@ -307,36 +345,27 @@
                            </effect>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip opacity="0.75" text="Help" />
+                     </tooltip>
+                  </Button>
+                  <Button fx:id="btnDark" mnemonicParsing="false" onAction="#toggleTheme" prefHeight="60.0" prefWidth="63.0">
+                     <graphic>
+                        <ImageView pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../images/theme.png" />
+                           </image>
+                           <effect>
+                              <ColorAdjust brightness="1.0" />
+                           </effect>
+                        </ImageView>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip opacity="0.75" text="Theme" />
+                     </tooltip>
                   </Button>
                </children>
             </VBox>
-            <Button fx:id="btnAdmin" alignment="CENTER" contentDisplay="RIGHT" layoutY="709.0" mnemonicParsing="false" onAction="#openAdmin" prefHeight="60.0" prefWidth="63.0" textAlignment="CENTER" textFill="WHITE" visible="false">
-               <font>
-                  <Font size="18.0" />
-               </font>
-               <graphic>
-                  <ImageView fitHeight="40.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true" styleClass="image-view">
-                     <image>
-                        <Image url="@../../images/admin.png" />
-                     </image>
-                     <effect>
-                        <ColorAdjust brightness="1.0" />
-                     </effect>
-                  </ImageView>
-               </graphic>
-            </Button>
-            <Button fx:id="btnDark" layoutY="769.0" mnemonicParsing="false" onAction="#toggleTheme" prefHeight="60.0" prefWidth="63.0">
-               <graphic>
-                  <ImageView pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../../images/theme.png" />
-                     </image>
-                     <effect>
-                        <ColorAdjust brightness="1.0" />
-                     </effect>
-                  </ImageView>
-               </graphic>
-            </Button>
          </children>
       </Pane>
    </left>

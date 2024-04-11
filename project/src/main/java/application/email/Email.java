@@ -46,13 +46,13 @@ public class Email {
                     // Setup mail server properties
                     setupServerProperties();
 
+                    updateEmailDateInDatabase();
+
                     // Draft an email
                     draftEmail();
 
                     // Send the email
                     sendEmail();
-
-                    updateEmailDateInDatabase();
                 }
             } catch (MessagingException | IOException | ParseException e) {
                 throw new RuntimeException(e);

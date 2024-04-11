@@ -3,17 +3,23 @@ package application.employees;
 import application.DatabaseController;
 import application.SceneController;
 import application.ThemeManager;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+
 import java.io.IOException;
 import java.net.URL;
+import java.util.Random;
 import java.util.ResourceBundle;
 
 public class EmployeeController implements Initializable {
@@ -118,6 +124,40 @@ public class EmployeeController implements Initializable {
     }
 
     @FXML
+    private void generateData() {
+        String[] employeeData = EmployeeGenerator.generateEmployeeData();
+
+        if (employeeData != null) {
+            txtFirstName.setText(employeeData[0]);
+            txtLastName.setText(employeeData[1]);
+            txtEmail.setText(employeeData[2]);
+            txtPhone.setText(employeeData[3]);
+            txtHourlySalary.setText(employeeData[4]);
+            txtNiNumber.setText(employeeData[5]);
+            txtLocation.setText(employeeData[6]);
+            txtContractType.setText(employeeData[7]);
+            txtContractedHours.setText(employeeData[8]);
+            txtDepartment.setText(employeeData[9]);
+            txtJobTitle.setText(employeeData[10]);
+            cboAccessLevel.setValue(employeeData[11]);
+        }
+    }
+
+    private void setupErrorTimer() {
+        Duration duration = Duration.seconds(5);
+        KeyFrame keyFrame = new KeyFrame(duration, new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                // Clear the error message after the specified duration
+                txtEmptyError.setText("");
+            }
+        });
+
+        Timeline timeline = new Timeline(keyFrame);
+        timeline.play();
+    }
+
+    @FXML
     private void btnRefresh() {
         // Refresh the table
         EmployeeTable.setItems(DatabaseController.GetTableData.getAllEmployees());
@@ -129,6 +169,8 @@ public class EmployeeController implements Initializable {
             if (DatabaseController.CheckTableData.employeeExists(txtEmail.getText())) {
                 // Show an error message
                 txtEmptyError.setText("Employee already exists!");
+
+                setupErrorTimer();
             } else {
 
                 // Check if the text fields are empty
@@ -158,7 +200,12 @@ public class EmployeeController implements Initializable {
                         return;
                     }
 
-                    if (!niNumber.matches("^[A-CEGHJ-PR-TW-Z]{1}[A-CEGHJ-NPR-TW-Z]{1}[0-9]{6}[A-D]{1}$")) {
+//                    if (!niNumber.matches("^[A-CEGHJ-PR-TW-Z]{1}[A-CEGHJ-NPR-TW-Z]{1}[0-9]{6}[A-D]{1}$")) {
+//                        txtEmptyError.setText("Invalid NI number!");
+//                        return;
+//                    }
+
+                    if (!niNumber.matches("^[ABCDEFGHKLMNPRSTWXYZ][ABCDEFGHKLMNPRSTUVWXYZ] [0-9]{2} [0-9]{2} [0-9]{2} [ABCD]$")) {
                         txtEmptyError.setText("Invalid NI number!");
                         return;
                     }
@@ -320,7 +367,8 @@ public class EmployeeController implements Initializable {
         for (Person person : DatabaseController.GetTableData.getAllEmployees()) {
             if (person.getEmployeeID().toLowerCase().contains(searchQuery.toLowerCase()) ||
                     person.getFirstName().toLowerCase().contains(searchQuery.toLowerCase()) ||
-                    person.getLastName().toLowerCase().contains(searchQuery.toLowerCase())) {
+                    person.getLastName().toLowerCase().contains(searchQuery.toLowerCase()) ||
+                    person.getEmail().toLowerCase().contains(searchQuery.toLowerCase())) {
                 filteredData.add(person);
             }
         }
@@ -383,3 +431,4 @@ public class EmployeeController implements Initializable {
         ThemeManager.toggleMode();
     }
 }
+

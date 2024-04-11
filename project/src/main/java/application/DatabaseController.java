@@ -212,7 +212,7 @@ public class DatabaseController {
                                 "LOCATION VARCHAR2(105) NOT NULL," +
                                 "CONTRACT_TYPE VARCHAR2(55) NOT NULL," +
                                 "CONTRACT_HOURS DECIMAL (10, 2) NOT NULL," +
-                                "DEPARTMENT VARCHAR2(25) NOT NULL," +
+                                "DEPARTMENT VARCHAR2(55) NOT NULL," +
                                 "JOB_TITLE VARCHAR2(25) NOT NULL" +
                                 ")");
                     } catch (SQLException e) {
@@ -1849,7 +1849,7 @@ public class DatabaseController {
             Person employee = DatabaseController.GetTableData.getEmployeeInfoByID(employeeId);
 
             // Check that you're not trying to delete the current logged-in user
-            if (employeeId != currentLoggedInEmployeeId) {
+            if (employeeId != currentLoggedInEmployeeId && employee != null) {
                 if (AddTableData.addEmployeeToDeletedUsersTable(deletedBy, employee.getFirstName(), employee.getLastName(),
                         employee.getEmail(), employee.getPhone(), employee.getNiNumber(), employee.getAddress1(),
                         employee.getAddress2(), employee.getCity(), employee.getPostcode(), employee.getBankName(),
@@ -1868,7 +1868,11 @@ public class DatabaseController {
                 }
 
             } else {
-                logger.error("You cannot delete the currently logged-in user.");
+                if (employee == null) {
+                    logger.error("Employee is null.");
+                } else {
+                    logger.error("You cannot delete the currently logged-in user.");
+                }
             }
         }
 
