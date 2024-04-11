@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.effect.ColorAdjust?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -16,7 +17,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<?import javafx.scene.control.Tooltip?>
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.help.HelpController">
    <center>
       <AnchorPane minHeight="830.0" minWidth="1000.0" prefHeight="830.0" prefWidth="1071.0" BorderPane.alignment="CENTER">
@@ -73,7 +73,7 @@
                   <VBox alignment="CENTER" fillWidth="false" layoutX="229.0" layoutY="125.0" prefHeight="540.0" prefWidth="623.0" spacing="25.0">
                      <children>
                         <Label text="Add help info" />
-                        <TextField fx:id="txtErrorCode" prefHeight="25.0" prefWidth="308.0" promptText="Error Code" />
+                        <TextField fx:id="txtErrorCode" prefHeight="25.0" prefWidth="308.0" promptText="Error Code - ABC123" />
                         <TextField fx:id="txtTitle" prefWidth="308.0" promptText="Title" />
                         <TextArea fx:id="txtDescription" prefHeight="183.0" prefWidth="308.0" promptText="Description" style="-fx-border-width: 0;" VBox.vgrow="NEVER" />
                         <HBox alignment="CENTER" prefHeight="29.0" prefWidth="200.0" spacing="15.0">
@@ -82,6 +82,7 @@
                               <Button fx:id="btnGreen" mnemonicParsing="false" onAction="#addHelpInfoToDB" prefWidth="50.0" text="Add" />
                            </children>
                         </HBox>
+                        <Label fx:id="txtEmptyError" layoutX="286.0" layoutY="91.0" textAlignment="CENTER" textFill="#b22424" />
                      </children>
                   </VBox>
                </children>

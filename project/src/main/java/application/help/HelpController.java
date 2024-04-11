@@ -38,6 +38,8 @@ public class HelpController implements Initializable {
     private TextArea txtDescription;
     @FXML
     private Button btnAdmin;
+    @FXML
+    private Label txtEmptyError;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -47,7 +49,7 @@ public class HelpController implements Initializable {
             btnAdmin.setVisible(true);
         }
 
-        ObservableList<HelpInfo> helpInfo = (ObservableList<HelpInfo>) DatabaseController.GetTableData.getHelpInfo();
+        ObservableList<HelpInfo> helpInfo = DatabaseController.GetTableData.getHelpInfo();
 
         VBox helpVbox = new VBox();
 
@@ -60,14 +62,46 @@ public class HelpController implements Initializable {
         scrollHelp.setContent(helpVbox);
     }
 
-    public void showAddPanel(ActionEvent event) throws IOException {
+    public void showAddPanel(ActionEvent event) {
         addPane.setVisible(true);
         addPane.setDisable(false);
     }
 
-    public void addHelpInfoToDB(ActionEvent event) throws IOException {
-        DatabaseController.AddTableData.addHelp(txtErrorCode.getText(), txtTitle.getText(), txtDescription.getText(),
+    public void addHelpInfoToDB(ActionEvent event) {
+        SceneController.removeErrorHighlight(txtErrorCode);
+        SceneController.removeErrorHighlight(txtTitle);
+        txtDescription.getStyleClass().remove("error-border");
+
+        // Get input from text fields
+        String errorCode = txtErrorCode.getText();
+        String title = txtTitle.getText();
+        String description = txtDescription.getText();
+
+        // Check if any required fields are empty
+        if (errorCode.isEmpty() || title.isEmpty() || description.isEmpty()) {
+            txtEmptyError.setText("All fields are required!");
+
+            SceneController.highlightError(txtErrorCode);
+            SceneController.highlightError(txtTitle);
+            txtDescription.getStyleClass().add("error-border");
+
+            return;
+        }
+
+        if (!errorCode.matches("^[A-Z]{3}\\d{3}$")) {
+            txtEmptyError.setText("Invalid error code! Please use the format: ABC123");
+            SceneController.highlightError(txtErrorCode);
+            return;
+        }
+
+        // Add the help information to the database
+        DatabaseController.AddTableData.addHelp(errorCode, title, description,
                 DatabaseController.GetTableData.getEmailById(DatabaseController.GetTableData.getCurrentLoggedInEmployeeId()));
+
+        // clear the text fields after adding the information
+        txtErrorCode.clear();
+        txtTitle.clear();
+        txtDescription.clear();
 
         addPane.setVisible(false);
         addPane.setDisable(true);
@@ -75,6 +109,12 @@ public class HelpController implements Initializable {
 
     @FXML
     public void closeAddPane() {
+        SceneController.removeErrorHighlight(txtErrorCode);
+        SceneController.removeErrorHighlight(txtTitle);
+        txtDescription.getStyleClass().remove("error-border");
+
+        txtEmptyError.setText("");
+
         txtErrorCode.clear();
         txtTitle.clear();
         txtDescription.clear();
