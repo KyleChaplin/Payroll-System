@@ -630,14 +630,13 @@ public class DatabaseController {
         public static void addEmergencyDetails(String email, String fName, String lName, String mobile, String relationship, int employeeID) {
             // Add record
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    "INSERT INTO NPS_EMERGENCY_CONTACT (EMPLOYEE_ID, FIRST_NAME, LAST_NAME, PHONE, " +
-                            "RELATIONSHIP WHERE EMPLOYEE_ID) VALUES (?, ?, ?, ?, ?, ?)")) {
-                preparedStatement.setInt(1, DatabaseController.GetTableData.getEmployeeId(email));
+                    "INSERT INTO NPS_EMERGENCY_CONTACT (EMPLOYEE_ID, FIRST_NAME, LAST_NAME, PHONE, RELATIONSHIP) " +
+                            "VALUES (?, ?, ?, ?, ?)")) {
+                preparedStatement.setInt(1, employeeID);
                 preparedStatement.setString(2, fName);
                 preparedStatement.setString(3, lName);
                 preparedStatement.setString(4, mobile);
                 preparedStatement.setString(5, relationship);
-                preparedStatement.setInt(6, employeeID);
 
                 int rowsAffected = preparedStatement.executeUpdate();
                 if (rowsAffected > 0) {
