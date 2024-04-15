@@ -333,10 +333,6 @@ public class EmployeeController implements Initializable {
             btnClear();
             btnRefresh();
         }
-
-        DatabaseController.DeleteTableData.deleteEmployee(txtID.getText(),
-                DatabaseController.GetTableData.getEmailById(
-                        DatabaseController.GetTableData.getCurrentLoggedInEmployeeId()));
     }
 
     public void btnClear() {

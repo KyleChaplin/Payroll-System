@@ -1848,7 +1848,7 @@ public class DatabaseController {
             Person employee = DatabaseController.GetTableData.getEmployeeInfoByID(employeeId);
 
             // Check that you're not trying to delete the current logged-in user
-            if (employeeId != currentLoggedInEmployeeId && employee != null) {
+            if (!Objects.equals(employeeId, currentLoggedInEmployeeId) && employee != null) {
                 if (AddTableData.addEmployeeToDeletedUsersTable(deletedBy, employee.getFirstName(), employee.getLastName(),
                         employee.getEmail(), employee.getPhone(), employee.getNiNumber(), employee.getAddress1(),
                         employee.getAddress2(), employee.getCity(), employee.getPostcode(), employee.getBankName(),
