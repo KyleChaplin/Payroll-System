@@ -1,0 +1,50 @@
+User Guide
+
+1. Logging In
+o	Upon launching the application, you will be prompted to log in with your username and password.
+o	Enter your credentials and click the "Login" button to access the system.
+
+2. Navigating the Dashboard and Navigation bar
+o	Once logged in, you will be directed to the dashboard where you can access various features of the application.
+o	The dashboard provides quick links to key functions such as managing employee records, viewing payslips, and accessing your person profile.
+o	On the left-hand side there is a navigation bar, this is used to transition between the different pages available. What you see here will vary depending on your access level, if you cannot see something and believe you should please reach out to your manager.
+
+3. Viewing your Payslips
+o	To view your unique payslip, navigate to the "Payslips" section in your profile.
+o	Select the desired month to download the payslip for that period.
+o	Save the payslip where you would like and open it with your favourite PDF viewer.
+o	Enter the password (the last four characters of your national insurance number) to view the payslip.
+
+4. Viewing Payroll Data
+o	To view payroll data, navigate to the “Payroll” page using the navigation bar.
+o	Here you can view general data for each month on record.
+o	Select a month to view specific data.
+
+5. Viewing and updating the schedule
+o	Open the schedule page using the calendar icon in the system tray.
+o	Select the week in the top right.
+o	Find yourself or an employee using the search function.
+o	With the correct permissions, select an employee and modify the text fields highlighted in green to change the start and end time.
+o	Press update to submit these changes.
+
+6. Managing Employee Records
+o	In the "Employees" section, with permission you can add, edit, or delete employee records.
+o	Click on the "Add Employee" button to create a new employee record.
+o	Select an existing employee to edit their details or delete the record if necessary.
+
+7. Accessing Help Resources
+o	For assistance or guidance on using the application, navigate to the "Help" section.
+o	Here you can search for helpful documentation, FAQs, and other details your colleagues have written.
+o	To add new documentation, press the add button in the bottom right and fill in the form.
+
+8. Changing system theme
+o	The system currently ships with two theme presets – light and dark mode.
+o	Change between these by pressing the button on the bottom left of the application.
+
+9. Navigating the Admin panel
+o	With the correct permissions you can see a shield icon in the nav bar – this is the admin panel.
+o	Within this you’re able to view, edit and delete backed-up date, email server information and help information. 
+
+10. Logging Out
+o	To log out of the application, simply exit the application by right clicking the icon in the system tray and select “Exit Application”.
+o	Logging out ensures the security of your account and prevents unauthorized access to your data but, remember to restart the application or no automatic processes will complete.

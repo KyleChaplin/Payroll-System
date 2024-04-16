@@ -57,7 +57,7 @@ public class HomeController implements Initializable {
         SceneController.openScene(event, "help", stage, scene);
     }
 
-    public void toggleTheme(ActionEvent event) throws IOException {
+    public void toggleTheme() throws IOException {
         ThemeManager.toggleMode();
     }
 

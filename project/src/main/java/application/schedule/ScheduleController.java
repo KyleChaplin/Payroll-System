@@ -371,7 +371,9 @@ public class ScheduleController implements Initializable {
     @FXML
     private void btnUpdate() {
         Schedule schedule = createScheduleFromTextFields();
+
         DatabaseController.UpdateTableData.updateSchedule(schedule);
+
 
         // Refresh the table
         loadTableData();
@@ -455,7 +457,6 @@ public class ScheduleController implements Initializable {
 
             // Loop for tax
             for (Map.Entry<String, Map<String, Double>> entry : employeePayrollMap.entrySet()) {
-                String employeeId = entry.getKey();
                 Map<String, Double> payrollInfo = entry.getValue();
 
                 // Retrieve total gross pay for the current employee
