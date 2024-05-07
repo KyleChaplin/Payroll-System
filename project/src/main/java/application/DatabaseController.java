@@ -593,6 +593,10 @@ public class DatabaseController {
                                           double taxes, double netPay) {
 
 
+            if (payDate == null) {
+                MiscMethod.getCurrentMonthString();
+            }
+
             payDate = payDate.substring(0, 10);
 
             // Add record
