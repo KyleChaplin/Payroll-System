@@ -1,5 +1,7 @@
 # Payroll-System
 
+![image](https://github.com/KyleChaplin/Payroll-System/assets/85872356/dddf33ee-136b-48e9-8e22-c334da42dfd7)
+
 ## Setting up database
 Download Database
 This payroll system uses Oracle Database 21c running on localhost.
