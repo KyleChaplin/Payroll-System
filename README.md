@@ -1,6 +1,6 @@
 # Payroll-System
 
-![image](https://github.com/KyleChaplin/Payroll-System/assets/85872356/dddf33ee-136b-48e9-8e22-c334da42dfd7)
+![image](https://github.com/KyleChaplin/Payroll-System/assets/85872356/b8f604d5-e29f-4710-aca6-acdaf12c76ab)
 
 ## Setting up database
 Download Database
